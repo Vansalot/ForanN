@@ -1,19 +1,19 @@
 """
-    Initialization of enemies and bosses. go go go 
-    """
-import gm_charstats
-import gm_combat
-import time
-import sys
+    Initialization of enemies and bosses.
+"""
+import gm_charstats, gm_combat
+import time, sys
 from random import randint
 from random import choice
 
-# class payexboi?
+# add class payexboi?
 
 class Enemy:
-    '''Initializes Enemy'''
+    # Initializes Enemy
     def __init__(self, pl_lvl):
         from random import choice
+        # Enemy stats, level is based on the players level. 
+
         self.pl_lvl = pl_lvl
         self.enemy_lvl = randint(self.pl_lvl, self.pl_lvl + 2)
         self.nameList = ['Benny', 'bjarte', 'roger', 'bent', 'are', 'franz', 'preben', 'hans', 'patrick', 'Roy', 'egil', 'Kent', 'Robin', 'Ola', 'Jonny', 'Ronny', 'Raymond', 'Bendik', 'Henrik', 'Jens', 'Peder', 'Preben', 'William', 'Axel', 'Erlend', 'Fredrik', 'Hans', 'Jacob', 'Johan', 'Karl', 'Nicolai', 'Oscar', 'Sondre', 'Tobias']
@@ -28,7 +28,7 @@ class Enemy:
         self.enemy_base_armor = 10
         self.enemy_currentArmor = self.enemy_base_armor + self.enemy_agi
         self.enemy_xp_reward = 250 * self.enemy_lvl
-        self.enemy_statusEffects = [] # TBI
+        self.enemy_statusEffects = []
         self.isEnemy = True
 
 
@@ -48,9 +48,11 @@ class Enemy:
         print(' ', headerPrint)
 
 class Boss:
-    '''Initializes Boss'''
+    # Initializes Boss
     def __init__(self, pl_lvl):
         from random import choice
+        # Boss stats, level is based on the players level. Level is higher than enemy will get. Stats might be further subject to change.
+
         self.pl_lvl = pl_lvl
         self.enemy_lvl = randint(1, self.pl_lvl + 2) + 1
         self.nameList = ['Da Governator','El prehidente', 'TrumPetten', 'Mr. Smith', 'Boba Futt', 'Shredder', 'Joffrey', 'lex luthor', 'bubba ho-tep']
@@ -65,19 +67,19 @@ class Boss:
         self.enemy_base_armor = 10
         self.enemy_currentArmor = self.enemy_base_armor + self.enemy_agi
         self.enemy_xp_reward = 250 * self.enemy_lvl
-        self.enemy_statusEffects = [] # TBI
+        self.enemy_statusEffects = []
         self.isEnemy = True  
 
-    def printEnemyStats(self):
+    '''def printEnemyStats(self):
         message = 'Enemy: %s Level: %s | Armor: %s HP: %s / %s' % (self.enemy_name.title(), self.enemy_lvl, self.enemy_currentArmor, self.enemy_current_hp, self.enemy_maxhp)
         messageL = round(len(message) / 3)
         spacing = int(messageL) * ' '
         print(spacing + '*** *** *** *** ***')
         print('Enemy: %s Level: %s | Armor: %s HP: %s / %s' % (self.enemy_name.title(), self.enemy_lvl, self.enemy_currentArmor, self.enemy_current_hp, self.enemy_maxhp))
-        print(spacing + '*** *** *** *** ***')
+        print(spacing + '*** *** *** *** ***')'''
 
 def createBoss(gameState):
-    # creates a boss that is more powerful than normal enemies.
+    # Creates a boss that is more powerful than normal enemies.
     boss = Boss(gameState.player.attributes.pl_lvl)
     gameState.enemy.append(boss)
     time.sleep(1)
@@ -88,7 +90,7 @@ def createBoss(gameState):
 
 def createEnemy(gameState):
     # creates a new enemy
-    enemy = Enemy(gameState.player.attributes.pl_lvl)#'''.player.attributes.pl_lvl'''
+    enemy = Enemy(gameState.player.attributes.pl_lvl)
     # Appends the enemy in gamestate list, so that the information is available.
     gameState.enemy.append(enemy)
     time.sleep(1)

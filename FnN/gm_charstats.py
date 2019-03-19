@@ -1,40 +1,46 @@
 import time, sys, os
 import gm_combat, gm_map, gm_badguys
 # Main file for the game, will also contain the game loop.
-
+# Note that print() and time.sleep(x) statements have been added in most files to try and smooth the flow of information on the screen.
+#os.system('cls') Clear the screen, not sure if needed, keeping it here just in case.
 
 # *** Classes ***
 class Player():
-    #Player, which holds the player name, attributes are created from PlayerAttributes class.
+    # Player, which holds the player name, attributes are created from PlayerAttributes class.
+    # Player is stored in the gamestate object.
     def __init__(self):
-        self.attributes = PlayerAttributes()
+        # Initialise player
+        self.attributes = PlayerAttributes() # see playerattributes for more info
         self.name = ""
-        self.inCombat = False
-        self.isENEMY = False
-        self.dead = False
-        self.statusEffects = []
-        self.possibleCombatActions = ['hit', 'parry']
-        self.possibleMapActions = ['(W)est', '(E)ast', '(N)orth', '(S)outh', '(R)est']
-        self.totalPointsAllocated = 6
+        self.inCombat = False # Used to determine if the player is in combat, this changes where the game loop goes.
+        self.isENEMY = False # Used to determine if it's the player of enemy who does actions in combat, also a parameter for enemy class.
+        self.dead = False # Used to determine if the player is dead and the game is over.
+        self.statusEffects = [] # For now, only used for parry function, new effects can be added and put in here.
+        self.possibleCombatActions = ['hit', 'parry'] # Possible actions for player when in combat, new actions can be added if they are implemented.
+        self.possibleMapActions = ['(W)est', '(E)ast', '(N)orth', '(S)outh', '(R)est'] # Possible actions for player not in combat, new actions can be added if they are implemented.
+        self.totalPointsAllocated = 6 # Default points player can allocate to skills at the beginning of the game.
+
 
     def printNameLevelXp(self):
-        # Prints player name, level and xp on one line, then prints attributes(from PlayerAttributes) to print Strength, Agility, Fortitude, Armor and HP.
+        # Prints player information in a box structure. Used almost every time the player is asked to perform an action.
         index = self.attributes.pl_lvl - 1
-        spacing = 45
-        message = '%s | Level: %s | %s / %s xp' % (self.name.title(), self.attributes.pl_lvl, self.attributes.pl_xp,self.attributes.levelup[index])
-        messagePrint = message.center(spacing)
-        print('+-----------------------------------------------+')
+        spacing = 45 # Value for centerspacing of the topInfo print message.
+        topInfo = '%s | Level: %s | %s / %s xp' % (self.name.title(), self.attributes.pl_lvl, self.attributes.pl_xp,self.attributes.levelup[index])
+        bottInfo = ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s' % (self.attributes.pl_str,self.attributes.pl_agi, self.attributes.pl_fort, self.attributes.pl_currentArmor, self.attributes.pl_current_hp, self.attributes.pl_maxhp)
+        topInfoPrint = topInfo.center(spacing) # Centers topInfo text
+        printedLine = "+" + (len(bottInfo)) * '-' + "+" # Creates a +----+ structure based on how long the bottInfo message are.
+        
+        print(printedLine)
         print('           ### Player information: ###           ')
-        print('+-----------------------------------------------+')        
-        print(' ', messagePrint)
-        print(' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s' % (self.attributes.pl_str,self.attributes.pl_agi, self.attributes.pl_fort, self.attributes.pl_currentArmor, self.attributes.pl_current_hp, self.attributes.pl_maxhp))
-        print('+-----------------------------------------------+')
+        print(printedLine)
+        print(' ', topInfoPrint)
+        print(printedLine)
+        print(bottInfo)
+        print(printedLine)
 
     def printPlayerPossibleactions(self):
         # Prints the possible actions the player can perform, depending on if the player is in combat or not.
         if self.inCombat == True:
-            #for action in possibleCombatActions:
-                #action += 
             print('You are in combat, your possible actions are: ', end='')
             print(*self.possibleCombatActions, sep=', ', end='') 
             print('.', end='')
@@ -43,19 +49,21 @@ class Player():
             print(*self.possibleMapActions, sep=', ', end='')
 
     def rest(self):
+        # Rest function, player can rest if it is not in combat, restores HP to full.
         time.sleep(1)
         print('You find a nice spot to rest. After a while you feel fresh and rested.')
         time.sleep(2)
         self.attributes.pl_current_hp = self.attributes.pl_maxhp
 
-    # Xp gain, check if player has leveled up, and levelup mechanics
+    #  vvv Xp gain, check if player has leveled up, and levelup mechanics vvv
+    
     def plXpGain(self, enemy_xp_reward):
         # Updates experience gain of the player, and calls plCheckLvlup to check if the character has leveled up.
         self.attributes.pl_xp += enemy_xp_reward
         self.plCheckLvlup()
     
     def plCheckLvlup(self):
-        # Checks if the player has leveled up, if so, calls the plLevelUp procedure, otherwise returns player stats.
+        # Checks if the player has leveled up, if so, calls the plLevelUp procedure, otherwise moves on. (added log line for now).
         # Levelup happpens at the xp limits set up in playerAttributes.
         index = self.attributes.pl_lvl -1
         if self.attributes.pl_xp >= self.attributes.levelup[index]:
@@ -70,6 +78,7 @@ class Player():
         possibleStats = ['s', 'a', 'f', 'str', 'agi', 'fort']
         while chosenStat not in possibleStats:
             chosenStat = (input('* LEVEL UP! Select stat to increase(str, agi, fort): ').lower())
+            
             if chosenStat.lower() == 'str' or chosenStat.lower() == 's':
                 self.attributes.pl_lvl += 1
                 self.playerStatChange(1, 0, 0)
@@ -88,7 +97,6 @@ class Player():
     def playerStatChange(self, strength, agility, fortitude):
         # (int, int, int) -> (int, int, int)
         # Procedure to change character stats. 
-        # this to be used as modifiers for combat outcome.
         self.attributes.pl_str += strength 
         self.attributes.pl_agi += agility
         self.attributes.pl_fort += fortitude
@@ -99,7 +107,6 @@ class Player():
 
 
 class Gamestate():
-    # Test class to see if I can pass gamestate as argument for all classes.
     def __init__(self):
         # Groups up all game information(hopefully) in one class, so that it can be passed around in the functions.
         self.player = Player()
@@ -111,23 +118,22 @@ class Gamestate():
 class PlayerAttributes():
     # Initializes the player attributes, they are part of the Player class.
     def __init__(self):
-        self.pl_lvl = 1
-        self.pl_hitmod = 0
-        self.pl_xp = 0
-        self.pl_str = 0
-        self.pl_agi = 0
-        self.pl_fort = 0
-        self.pl_base_hp = 10
-        self.pl_maxhp = self.pl_base_hp + self.pl_fort
-        self.pl_current_hp = self.pl_maxhp
-        self.pl_base_armor = 10
-        self.pl_currentArmor = self.pl_base_armor + self.pl_agi
-        self.levelup = [1000,2000,3500,5000,7000,8500,10000]
+        self.pl_lvl = 1 # Player level
+        self.pl_hitmod = 0 # Player hit modifier, normally lvl / 2, which is added to attack rolls.
+        self.pl_xp = 0 # player experience
+        self.pl_str = 0 # player strenght
+        self.pl_agi = 0 # player agility
+        self.pl_fort = 0 # player foritude
+        self.pl_base_hp = 10 # player base hp
+        self.pl_maxhp = self.pl_base_hp + self.pl_fort # player max hp, base hp + fortitude.
+        self.pl_current_hp = self.pl_maxhp # Current hp, to track how much hp you have during combat.
+        self.pl_base_armor = 10 # player base armor
+        self.pl_currentArmor = self.pl_base_armor + self.pl_agi # player armor modified by agility.
+        self.levelup = [1000,2000,3500,5000,7000,8500,10000] # xp thresholds for levelup.
 
 
-''' End of classes, game procedures follows '''
+''' vvv End of classes, game procedures follows vvv '''
 def getStarted(newPlayer):
-    #(str -> str)
     #starts the game, prompts for user to enter player name and calls playerStartingStats()
     playerName = ""
     # Set player name, with input validation.
@@ -135,23 +141,22 @@ def getStarted(newPlayer):
         playerName = (input('Please enter player name: ').lower())
         for letter in playerName:
             if letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ':
-                #player.name = playerName
                 newPlayer.player.name = playerName
             else:
                 print("Name must be written with letters, avoid numbers and special characters")
                 playerName = ""
+    
     # Set the starting attributes of the newPlayer
     getStartingStats(newPlayer.player)
     # player is returned to the main() function.
     return newPlayer
 
 def getStartingStats(gameState):
-    # Setting the starting stats of the player. Default max attribute points(variable: totalPointsAllocated) can be changed for stronger character.
-    minPointsAllowedInOneStat = 1
-    maxPointsAllowedInOneStat = gameState.totalPointsAllocated - 2
-    # modifiedmaxPointsAllowedInOneStat Can not be more than totalPointsAllocated - 2, since at least 1 + 1 = 2 points have to be spent on the other 2 stats
-    modifiedmaxPointsAllowedInOneStat = gameState.totalPointsAllocated - 2
-    totalPointsLeft = gameState.totalPointsAllocated
+    # Setting the starting stats of the player. Default max attribute points(variable: totalPointsAllocated) are changed by difficulty settings.
+    minPointsAllowedInOneStat = 1 # You can not have less than 1 point in 1 stat.
+    maxPointsAllowedInOneStat = gameState.totalPointsAllocated - 2 # When setting starting stats, you can not have all your points in one stat, atleast 2 points are reserved to the last 2 stats.
+    modifiedmaxPointsAllowedInOneStat = gameState.totalPointsAllocated - 2 
+    totalPointsLeft = gameState.totalPointsAllocated 
     # Setting variables for the calculation of allotted player stat points
     # Variables for the stats, s =strength a =agility f =fortitude
     str = 0
@@ -184,9 +189,7 @@ def getStartingStats(gameState):
     print()
     print()
     # Print the player information after character creation is finished.
-    #os.system('cls') Clear the screen, not sure if needed, keeping it here just in case.
     gameState.printNameLevelXp()
-    #time.sleep(1)
 
 def getStartingAttribute(prompt, min_value, max_value):
     # When starting the game, player are prompted to enter value for the different stats.
@@ -220,9 +223,9 @@ def titleScreen():
         difficulty = input('Please input difficulty easy, medium, hard: ').lower()
     if difficulty == 'easy':
         newPlayer.player.totalPointsAllocated = 10
-    if difficulty == 'medium':
-        newPlayer.player.totalPointsAllocated = 6
-    if difficulty == 'hard':
+    elif difficulty == 'medium':
+        pass # totalPointsAllocated default = 6 so no change is needed.
+    elif difficulty == 'hard':
         newPlayer.player.totalPointsAllocated = 4
     getStarted(newPlayer) # Set up new player, This will also print prompts and player information to the player.
     return newPlayer
@@ -230,10 +233,8 @@ def titleScreen():
 def main():
     # Main game loop
     gameState = titleScreen()
-    # Draw the map on the screen.
-    gameState.map.drawMap()
-    # Print Intro message for the player.
-    gm_map.printIntro()
+    gameState.map.drawMap() # Draw the map on the screen.
+    gm_map.printIntro() # Print Intro message for the player.
     time.sleep(1)
     gameState.map.navigateTheMap(gameState)
     while True:
@@ -241,21 +242,25 @@ def main():
         # player stats is printed on the screen with the map.
         # and you are prompted to move in a direction
         if gameState.map.victory == True and gameState.player.inCombat == False:
+            # If the game is finished, print game ending messages.
             print(gm_map.ENDING)
             print()
             print(gm_map.ENDING_MSG)
         if gameState.player.inCombat == True:
+            # If the player is in combat prior to movement, call the combat loop.
             gm_combat.combatLoop(gameState)
+        
         time.sleep(1)
-        gameState.player.printNameLevelXp()
-        gameState.map.drawMap()
-        gameState.map.navigateTheMap(gameState)
+        gameState.player.printNameLevelXp() # print player information 
+        gameState.map.drawMap() # draw the map
+        gameState.map.navigateTheMap(gameState) # If the player is not in combat, it will be looped around the map
         time.sleep(1)
+        
         if gameState.player.inCombat == True:
+            # check If the player is in combat after movement.
             gm_combat.combatLoop(gameState) 
             
-        #if the player is dead, print game over, and ask if you want to play again.
-        if gameState.player.dead == True:
+        if gameState.player.dead == True: #if the player is dead, print game over, and ask if you want to play again.
             print('''
                        ::::::::      :::       :::   :::   ::::::::::          ::::::::  :::     ::: :::::::::: :::::::::   ::: 
                      :+:    :+:   :+: :+:    :+:+: :+:+:  :+:                :+:    :+: :+:     :+: :+:        :+:    :+:  :+:  
@@ -271,8 +276,8 @@ def main():
                 sys.exit()
             else:
                 main()
-    # Print that the application is out of the loop, meant for debug purposes.
-    print("# Game loop has ended.")
+    
+    print("# Game loop has ended.") # Print that the application is out of the loop, meant for debug purposes.
 
 if (__name__ == "__main__"):
     main()
