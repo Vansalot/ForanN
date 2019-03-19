@@ -1,5 +1,5 @@
 """
-    Initialization of enemies and bosses.
+    Initialization of enemies and bosses. go go go 
     """
 import gm_charstats
 import gm_combat
