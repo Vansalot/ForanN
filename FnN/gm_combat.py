@@ -13,10 +13,10 @@ def initiativeRoll(gameState):
         
         if (enemyInitiative == playerInitiative) and (playerInitiative and enemyInitiative != 0):
             print('#Log: Identical initiative roll, rerolling')
-        print('# Initiative roll: %s: %s, ' % (gameState.player.name.title(), playerInitiative), end='')
         
         if playerInitiative > enemyInitiative:
             # A bit many lines of code, but they are for flavoring up the presentation of the initiative roll.
+            print('# Initiative roll: %s: %s, ' % (gameState.player.name.title(), playerInitiative), end='')
             time.sleep(1)
             print('%s: %s' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), enemyInitiative),end='')
             time.sleep(1)
@@ -25,6 +25,7 @@ def initiativeRoll(gameState):
             return 'player'
         
         elif enemyInitiative > playerInitiative:
+            print('# Initiative roll: %s: %s, ' % (gameState.player.name.title(), playerInitiative), end='')
             time.sleep(1)
             print('%s: %s' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), enemyInitiative),end='')
             time.sleep(1)
@@ -78,11 +79,11 @@ def counterattack(gameState, enemy):
             critHandling(gameState, gameState.player.isENEMY)
         # If the player get a hit, it goes through normal hit handling.
         if hitResult == 'Hit':
-            print('# You rolled %s * %s *' % (hitRoll, hitResult))
+            print('# Counterattack: You rolled %s * %s *' % (hitRoll, hitResult))
             damageHandling(gameState, damageRoll(), gameState.player.isENEMY)
             time.sleep(2)
         else: # If player misses, it's the enemy's turn 
-            print('# You rolled %s * %s *' % (hitRoll, hitResult))
+            print('# Counterattack: You rolled %s * %s *' % (hitRoll, hitResult))
             
     elif enemy == True:
         # enemy attempt counterattck
@@ -94,11 +95,11 @@ def counterattack(gameState, enemy):
             critHandling(gameState, gameState.enemy[gameState.enemyIndex].isEnemy)
         elif hitResult == 'Hit':
             # If the enemy get a hit, it goes through normal hit handling.
-            print('# %s rolled %s * %s *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, hitResult))
+            print('# Counterattack: %s rolled %s * %s *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, hitResult))
             damageHandling(gameState, damageRoll(), gameState.enemy[gameState.enemyIndex].isEnemy)
             time.sleep(2)
         else: # Also known as 'miss'
-            print('# %s rolled %s * %s *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, hitResult))
+            print('# Counterattack: %s rolled %s * %s *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, hitResult))
 
 def damageRoll():
     # Returns a random number between 1 and 6. Can also be called "Base damage".

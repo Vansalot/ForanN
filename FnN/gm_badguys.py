@@ -70,13 +70,19 @@ class Boss:
         self.enemy_statusEffects = []
         self.isEnemy = True  
 
-    '''def printEnemyStats(self):
-        message = 'Enemy: %s Level: %s | Armor: %s HP: %s / %s' % (self.enemy_name.title(), self.enemy_lvl, self.enemy_currentArmor, self.enemy_current_hp, self.enemy_maxhp)
-        messageL = round(len(message) / 3)
-        spacing = int(messageL) * ' '
-        print(spacing + '*** *** *** *** ***')
-        print('Enemy: %s Level: %s | Armor: %s HP: %s / %s' % (self.enemy_name.title(), self.enemy_lvl, self.enemy_currentArmor, self.enemy_current_hp, self.enemy_maxhp))
-        print(spacing + '*** *** *** *** ***')'''
+    def printEnemyStats(self):
+        headSpacing = 49
+        eNameLvl = ' Enemy: %s Level: %s ' % (self.enemy_name.title(), self.enemy_lvl)
+        eNameLvlPrint = eNameLvl.center(headSpacing)
+        eArmHp = '    Armor: %s HP: %s / %s      ' % (self.enemy_currentArmor, self.enemy_current_hp, self.enemy_maxhp)
+        eArmHpPrint = eArmHp.center(headSpacing)
+        header = len(eNameLvl) * '#'
+        headerPrint = header.center(headSpacing)
+        print(' ', headerPrint)
+        print(' ', eNameLvlPrint)
+        print(' ', eArmHpPrint)
+        print(' ', headerPrint)
+
 
 def createBoss(gameState):
     # Creates a boss that is more powerful than normal enemies.

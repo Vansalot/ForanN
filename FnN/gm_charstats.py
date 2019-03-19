@@ -244,8 +244,10 @@ def main():
         if gameState.map.victory == True and gameState.player.inCombat == False:
             # If the game is finished, print game ending messages.
             print(gm_map.ENDING)
+            time.sleep(2)
             print()
             print(gm_map.ENDING_MSG)
+            time.sleep(4)
         if gameState.player.inCombat == True:
             # If the player is in combat prior to movement, call the combat loop.
             gm_combat.combatLoop(gameState)
