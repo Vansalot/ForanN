@@ -1,8 +1,8 @@
-import time, sys, os
-import gm_combat, gm_map, gm_badguys
+import time, sys, os, random
+import gm_combat, gm_map, gm_badguys, gm_items, gm_scenarios
 # Main file for the game, will also contain the game loop.
 # Note that print() and time.sleep(x) statements have been added in most files to try and smooth the flow of information on the screen.
-#os.system('cls') Clear the screen, not sure if needed, keeping it here just in case.
+# os.system('cls') Clear the screen, not sure if needed, keeping it here just in case.
 
 # *** Classes ***
 class Player():
@@ -10,6 +10,7 @@ class Player():
     # Player is stored in the gamestate object.
     def __init__(self):
         # Initialise player
+        # Contains player specific data that does not involve combat related stats.
         self.attributes = PlayerAttributes() # see playerattributes for more info
         self.name = ""
         self.inCombat = False # Used to determine if the player is in combat, this changes where the game loop goes.
@@ -17,9 +18,10 @@ class Player():
         self.dead = False # Used to determine if the player is dead and the game is over.
         self.statusEffects = [] # For now, only used for parry function, new effects can be added and put in here.
         self.possibleCombatActions = ['hit', 'parry'] # Possible actions for player when in combat, new actions can be added if they are implemented.
-        self.possibleMapActions = ['(W)est', '(E)ast', '(N)orth', '(S)outh', '(R)est'] # Possible actions for player not in combat, new actions can be added if they are implemented.
+        self.possibleMapActions = ['(M)ap/move', '(E)xamine', '(R)est'] # Possible actions for player not in combat, new actions can be added if they are implemented.
+        self.moveActions = ['(W)est', '(E)ast', '(N)orth', '(S)outh'] # Possible move actions on the map
         self.totalPointsAllocated = 6 # Default points player can allocate to skills at the beginning of the game.
-
+        self.inventory = []
 
     def printNameLevelXp(self):
         # Prints player information in a box structure. Used almost every time the player is asked to perform an action.
@@ -34,19 +36,66 @@ class Player():
         print('           ### Player information: ###           ')
         print(printedLine)
         print(' ', topInfoPrint)
-        print(printedLine)
         print(bottInfo)
         print(printedLine)
 
     def printPlayerPossibleactions(self):
         # Prints the possible actions the player can perform, depending on if the player is in combat or not.
         if self.inCombat == True:
+            if len(self.inventory) > 0:
+                # Print inventory if there are items in inventory
+                self.printInventory()
             print('You are in combat, your possible actions are: ', end='')
             print(*self.possibleCombatActions, sep=', ', end='') 
             print('.', end='')
         else:
             print('Your possible actions are: ', end='')
             print(*self.possibleMapActions, sep=', ', end='')
+
+    def printInventory(self):
+        # Print the inventory
+        itemType = 'Healing potion'
+        totalpot = self.inventory.count('itemType')
+        spacing = 45 # set centerspace for the printed text
+        bottInfo = ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s' % (self.attributes.pl_str,self.attributes.pl_agi, self.attributes.pl_fort, self.attributes.pl_currentArmor, self.attributes.pl_current_hp, self.attributes.pl_maxhp)
+        # Bottinfo for finding out how long the bottom line needs to be based on the line above.
+        printedLine = "+" + (len(bottInfo)) * '-' + "+" # Creates a +----+ structure based on how long the bottInfo message are.
+        inventoryinfo = ' Inventory: %s x %s' % (itemType, totalpot)
+        inventoryinfoPrint = inventoryinfo.center(spacing)
+        print(inventoryinfoPrint)
+        print(printedLine)
+
+    def printMoveActions(self):
+        # Prints directions that player can move. invoked when player enters "move" or "map".
+        print('Your possible actions are: ', end='')
+        print(*self.moveActions, sep=', ', end='')
+
+    def examineLocation(self, gameState):
+        # function for examining an area.
+        playerLocation = gameState.map.theMap[gameState.map.currentPosition[1]][gameState.map.currentPosition[0]] # Set player loc to make more readable code.
+        if playerLocation.beenExamined == True:
+            # If the location has been examined, it can not be examined again.
+            #print(gm_scenarios.forest["alreadyexamined"][-1])
+            gm_map.printThis(gm_scenarios.forest["alreadyexamined"][-1])
+        elif playerLocation.examineable == False:
+            # If the location is not examinable
+            # print(gm_scenarios.forest["notexaminable"][-1])
+            gm_map.printThis(gm_scenarios.forest["notexaminable"][-1])
+        elif playerLocation.examineable == True and playerLocation.beenExamined == False:
+            # If the location is examinable, and haven't been examined before.
+            examineRoll = random.randint(1,10)
+            examineChance = playerLocation.examineChance
+            #examineChance = gameState.map.theMap[gameState.map.currentPosition[0]][gameState.map.currentPosition[0]].examineChance
+            if examineRoll >= examineChance:
+                # If the examine roll succeeds
+                playerLocation.beenExamined = True
+                gm_items.itemFound(gameState)
+            else:
+                # if the examine roll fail
+                # print(gm_scenarios.forest["failedexamine"][random.randint(0, len(gm_scenarios.forest["failedexamine"]) -1)])
+                gm_map.printThis(gm_scenarios.forest["failedexamine"][random.randint(0, len(gm_scenarios.forest["failedexamine"]) -1)])
+        else:
+            print('something strange is happening in examineLocation function')
 
     def rest(self):
         # Rest function, player can rest if it is not in combat, restores HP to full.
@@ -110,7 +159,7 @@ class Gamestate():
     def __init__(self):
         # Groups up all game information(hopefully) in one class, so that it can be passed around in the functions.
         self.player = Player()
-        self.map = gm_map.WorldMap(self.player)
+        self.map = gm_map.WorldMap()
         self.enemy = []
         self.enemyIndex = len(self.enemy) - 1
 
@@ -212,19 +261,23 @@ def testHero(pl):
     pl.printNameLevelXp()
 
 def titleScreen():
-    gm_map.TITLE() # prints the title.
+    #gm_map.TITLE() # OLD TITLE: prints the title.
+    print(gm_map.TITLE2) # prints the title.
+    print()
+    print(gm_map.TITLE3)
+    time.sleep(2)
     # Create a new gamestate with player.
     newPlayer = Gamestate()
     difficulties = ['easy', 'medium', 'hard']
-    print('Please input difficulty')
-    difficulty = input('easy, medium, hard: ').lower()
+    print('Please input difficulty (easy, medium, hard): ', end='')
+    difficulty = input().lower()
     # Set game difficulty, with input validation.
     while difficulty.lower() not in difficulties:
         difficulty = input('Please input difficulty easy, medium, hard: ').lower()
     if difficulty == 'easy':
         newPlayer.player.totalPointsAllocated = 10
     elif difficulty == 'medium':
-        pass # totalPointsAllocated default = 6 so no change is needed.
+       pass # totalPointsAllocated default = 6 so no change is needed.
     elif difficulty == 'hard':
         newPlayer.player.totalPointsAllocated = 4
     getStarted(newPlayer) # Set up new player, This will also print prompts and player information to the player.
@@ -234,9 +287,10 @@ def main():
     # Main game loop
     gameState = titleScreen()
     gameState.map.drawMap() # Draw the map on the screen.
-    gm_map.printIntro() # Print Intro message for the player.
+    gm_map.printThis(gm_scenarios.forest["intro"][-1]) # Prints the intro of the game.
     time.sleep(1)
-    gameState.map.navigateTheMap(gameState)
+    gameState.map.whatToDo(gameState)
+    #gameState.map.navigateTheMap(gameState)
     while True:
         # Start of the loop when traversing the map
         # player stats is printed on the screen with the map.
@@ -252,10 +306,11 @@ def main():
             # If the player is in combat prior to movement, call the combat loop.
             gm_combat.combatLoop(gameState)
         
+        # Normal loop
         time.sleep(1)
         gameState.player.printNameLevelXp() # print player information 
         gameState.map.drawMap() # draw the map
-        gameState.map.navigateTheMap(gameState) # If the player is not in combat, it will be looped around the map
+        gameState.map.whatToDo(gameState) # If the player is not in combat, it will be looped around the map
         time.sleep(1)
         
         if gameState.player.inCombat == True:

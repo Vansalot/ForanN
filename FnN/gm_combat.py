@@ -1,4 +1,4 @@
-import gm_badguys, gm_charstats
+import gm_badguys, gm_charstats, gm_map
 from random import randint
 import time
 
@@ -42,8 +42,7 @@ def combatRoll():
 def hitDecider(gameState, hit_roll, hitModifier, currentArmor, enemy):
     # If hit roll >= the opponents CurrentArmor(armorclass) it will result in a normal hit, then hitDecider returns 'Hit'.
     # If parry is in the picture call the parry function
-    
-    
+        
     parryModifier = 0
     # If player of enemy is in parry mode:
     if enemy == True and 'parry' in gameState.player.statusEffects:
@@ -134,8 +133,9 @@ def hpUpdater(gameState, modifiedDmg, enemy):
             # Check if enemy is dead
             if gameState.enemy[gameState.enemyIndex].enemy_current_hp <= 0:
                 print()
-                print("The enemy has been defeated! You have earned", gameState.enemy[gameState.enemyIndex].enemy_xp_reward, "xp.")
+                print('The enemy has been defeated! You have earned', gameState.enemy[gameState.enemyIndex].enemy_xp_reward, 'xp.\n')
                 time.sleep(1)
+                gm_map.printThis('(Funky cool combat music fades away in the background)\n')
                 print()
                 gameState.player.plXpGain(gameState.enemy[gameState.enemyIndex].enemy_xp_reward) # update player xp
                 gameState.player.inCombat = False # set player out of combat so it can traverse the map
@@ -205,6 +205,9 @@ def combatLoop(gameState):
         # If there are no enemies in the list, create new enemy
         gm_badguys.createEnemy(gameState)
     print()        
+    gm_map.printThis('(Que funky cool combat music) DU DU DU DU DU DU DU DU DUUUUUUUUUUU DU DU DUDUDU...\n')
+    time.sleep(1)
+    print()
     turn = initiativeRoll(gameState)
     print()
 
@@ -250,7 +253,6 @@ def combatLoop(gameState):
                     continue
             
             # If the player get a hit, it goes through normal hit handling.
-            print()
             print('# You rolled %s (+%s hit modifier) = %s. * %s *' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod, hitResult))
             if hitResult == 'Hit':
                 damageHandling(gameState, damageRoll(), gameState.player.isENEMY)
