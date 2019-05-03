@@ -1,5 +1,5 @@
 import time, sys, os, random
-import gm_combat, gm_map, gm_badguys, gm_items, gm_scenarios
+import gm_combat, gm_map, gm_badguys, gm_items, gm_scenarios, gm_locations
 # Main file for the game, will also contain the game loop.
 # Note that print() and time.sleep(x) statements have been added in most files to try and smooth the flow of information on the screen.
 # os.system('cls') Clear the screen, not sure if needed, keeping it here just in case.
@@ -54,20 +54,20 @@ class Player():
 
     def printInventory(self):
         # Print the inventory
-        itemType = 'Healing potion'
-        totalpot = self.inventory.count('itemType')
+        itemType = 'healing potion'
+        totalpot = self.inventory.count(itemType)
         spacing = 45 # set centerspace for the printed text
         bottInfo = ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s' % (self.attributes.pl_str,self.attributes.pl_agi, self.attributes.pl_fort, self.attributes.pl_currentArmor, self.attributes.pl_current_hp, self.attributes.pl_maxhp)
         # Bottinfo for finding out how long the bottom line needs to be based on the line above.
         printedLine = "+" + (len(bottInfo)) * '-' + "+" # Creates a +----+ structure based on how long the bottInfo message are.
-        inventoryinfo = ' Inventory: %s x %s' % (itemType, totalpot)
+        inventoryinfo = ' Inventory: %s x %s' % (itemType.title(), totalpot)
         inventoryinfoPrint = inventoryinfo.center(spacing)
         print(inventoryinfoPrint)
         print(printedLine)
 
     def printMoveActions(self):
         # Prints directions that player can move. invoked when player enters "move" or "map".
-        print('Your possible actions are: ', end='')
+        print('Please enter a direction to move: ', end='')
         print(*self.moveActions, sep=', ', end='')
 
     def examineLocation(self, gameState):
@@ -75,11 +75,9 @@ class Player():
         playerLocation = gameState.map.theMap[gameState.map.currentPosition[1]][gameState.map.currentPosition[0]] # Set player loc to make more readable code.
         if playerLocation.beenExamined == True:
             # If the location has been examined, it can not be examined again.
-            #print(gm_scenarios.forest["alreadyexamined"][-1])
             gm_map.printThis(gm_scenarios.forest["alreadyexamined"][-1])
         elif playerLocation.examineable == False:
             # If the location is not examinable
-            # print(gm_scenarios.forest["notexaminable"][-1])
             gm_map.printThis(gm_scenarios.forest["notexaminable"][-1])
         elif playerLocation.examineable == True and playerLocation.beenExamined == False:
             # If the location is examinable, and haven't been examined before.
@@ -88,11 +86,11 @@ class Player():
             #examineChance = gameState.map.theMap[gameState.map.currentPosition[0]][gameState.map.currentPosition[0]].examineChance
             if examineRoll >= examineChance:
                 # If the examine roll succeeds
-                playerLocation.beenExamined = True
+                gm_locations.setExamined(playerLocation) # Set examined to True, so that it can not be examined again.
+                #playerLocation.beenExamined = True
                 gm_items.itemFound(gameState)
             else:
                 # if the examine roll fail
-                # print(gm_scenarios.forest["failedexamine"][random.randint(0, len(gm_scenarios.forest["failedexamine"]) -1)])
                 gm_map.printThis(gm_scenarios.forest["failedexamine"][random.randint(0, len(gm_scenarios.forest["failedexamine"]) -1)])
         else:
             print('something strange is happening in examineLocation function')
@@ -100,7 +98,7 @@ class Player():
     def rest(self):
         # Rest function, player can rest if it is not in combat, restores HP to full.
         time.sleep(1)
-        print('You find a nice spot to rest. After a while you feel fresh and rested.')
+        print('You find a nice spot to rest. After a while you feel fresh and fit for another fight.')
         time.sleep(2)
         self.attributes.pl_current_hp = self.attributes.pl_maxhp
 
@@ -118,7 +116,8 @@ class Player():
         if self.attributes.pl_xp >= self.attributes.levelup[index]:
             self.plLevelUp()
         else:
-            print('# Log: No level up today.') # Added for debug purposes, so show that this function is called.
+            pass
+            # print('# Log: No level up today.') # Added for debug purposes, so show that this function is called.
 
     def plLevelUp(self):
         # Asks which stat you want to increase when you level up and calls pl_stat_change to update the stat.
@@ -234,11 +233,11 @@ def getStartingStats(gameState):
     fort = totalPointsLeft
     # Call player stat change with the values that have been input by the user, to update player.        
     gameState.playerStatChange(str, agi, fort)
-    time.sleep(2)
-    print()
+    time.sleep(1)
     print()
     # Print the player information after character creation is finished.
     gameState.printNameLevelXp()
+    time.sleep(2)
 
 def getStartingAttribute(prompt, min_value, max_value):
     # When starting the game, player are prompted to enter value for the different stats.
@@ -260,26 +259,32 @@ def testHero(pl):
     pl.playerStatChange(4, 4, 4)
     pl.printNameLevelXp()
 
+def enterDifficulty(newPlayer):
+    # Set game difficulty, with input validation.
+    difficulties = ['easy', 'medium', 'hard']
+    difficulty = ''
+    while difficulty.isalpha() != True: # If a letter is not written prompt again
+        print('Please enter difficulty (easy, medium, hard): ', end='')
+        difficulty = input().lower()
+    for value in difficulties:
+        if value.lower().startswith(difficulty):
+            if difficulty == 'easy' or difficulty == 'e':
+                newPlayer.player.totalPointsAllocated = 10
+                break
+            elif difficulty == 'medium' or difficulty == 'm':
+                pass # totalPointsAllocated default = 6 so no change is needed.
+            elif difficulty == 'hard' or difficulty == 'h':
+                newPlayer.player.totalPointsAllocated = 4
+                break
+        else:
+            enterDifficulty(newPlayer) # If value entered is not easy medium or hard, or e m h, run over the procedure again.
 def titleScreen():
-    #gm_map.TITLE() # OLD TITLE: prints the title.
     print(gm_map.TITLE2) # prints the title.
     print()
     print(gm_map.TITLE3)
     time.sleep(2)
-    # Create a new gamestate with player.
-    newPlayer = Gamestate()
-    difficulties = ['easy', 'medium', 'hard']
-    print('Please input difficulty (easy, medium, hard): ', end='')
-    difficulty = input().lower()
-    # Set game difficulty, with input validation.
-    while difficulty.lower() not in difficulties:
-        difficulty = input('Please input difficulty easy, medium, hard: ').lower()
-    if difficulty == 'easy':
-        newPlayer.player.totalPointsAllocated = 10
-    elif difficulty == 'medium':
-       pass # totalPointsAllocated default = 6 so no change is needed.
-    elif difficulty == 'hard':
-        newPlayer.player.totalPointsAllocated = 4
+    newPlayer = Gamestate() # Create a new gamestate with player.
+    enterDifficulty(newPlayer) # Set up difficulty
     getStarted(newPlayer) # Set up new player, This will also print prompts and player information to the player.
     return newPlayer
 
@@ -290,11 +295,11 @@ def main():
     gm_map.printThis(gm_scenarios.forest["intro"][-1]) # Prints the intro of the game.
     time.sleep(1)
     gameState.map.whatToDo(gameState)
-    #gameState.map.navigateTheMap(gameState)
+
     while True:
         # Start of the loop when traversing the map
         # player stats is printed on the screen with the map.
-        # and you are prompted to move in a direction
+        # and you are prompted for actions to perform
         if gameState.map.victory == True and gameState.player.inCombat == False:
             # If the game is finished, print game ending messages.
             print(gm_map.ENDING)
@@ -332,6 +337,7 @@ def main():
             if not input().lower().startswith('y'):
                 sys.exit()
             else:
+                os.system('cls')
                 main()
     
     print("# Game loop has ended.") # Print that the application is out of the loop, meant for debug purposes.

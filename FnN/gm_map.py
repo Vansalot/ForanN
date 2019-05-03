@@ -6,7 +6,7 @@ import gm_charstats, gm_badguys, gm_scenarios, gm_locations
 
 STARTINGLOC_Visited = 'After a while of struggling through a shrubbery you finally get into a clearing in the forest, you look around and find out that this is the place that you woke up earlier. You immidiately find out that you have to move on.'
 STORYLOC = ["You traverse through some bushes and come out into a clearing. In front of you stand a Nissemann, he tells you that 'it's hard to be a nissemann'.\nHe asks you if you can find his friends 'Frits' and 'Gunther'.\nHe doesn't know where to find them, so you just have to start somewhere.\n",
-    'You hear some screaming close by, after you pass some rocks you see a Nisse who\'s lying on the ground. He is badly injured. You ask him if he\'s feeling under the weather.\nThe response you get is "that is a good vending, maybe we should use that in another episode", so you guess he\'s not as badly hurt as you first thought.\nAfter talking for a while you hear from him that his friend Gunther is missing, and that he might have been taken by one of the nasty Nåså\'s.\nYou tell him where you found his friend Hansi, and tell him to wait for you there\n',
+    'You hear some screaming close by, after you pass some rocks you see a Nisse who\'s lying on the ground. He is badly injured. You ask him if he\'s feeling under the weather.\nThe response you get is "that is a good vending, maybe we should use that in another episode", so you guess he\'s not as badly hurt as you first thought.\nAfter talking for a while you hear from him that his friend Gunther is missing, and that he might have been taken by one of the nasty Nåså\'s.\nYou tell him where you found his friend Hansi, and tell him to wait for you there.\n',
     'last story']
 ENDING = '''
    :::     ::: ::::::::::: :::::::: ::::::::::: ::::::::  :::::::::  :::   :::  ::: 
@@ -123,6 +123,24 @@ class WorldMap():
             self.theMap[currentY][currentX].mapTile = WorldMap.heroCurrentPos
             #self.theMap[currentY][currentX] = WorldMap.heroCurrentPos
 
+    def whatToDo(self, gameState):
+        # Ask the player what to do when on the map, choices move, examine, rest. "move" takes you to the "submenu" where player is promted for a direction.
+        # examine and rest calls their respective procedures.
+        ctrl = ''
+        while ctrl.isalpha() != True:
+            gameState.player.printPlayerPossibleactions()
+            ctrl = input('. What do you do? ').lower().strip()
+        if ctrl.lower() == 'rest' or ctrl.lower().startswith('r'):
+            gm_charstats.Player.rest(gameState.player)
+            print('You get up and look around.')
+            #gameState.player.printPlayerPossibleactions()
+            self.whatToDo(gameState)
+        elif ctrl.lower() == 'map' or ctrl.lower().startswith('m'):
+            self.navigateTheMap(gameState)
+        elif ctrl.lower() == 'examine' or ctrl.lower().startswith('e'):
+            gameState.player.examineLocation(gameState)
+            self.whatToDo(gameState)
+
     def move_player(self, gameState):
         # Validates if the move entered is on the board and executes it.
         previousX, previousY = self.previousPosition
@@ -141,32 +159,19 @@ class WorldMap():
                 time.sleep(1)
                 gameState.player.inCombat = self.checkCombat(playerLocation.encounterChance) # Checks if the player gets into combat.
         else:
-            print("Can't go further in that direction, please select another direction.")
+            #print("Can't go further in that direction, please select another direction.")
             self.currentPosition = self.previousPosition[:]
-            
-    def whatToDo(self, gameState):
-        # Ask the player what to do when on the map, choices move, examine, rest. "move" takes you to the "submenu" where player is promted for a direction.
-        # examine and rest calls their respective procedures.
-        ctrl = ''
-        while ctrl.isalpha() != True:
-            gameState.player.printPlayerPossibleactions()
-            ctrl = input('. What do you do? ').lower().strip()
-        if ctrl.lower() == 'rest' or ctrl.lower().startswith('r'):
-            gm_charstats.Player.rest(gameState.player)
-            print('You get up and look around.')
-            #gameState.player.printPlayerPossibleactions()
-            self.whatToDo(gameState)
-        elif ctrl.lower() == 'map' or ctrl.lower().startswith('m'):
-            self.navigateTheMap(gameState)
-        elif ctrl.lower() == 'examine' or ctrl.lower().startswith('e'):
-            gameState.player.examineLocation(gameState)
+            self.navigateTheMap(gameState, tryAgain=True)
 
-    def navigateTheMap(self, gameState):
+    def navigateTheMap(self, gameState, tryAgain=False):
         # Asks the player for a move action. should be implemented so that you got a list of possible actions e.g: rest, look for trouble o.l, and go in directions.
         # If direction is entered, then there should be a function that calls this function for movement. Might be changed so ensure proper state transitioning
         # e.g map -> show map actions -> direction selected -> call this function to initiate move.
         ctrl = ''
-        self.showmap()
+        if tryAgain == True:
+            self.showmap(tryAgain=True)
+        else:
+            self.showmap()
         while ctrl.isalpha() != True:
             gameState.player.printMoveActions()
             ctrl = input('. Which direction yould you like to go? ').lower().strip()       
@@ -181,7 +186,7 @@ class WorldMap():
     def checkCombat(self, encounterChance):
         # Randomly encounter checker, (0,1) = 50% chance of encounter
         checkCombatRoll = random.randint(0, 10)
-        print('# Log: Roll: %s vs Chance: %s' % (checkCombatRoll, encounterChance))
+        # print('# Log: Roll: %s vs Chance: %s' % (checkCombatRoll, encounterChance)) # Logline for testing
         if checkCombatRoll < encounterChance:
             return True
         else:
@@ -202,7 +207,7 @@ class WorldMap():
             print('\t\t  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
         print('' + ('\t\t  +- You = @ -+'))
 
-    def showmap(self):
+    def showmap(self, tryAgain=False):
         # Draw the game map when it is called from command prompt
         #print('' + ('\t\t  +----MAP----+'))
         os.system('cls')
@@ -221,13 +226,15 @@ class WorldMap():
         print('''                  |__  ___   _|
                 =(_____________)=''')
         print('Map: You are @, Unvisited location are #, visited location are ¤')
+        if tryAgain == True:
+            print(" * Can't go further in that direction, please select another direction. *")
 
-def printThis(message):
+def printThis(message, speed=0.02):
     # Possible usable function to call when you want to print fluid messages. time will show /12.03.19
     for character in message:
                     sys.stdout.write(character)
                     sys.stdout.flush()
-                    time.sleep(0.02)
+                    time.sleep(speed)
 
 
 

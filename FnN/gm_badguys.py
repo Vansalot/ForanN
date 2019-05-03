@@ -90,7 +90,7 @@ def createBoss(gameState):
     print()
     print('A big ass mother dude lunges through the bushes. Screams that he\'s going to turn you into an ear ornament! DEFEND YOURSELF!')
     print()
-    time.sleep(2)
+    time.sleep(1)
 
 def createEnemy(gameState):
     # creates a new enemy
