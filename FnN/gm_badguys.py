@@ -10,11 +10,12 @@ from random import choice
 
 class Enemy:
     # Initializes Enemy
-    def __init__(self, pl_lvl):
+    def __init__(self, pl_lvl, gameState):
         # Enemy stats, level is based on the players level. 
         self.pl_lvl = pl_lvl
         self.enemy_lvl = randint(self.pl_lvl, self.pl_lvl + 2)
         self.nameList = ['Benny', 'bjarte', 'roger', 'bent', 'are', 'franz', 'preben', 'hans', 'patrick', 'Roy', 'egil', 'Kent', 'Robin', 'Ola', 'Jonny', 'Ronny', 'Raymond', 'Bendik', 'Henrik', 'Jens', 'Peder', 'Preben', 'William', 'Axel', 'Erlend', 'Fredrik', 'Hans', 'Jacob', 'Johan', 'Karl', 'Nicolai', 'Oscar', 'Sondre', 'Tobias']
+        self.payexNames = ['Jens Egil', 'Jørn Efteland', 'Jørn Tharaldsen', 'Hallstein', 'Petter storaas', 'Jon Terje', 'Christian Slater', 'Andreas Jakobsen']
         self.enemy_name = choice(self.nameList) + '-' + choice(self.nameList)
         self.enemy_hitmod = round(self.enemy_lvl / 2)
         self.enemy_str = 1 * self.enemy_lvl
@@ -28,7 +29,11 @@ class Enemy:
         self.enemy_xp_reward = 250 * self.enemy_lvl
         self.enemy_statusEffects = []
         self.isEnemy = True
+        self.setPayexName(gameState)
 
+    def setPayexName(self, gameState):
+        if gameState.payexMode == True:
+            self.enemy_name = choice(self.payexNames)
 
     def printEnemyStats(self):
         # Print enemy stats when player is in combat. 
@@ -86,15 +91,14 @@ def createBoss(gameState):
     # Creates a boss that is more powerful than normal enemies.
     boss = Boss(gameState.player.attributes.pl_lvl)
     gameState.enemy.append(boss)
-    time.sleep(1)
+    time.sleep(2)
     print()
     print('A big ass mother dude lunges through the bushes. Screams that he\'s going to turn you into an ear ornament! DEFEND YOURSELF!')
-    print()
     time.sleep(1)
 
 def createEnemy(gameState):
     # creates a new enemy
-    enemy = Enemy(gameState.player.attributes.pl_lvl)
+    enemy = Enemy(gameState.player.attributes.pl_lvl, gameState)
     # Appends the enemy in gamestate list, so that the information is available.
     gameState.enemy.append(enemy)
     time.sleep(1)

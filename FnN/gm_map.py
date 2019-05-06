@@ -54,7 +54,9 @@ class WorldMap():
                 for i in range(5):
                     # Add flavor description for every location
                     description = gm_scenarios.forest["description"][random.randint(0, len(gm_scenarios.forest["description"]) -1)] 
-                    templist.append(gm_locations.Locationforest(description)) # Call the constructur with desc that is defined in line above.
+                    examineText = gm_scenarios.forest["examination"][random.randint(0, len(gm_scenarios.forest["examination"]) -1)] 
+                    #print(examineText, description) # test to print location info, to verify the constructor is doing it's thing
+                    templist.append(gm_locations.Locationforest(description, examineText)) # Call the constructur with desc that is defined in line above.
                 locations.append(templist)
             WorldMap.STARTINGBOARD = locations
 
@@ -62,7 +64,7 @@ class WorldMap():
         # Set the story locations on the map, they will be hidden from the player, setting up 3 to start with, so increase the players chances of ladning on a storyloc.
         # When the player visit these locations it will get some flavortext.
         from random import randint
-        while len(self.storyLocations) < 3:
+        while len(self.storyLocations) < 4:
             storyLoc = [randint(0, 4), randint(0, 4)]
             startingLocation = self.START[:]
             while storyLoc in startingLocation or storyLoc in self.storyLocations:
@@ -91,25 +93,15 @@ class WorldMap():
         # Prints flavortext for the story locations
         if self.storylocIndex == self.maxStorylocIndex:
             # If you reached the max amount of story locations, do this.
-            # Run boss encounter?
             if len(gameState.enemy) <= 0:
                 print()
-                #print(STORYLOC[self.storylocIndex])
-                for character in STORYLOC[self.storylocIndex]:
-                    sys.stdout.write(character)
-                    sys.stdout.flush()
-                    time.sleep(0.05)
-                time.sleep(3)
+                printThis(gm_scenarios.forest["storylocation"][self.storylocIndex], speed=0.05)
                 gm_badguys.createBoss(gameState)
                 gameState.player.inCombat = True
-                self.victory = True
-            
+                self.victory = True            
         else:            
             print()
-            for character in STORYLOC[self.storylocIndex]:
-                    sys.stdout.write(character)
-                    sys.stdout.flush()
-                    time.sleep(0.05)
+            printThis(gm_scenarios.forest["storylocation"][self.storylocIndex], speed=0.05)
             self.storylocIndex += 1
             self.setStoryLoc()
 
@@ -182,6 +174,8 @@ class WorldMap():
                 self.currentPosition[d > 2] += d - (1 if d < 3 else 4)
                 self.move_player(gameState)
                 break
+        else:
+            print('You entered an invalid direction')
 
     def checkCombat(self, encounterChance):
         # Randomly encounter checker, (0,1) = 50% chance of encounter

@@ -12,7 +12,7 @@ class Player():
         # Initialise player
         # Contains player specific data that does not involve combat related stats.
         self.attributes = PlayerAttributes() # see playerattributes for more info
-        self.name = ""
+        self.name = ''
         self.inCombat = False # Used to determine if the player is in combat, this changes where the game loop goes.
         self.isENEMY = False # Used to determine if it's the player of enemy who does actions in combat, also a parameter for enemy class.
         self.dead = False # Used to determine if the player is dead and the game is over.
@@ -151,17 +151,21 @@ class Player():
         self.attributes.pl_maxhp += self.attributes.pl_fort
         self.attributes.pl_current_hp = self.attributes.pl_maxhp
         self.attributes.pl_currentArmor = self.attributes.pl_base_armor + self.attributes.pl_agi
-        self.attributes.pl_hitmod = round(self.attributes.pl_lvl / 2)
-
+        if self.attributes.pl_lvl > 10:
+            self.attributes.pl_hitmod = round(self.attributes.pl_lvl / 2) + 2
+        elif self.attributes.pl_lvl > 20:
+            self.attributes.pl_hitmod = round(self.attributes.pl_lvl / 2) + 4        
+        else:
+            self.attributes.pl_hitmod = round(self.attributes.pl_lvl / 2)
 
 class Gamestate():
     def __init__(self):
         # Groups up all game information(hopefully) in one class, so that it can be passed around in the functions.
+        self.payexMode = False
         self.player = Player()
         self.map = gm_map.WorldMap()
         self.enemy = []
         self.enemyIndex = len(self.enemy) - 1
-
 
 class PlayerAttributes():
     # Initializes the player attributes, they are part of the Player class.
@@ -177,7 +181,7 @@ class PlayerAttributes():
         self.pl_current_hp = self.pl_maxhp # Current hp, to track how much hp you have during combat.
         self.pl_base_armor = 10 # player base armor
         self.pl_currentArmor = self.pl_base_armor + self.pl_agi # player armor modified by agility.
-        self.levelup = [1000,2000,3500,5000,7000,8500,10000] # xp thresholds for levelup.
+        self.levelup = [1000, 2000, 3500, 5000, 7000, 8500, 10000, 12500, 15000, 17500, 20000, 23000, 26000, 30000, 35000, 41000, 47000, 52000, 58000, 65000] # xp thresholds for levelup.
 
 
 ''' vvv End of classes, game procedures follows vvv '''
@@ -252,52 +256,50 @@ def getStartingAttribute(prompt, min_value, max_value):
                 print("You entered a value that is too high, or too low.")
         else:
             print("You did not enter a number, please enter a number.")
-           
-def testHero(pl):
-    # Generating a test hero. Needs change to have the desired result. 
-    pl.name = "TestBoi Von Testison"
-    pl.playerStatChange(4, 4, 4)
-    pl.printNameLevelXp()
 
 def enterDifficulty(newPlayer):
     # Set game difficulty, with input validation.
-    difficulties = ['easy', 'medium', 'hard']
     difficulty = ''
-    while difficulty.isalpha() != True: # If a letter is not written prompt again
+    while True:
+    #difficulty.isalpha() == False: # If a letter is not written prompt again
         print('Please enter difficulty (easy, medium, hard): ', end='')
         difficulty = input().lower()
-    for value in difficulties:
-        if value.lower().startswith(difficulty):
-            if difficulty == 'easy' or difficulty == 'e':
-                newPlayer.player.totalPointsAllocated = 10
-                break
-            elif difficulty == 'medium' or difficulty == 'm':
-                pass # totalPointsAllocated default = 6 so no change is needed.
-            elif difficulty == 'hard' or difficulty == 'h':
-                newPlayer.player.totalPointsAllocated = 4
-                break
-        else:
-            enterDifficulty(newPlayer) # If value entered is not easy medium or hard, or e m h, run over the procedure again.
+        if difficulty == 'easy' or difficulty == 'e':
+            newPlayer.player.totalPointsAllocated = 10
+            break
+        elif difficulty == 'medium' or difficulty == 'm':
+            break # totalPointsAllocated default = 6 so no change is needed.
+        elif difficulty == 'hard' or difficulty == 'h':
+            newPlayer.player.totalPointsAllocated = 4
+            break
+
+def setPayexMode(newPlayer):
+    # Set payex mode, it's just for naming enemies differently. For funs.
+    mode = input('Do you want PayEx mode? (\'yes\' for yes, any other input for NO. PayEx mode is a internal thing): ').lower()
+    if mode == 'yes':
+        newPlayer.payexMode = True
+
 def titleScreen():
     print(gm_map.TITLE2) # prints the title.
     print()
     print(gm_map.TITLE3)
     time.sleep(2)
     newPlayer = Gamestate() # Create a new gamestate with player.
+    setPayexMode(newPlayer)
     enterDifficulty(newPlayer) # Set up difficulty
     getStarted(newPlayer) # Set up new player, This will also print prompts and player information to the player.
     return newPlayer
 
 def main():
-    # Main game loop
-    gameState = titleScreen()
+    # Starts the game, continues into the game loop
+    gameState = titleScreen() # Creates a new game, prints the title screen and initiates the character creation.
     gameState.map.drawMap() # Draw the map on the screen.
-    gm_map.printThis(gm_scenarios.forest["intro"][-1]) # Prints the intro of the game.
+    gm_map.printThis(gm_scenarios.forest["intro"]) # Prints the intro of the game.
     time.sleep(1)
-    gameState.map.whatToDo(gameState)
+    gameState.map.whatToDo(gameState) # Start the first "what would you like to do dialogue" before entering the game loop.
 
     while True:
-        # Start of the loop when traversing the map
+        # Main game loop starts here.
         # player stats is printed on the screen with the map.
         # and you are prompted for actions to perform
         if gameState.map.victory == True and gameState.player.inCombat == False:

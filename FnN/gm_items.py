@@ -18,6 +18,7 @@ def drinkHealingPot(gameState):
     if 'healing potion' in gameState.player.inventory:
         gameState.player.attributes.pl_current_hp += hpgained
         gameState.player.inventory.remove('healing potion')
+        print('You use your healing potion, healing you for %s hp' % (hpgained))
         if 'healing potion' not in gameState.player.inventory:
             gameState.player.possibleCombatActions.remove('healing potion')
     else:
@@ -28,7 +29,6 @@ def itemFound(gameState):
     playerLocation = gameState.map.theMap[gameState.map.currentPosition[0]][gameState.map.currentPosition[0]]
     itemFound = random.choice(POSSIBLE_ITEMS)
     gm_map.printThis(playerLocation.examineText)
-    #print(gm_scenarios.forest["examination"][random.randint(0, len(gm_scenarios.forest["examination"]) -1)]) # Flavortext that is printed when entering a new location.)
     print('You have found a %s' % (itemFound.title()))
     # Set up stuff to add the item to the inventory
     if itemFound == 'healing potion' and itemFound not in gameState.player.inventory:

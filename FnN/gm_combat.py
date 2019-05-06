@@ -205,8 +205,10 @@ def combatLoop(gameState):
     if len(gameState.enemy) <= 0:
         # If there are no enemies in the list, create new enemy
         gm_badguys.createEnemy(gameState)
-    print()        
-    gm_map.printThis('(Que funky cool combat music) DU DU DU DU DU DU DU DU DUUUUUUUUUUU DU DU DUDUDU...\n',speed=0.05)
+    print()
+    print('(Que funky cool combat music)', end='')
+    time.sleep(0.3)
+    gm_map.printThis(' DU DU DU DU DU DU DU DU DUUUUUUUUUUU DU DU DUDUDU...\n',speed=0.05)
     time.sleep(1)
     print()
     turn = initiativeRoll(gameState)
@@ -219,11 +221,12 @@ def combatLoop(gameState):
         if turn == 'player':
             if 'parry' in gameState.player.statusEffects:
                 gameState.player.statusEffects.remove('parry')
-            if gameState.player.dead == True: # If the player is dead, break out of the loop.
+            if gameState.player.attributes.pl_current_hp <= 0: # If the player is dead, break out of the loop.
                 break
             
-            time.sleep(2)
-            print()    
+            #time.sleep(2)
+            #print()    
+            input('Press enter to continue...\n')
             gameState.enemy[gameState.enemyIndex].printEnemyStats() # print enemy stats
             gameState.player.printNameLevelXp() # print player stats
             #gameState.player.printPlayerPossibleactions() # print player's possible actions
@@ -256,6 +259,8 @@ def combatLoop(gameState):
                             continue
                     elif enteredAction == 'heal' or enteredAction == 'healing potion':
                         gm_items.drinkHealingPot(gameState)
+                        time.sleep(1)
+                        turn = 'enemy'
                         continue
                     else:
                         print(enteredAction + ', not valid command.')
@@ -281,8 +286,9 @@ def combatLoop(gameState):
         # Enemy's turn to act in combat
         #
         elif turn == 'enemy':
-            print('\n# %s\'s turn. ' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()))
-            time.sleep(1)
+            input('\n# %s\'s turn. Press enter to continue...\n' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()))
+            #input('Press enter to continue...\n')
+            #time.sleep(1)
             if 'parry' in gameState.enemy[gameState.enemyIndex].enemy_statusEffects:
                 # If enemy in parrymode remove parrymode at the start of his next turn.
                 gameState.enemy[gameState.enemyIndex].enemy_statusEffects.remove('parry')
