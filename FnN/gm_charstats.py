@@ -26,21 +26,14 @@ class Player():
         self.specialItem = {}
 
         # Printed player information
-        self.lvlIndex = self.attributes.pl_lvl - 1
-        self.spacing = 45
-        self.plInfoDashedLine = '+----------- <<< Player information >>> ---------'
-        self.nameLvlXp = '%s | Level: %s | %s / %s xp' % (self.name.title(), self.attributes.pl_lvl, self.attributes.pl_xp, self.attributes.levelup[self.lvlIndex])
-        self.nameLvlXpPrint = self.nameLvlXp.center(self.spacing)
-        self.dashedLine = '+------------------------------------------------'
-        self.plAttributes= ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s' % (self.attributes.pl_str,self.attributes.pl_agi, self.attributes.pl_fort, self.attributes.pl_currentArmor, self.attributes.pl_current_hp, self.attributes.pl_maxhp)
-        self.plAttributesPrint = self.plAttributes.center(self.spacing)
-
-    def reInitprintedattributes(self):
-        self.lvlIndex = self.attributes.pl_lvl - 1
-        self.nameLvlXp = '%s | Level: %s | %s / %s xp' % (self.name.title(), self.attributes.pl_lvl, self.attributes.pl_xp, self.attributes.levelup[self.lvlIndex])
-        self.nameLvlXpPrint = self.nameLvlXp.center(self.spacing)
-        self.plAttributes= ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s' % (self.attributes.pl_str,self.attributes.pl_agi, self.attributes.pl_fort, self.attributes.pl_currentArmor, self.attributes.pl_current_hp, self.attributes.pl_maxhp)
-        self.plAttributesPrint = self.plAttributes.center(self.spacing)
+        #self.lvlIndex = self.attributes.pl_lvl - 1
+        #self.spacing = 45
+        #self.plInfoDashedLine = '+----------- <<< Player information >>> ---------'
+        #self.nameLvlXp = '%s | Level: %s | %s / %s xp' % (self.name.title(), self.attributes.pl_lvl, self.attributes.pl_xp, self.attributes.levelup[self.lvlIndex])
+        #self.nameLvlXpPrint = self.nameLvlXp.center(self.spacing)
+        #self.dashedLine = '+------------------------------------------------'
+        #self.plAttributes= ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s' % (self.attributes.pl_str,self.attributes.pl_agi, self.attributes.pl_fort, self.attributes.pl_currentArmor, self.attributes.pl_current_hp, self.attributes.pl_maxhp)
+        #self.plAttributesPrint = self.plAttributes.center(self.spacing)
 
     def printNameLevelXp(self):
         # Prints player information in a box structure. Used almost every time the player is asked to perform an action.
@@ -246,7 +239,6 @@ def getStarted(newPlayer):
     # update player stats based on the changes done prior.
     newPlayer.player.playerarmHpChange()
     newPlayer.player.playerHitModChange()
-    newPlayer.player.reInitprintedattributes()
     # player is returned to the main() function.
     return newPlayer
 
@@ -355,7 +347,7 @@ def gameLoop(gameState):
             gm_map.printThis(gameState.scenario["ending"])
             time.sleep(2)
             print()
-            print(gm_map.ENDING)
+            print(gm_scenarios.ENDING)
             print()
             print(gm_scenarios.ENDING_MSG)
             time.sleep(4)

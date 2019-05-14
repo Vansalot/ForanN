@@ -228,7 +228,7 @@ def combatLoop(gameState):
             if gameState.player.attributes.pl_current_hp <= 0: # If the player is dead, break out of the loop.
                 break
 
-            input('Press enter to continue...\n')
+            input('Press enter to continue...')
             gameState.enemy[gameState.enemyIndex].printEnemyStats() # print enemy stats
             gameState.map.drawMap(gameState)
             # gameState.player.printNameLevelXp() # print player stats
@@ -292,7 +292,7 @@ def combatLoop(gameState):
         #
         elif turn == 'enemy':
             try:
-                input('\n# %s\'s turn. Press enter to continue...\n' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()))
+                input('\n# %s\'s turn. Press enter to continue...' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()))
             except EOFError:
                 continue
             #input('Press enter to continue...\n')

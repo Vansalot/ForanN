@@ -193,10 +193,14 @@ class WorldMap():
             # Merged printing of map together with printing of the player information.
             # setting up the player info prints:
             spacing = 45           
-            plInfoDashedLine = gameState.player.plInfoDashedLine # +---- < Player information > ----+
-            nameLvlXpPrint = gameState.player.nameLvlXpPrint     # Name lvl xp 
-            dashedLine = gameState.player.dashedLine             # -------
-            plAttributesPrint = gameState.player.plAttributesPrint # attributes
+            # Printed player information
+            lvlIndex = gameState.player.attributes.pl_lvl - 1
+            plInfoDashedLine = '+----------- <<< Player information >>> ---------'
+            nameLvlXp = '%s | Level: %s | %s / %s xp' % (gameState.player.name.title(), gameState.player.attributes.pl_lvl, gameState.player.attributes.pl_xp, gameState.player.attributes.levelup[lvlIndex])
+            nameLvlXpPrint = nameLvlXp.center(spacing)
+            dashedLine = '+------------------------------------------------'
+            plAttributes= ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
+            plAttributesPrint = plAttributes.center(spacing)
             
             # Set up boolean checks so that the right lines are printed at the right place. 
             nameLvlXpPrintP1 = False
@@ -214,6 +218,7 @@ class WorldMap():
                 weaponPrint = ' Weapon: '
 
             # Draw the game map data structure together with the player information data structure.
+            print()
             print('' + plInfoDashedLine + ('+- < MAP > -+'))
             # Print each line of the rows.
             for column in range(len(self.theMap)):
