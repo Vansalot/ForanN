@@ -3,9 +3,7 @@
 
 # Scenario file. Contains map data. Thought is that you can generate a new map/scenario after completing first scenario based on data in this file. 
 
-# Scenario 1 / starting scenario
-
-### Flavor text based on terrain location, e.g Forest, Lake, Beach, etc.
+SCENARIOS = ['forest', 'town']
 
 #
 # Scenario 1. Forest data
@@ -22,7 +20,7 @@ forest = {
     'It\'s getting darker as you get further and further into the forest, you are thinking about HEY! What was that!?! oh.... a dead mouse...\n',
     'You reach a high stone ridge. You can not climb up. You think that you might have to go around it.\n',
     'As you walk down a path you are wondering about why people don\'t spikk as much as they used to.\n',
-    'Thousands of vendings kvern around in your head as you wander further into the forest.\n'
+    'Thousands of vendings kvern around in your head as you wander further into the forest.\n',
     'Tired, you wander along the path in front of you, if you only had some juløl.\n'
     ],
 
@@ -46,20 +44,26 @@ forest = {
     "notexaminable": ['You take a quick sweep over the area and decide that there\'s not much to find here.\n'],
     
     "storylocation": [
-    "You traverse through some bushes and come out into a clearing. In front of you stand a Nissemann, he tells you that 'it's hard to be a nissemann'.\nHe asks you if you can find his friends 'Frits' and 'Gunther'.\nHe doesn't know where to find them, so you just have to start somewhere.\n\n",
-    "You hear some screaming close by, after you pass some rocks you see a Nisse who\'s lying on the ground. He seems badly injured. You ask him if he\'s feeling under the weather.\nThe response you get is 'that is a good vending, maybe we should use that in another episode', so you guess he\'s not as badly hurt as you first thought.\nAfter talking for a while you hear from him that his friend Gunther is missing, and that he might have been taken by one of the nasty Nåså\'s.\nYou tell him where you found his friend Hansi, and tell him to wait for you there.\n\n",
-    "When you come through a clearing in the forest you see a Nisse who\'s tied up against a tree. He looks pretty beaten up. \nYou ask him if he\'s alright. After muttering for a bit, he manages to inform you that he\'s a 'spikker' so he\'s more than alright. \nJust as you finish untying him, you realize that you are not alone...\n\n"   
+    "You traverse through some bushes and come out into a clearing. In front of you stand a Nissemann, he tells you that 'it's hard to be a nissemann'.\nHe asks you if you can find his friends 'Frits' and 'Gunther'.\nHe doesn't know where to find them, so you just have to start somewhere.\n",
+    "You hear some screaming close by, after you pass some rocks you see a Nisse who\'s lying on the ground. He seems badly injured. You ask him if he\'s feeling under the weather.\nThe response you get is 'that is a good vending, maybe we should use that in another episode', so you guess he\'s not as badly hurt as you first thought.\nAfter talking for a while you hear from him that his friend Gunther is missing, and that he might have been taken by one of the nasty Nåså\'s.\nYou tell him where you found his friend Hansi, and tell him to wait for you there.\n",
+    "When you come through a clearing in the forest you see a Nisse who\'s tied up against a tree. He looks pretty beaten up. \nYou ask him if he\'s alright. After muttering for a bit, he manages to inform you that he\'s a 'spikker' so he\'s more than alright. \nJust as you finish untying him, you realize that you are not alone...\n"   
     ],
     "ending": 'When the fight ends, you take Gunther and help him back to his friends. In the evening you drink beer and dance støveldæns.',
     "specialitem" : {'type':'sword', 'hitbonus':2, 'dmgbonus': 1, 'ability': 'powerattack'}
 }
 #
-# Scenario 2. Lake and rivers.
+# Scenario 2. town
 #
 
-lake = {
+town = {
     "intro": '',
-    "Description": ['Description 1', 'Description 2', 'Description 3'],
+    "Description": [
+    '00: You are in the edge of the forest, you see that the trees are more scarse here than in the thick forest you were in earlier.\nTo the south east you can see rooftops of the nearby village.',
+    '01: You are between the forest and the edge of the village on a small meadow. close by you can see a building, you are guessing it might be the village stable.',
+    '02: You are on a road that leads to the village to the south, there are a few buildings nearby. It seems that you can not follow the road north',
+    '03: You are in a small '
+    ],
+    
     "startlocationagain":'',
     "Examination": ['Examination 1', 'Examination 2', 'Examination 3'],
     "failedexamine": [
@@ -70,8 +74,27 @@ lake = {
     "notexaminable": ['You take a quick sweep over the area and decide that there\'s not much to find here.\n'],
     "alreadyexamined": ['You have already examined this location. You look around, but there\'s nothing of interest.\n'],
     "storylocation": [],
-    "ending": ''
+    "ending": '',
+    "startinglocation": [0, 0],
 }
+
+SCENARIO_COMPLETE = '''			  
+              ::::::::   ::::::::  :::::::::: ::::    :::     :::     :::::::::  ::::::::::: ::::::::              
+			 :+:    :+: :+:    :+: :+:        :+:+:   :+:   :+: :+:   :+:    :+:     :+:    :+:    :+:              
+		    +:+        +:+        +:+        :+:+:+  +:+  +:+   +:+  +:+    +:+     +:+    +:+    +:+               
+		   +#++:++#++ +#+        +#++:++#   +#+ +:+ +#+ +#++:++#++: +#++:++#:      +#+    +#+    +:+                
+				 +#+ +#+        +#+        +#+  +#+#+# +#+     +#+ +#+    +#+     +#+    +#+    +#+                 
+		 #+#    #+# #+#    #+# #+#        #+#   #+#+# #+#     #+# #+#    #+#     #+#    #+#    #+#                  
+	    ########   ########  ########## ###    #### ###     ### ###    ### ########### ########    
+                
+      ::::::::   ::::::::    :::   :::   :::::::::  :::        :::::::::: ::::::::::: :::::::::: ::::::::: 
+    :+:    :+: :+:    :+:  :+:+: :+:+:  :+:    :+: :+:        :+:            :+:     :+:        :+:    :+: 
+   +:+        +:+    +:+ +:+ +:+:+ +:+ +:+    +:+ +:+        +:+            +:+     +:+        +:+    +:+  
+  +#+        +#+    +:+ +#+  +:+  +#+ +#++:++#+  +#+        +#++:++#       +#+     +#++:++#   +#+    +:+   
+ +#+        +#+    +#+ +#+       +#+ +#+        +#+        +#+            +#+     +#+        +#+    +#+    
+#+#    #+# #+#    #+# #+#       #+# #+#        #+#        #+#            #+#     #+#        #+#    #+#     
+########   ########  ###       ### ###        ########## ##########     ###     ########## #########       '''
+
 
 ENDING = '''
    :::     ::: ::::::::::: :::::::: ::::::::::: ::::::::  :::::::::  :::   :::  ::: 

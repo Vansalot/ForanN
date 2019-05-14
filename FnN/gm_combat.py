@@ -32,7 +32,7 @@ def initiativeRoll(gameState):
             
 def combatRoll():
     # Returns a random number in the range of 1-20.
-    hitRoll = randint(7, 20) # changed for debug purposes default value (1,20)
+    hitRoll = randint(8, 20) # changed for debug purposes default value (1,20)
     return hitRoll
     
 def hitDecider(gameState, hit_roll, currentArmor, enemy):

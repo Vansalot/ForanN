@@ -87,6 +87,7 @@ class WorldMap():
             printThis(gameState.scenario["storylocation"][self.storylocIndex], speed=0.05)
             self.storylocIndex += 1
             self.setStoryLoc()
+            time.sleep(3)
 
     def setStartLoc(self, scenario):
         # Validates if the move entered is on the board and executes it.
@@ -218,7 +219,8 @@ class WorldMap():
                 weaponPrint = ' Weapon: '
 
             # Draw the game map data structure together with the player information data structure.
-            print()
+            if gameState.player.inCombat == False:
+                print()
             print('' + plInfoDashedLine + ('+- < MAP > -+'))
             # Print each line of the rows.
             for column in range(len(self.theMap)):

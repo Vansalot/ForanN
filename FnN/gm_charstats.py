@@ -196,6 +196,7 @@ class Player():
 class Gamestate():
     def __init__(self, scenarioDict):
         # Groups up all game information(hopefully) in one class, so that it can be passed around in the functions.
+        self.allScenarios = ['forest', 'lake'] # possible way to iterate throught the scenarios?
         self.scenario = scenarioDict # contains the dictionary of the first scenario.
         self.player = Player()
         self.map = gm_map.WorldMap(self.scenario)
@@ -327,6 +328,17 @@ def titleScreen():
     getStarted(newPlayer) # Set up new player, This will also print prompts and player information to the player.
     return newPlayer
 
+def nextScenario(gameState):
+    # When a scenario is finished, ititiate the next scenario.
+    gameState.scenario = gm_scenarios.lakes # Set the next scenario, this must be changed if we are having more scenarios.
+    gameState.map = gm_map.WorldMap(gameState.scenario) # Set up the map according to the scenario.
+    gameState.player.attributes.pl_current_hp = gameState.player.attributes.pl_maxhp # Reset player hp to max.
+
+    # Print scenario stuff
+    gm_map.printThis(gameState.scenario["intro"])
+
+    gameLoop(gameState) # go back to the game loop after the setup is complete.
+
 def main():
     # Starts the game, calls the game loop
     gameState = titleScreen() # Creates a new game, prints the title screen and initiates the character creation.
@@ -345,19 +357,22 @@ def gameLoop(gameState):
         if gameState.map.victory == True and gameState.player.inCombat == False:
             # If the game is finished, print game ending messages.
             gm_map.printThis(gameState.scenario["ending"])
-            time.sleep(2)
+            time.sleep(4)
             print()
             print(gm_scenarios.ENDING)
             print()
-            print(gm_scenarios.ENDING_MSG)
+            print(gm_scenarios.ENDING_MSG) # To be printed when all is done
             time.sleep(4)
+            # TO BE ADDED:
+                # print(gm_scenarios.SCENARIO_COMPLETE)
+                # nextScenario(gameState) # New function to start a new scenario.
+
         if gameState.player.inCombat == True:
             # If the player is in combat prior to movement, call the combat loop.
             gm_combat.combatLoop(gameState)
         
         # Normal loop
-        time.sleep(1)
-        # gameState.player.printNameLevelXp() # print player information // commented out due to new map/info printing.
+        # time.sleep(1)
         gameState.map.drawMap(gameState) # draw the map
         gameState.map.whatToDo(gameState) # If the player is not in combat, it will be looped around the map
         time.sleep(1)
