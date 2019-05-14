@@ -15,7 +15,7 @@ class Enemy:
         self.pl_lvl = pl_lvl
         self.enemy_lvl = randint(self.pl_lvl, self.pl_lvl + 2)
         self.nameList = ['Benny', 'bjarte', 'roger', 'bent', 'are', 'franz', 'preben', 'hans', 'patrick', 'Roy', 'egil', 'Kent', 'Robin', 'Ola', 'Jonny', 'Ronny', 'Raymond', 'Bendik', 'Henrik', 'Jens', 'Peder', 'Preben', 'William', 'Axel', 'Erlend', 'Fredrik', 'Hans', 'Jacob', 'Johan', 'Karl', 'Nicolai', 'Oscar', 'Sondre', 'Tobias']
-        self.payexNames = ['Jens Egil', 'Jørn Efteland', 'Jørn Tharaldsen', 'Hallstein', 'Petter storaas', 'Jon Terje', 'Christian Slater', 'Andreas Jakobsen']
+        self.payexNames = ['Jens Egil', 'Jørn Efteland', 'Jørn Tharaldsen', 'Hallstein', 'Petter storaas', 'Jon Terje', 'Christian Slater', 'Andreas Jakobsen', 'Jan-Phillippe', 'Giresse Kadima', 'Nicolas Lopez']
         self.enemy_name = choice(self.nameList) + '-' + choice(self.nameList)
         self.enemy_hitmod = round(self.enemy_lvl / 2)
         self.enemy_str = 1 * self.enemy_lvl
@@ -60,8 +60,8 @@ class Boss:
         # Boss stats, level is based on the players level. Level is higher than enemy will get. Stats might be further subject to change.
 
         self.pl_lvl = pl_lvl
-        self.enemy_lvl = randint(1, self.pl_lvl + 2) + 1
-        self.nameList = ['Da Governator','El prehidente', 'TrumPetten', 'Mr. Smith', 'Boba Futt', 'Shredder', 'Joffrey', 'lex luthor', 'bubba ho-tep']
+        self.enemy_lvl = randint(self.pl_lvl, self.pl_lvl + 3) + 2
+        self.nameList = ['Da Governator','El prehidente', 'TrumPetten', 'Mr. Smith', 'Boba Futt', 'Shredder', 'Joffrey', 'lex luthor', 'bubba ho-tep', 'B.J. Blazkowicz', 'The Sherminator']
         self.enemy_name = choice(self.nameList)
         self.enemy_hitmod = round(self.enemy_lvl / 2)
         self.enemy_str = 1 * self.enemy_lvl
@@ -70,9 +70,9 @@ class Boss:
         self.enemy_base_hp = 10
         self.enemy_maxhp = self.enemy_base_hp + self.enemy_fort         
         self.enemy_current_hp = self.enemy_maxhp
-        self.enemy_base_armor = 10
+        self.enemy_base_armor = 12
         self.enemy_currentArmor = self.enemy_base_armor + self.enemy_agi
-        self.enemy_xp_reward = 250 * self.enemy_lvl
+        self.enemy_xp_reward = 300 * self.enemy_lvl
         self.enemy_statusEffects = []
         self.isEnemy = True  
 
