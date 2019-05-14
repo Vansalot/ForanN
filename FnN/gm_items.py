@@ -36,4 +36,13 @@ def itemFound(gameState):
     gameState.player.inventory.append(itemFound)
     #print()
     
-    
+def critItemFound(gameState):
+    playerLocation = gameState.map.theMap[gameState.map.currentPosition[0]][gameState.map.currentPosition[0]]
+    itemFound = gameState.scenario["specialitem"]["type"]
+    gm_map.printThis(playerLocation.examineText)
+    print('You have found a %s!' % (itemFound.title()))
+    # Set up stuff to add the item to the inventory
+    if itemFound not in gameState.player.weapon:
+        gameState.player.specialItem = gameState.scenario["specialitem"]
+        gameState.player.weapon.append(itemFound)
+        gameState.player.playerHitModChange()

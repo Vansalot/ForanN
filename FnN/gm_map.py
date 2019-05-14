@@ -1,22 +1,7 @@
-#     Game map
+#     Game map and movement functions
 # Movement will be issued by compass directions North, East, South and West.
-# What do you want to do? print allowed actions, e.g : print stats, rest(get full hp(chance to get encounter?)), go direction."""
 import random, math, sys, time, os
 import gm_charstats, gm_badguys, gm_scenarios, gm_locations
-
-STARTINGLOC_Visited = 'After a while of struggling through a shrubbery you finally get into a clearing in the forest, you look around and find out that this is the place that you woke up earlier. You immidiately find out that you have to move on.'
-STORYLOC = ["You traverse through some bushes and come out into a clearing. In front of you stand a Nissemann, he tells you that 'it's hard to be a nissemann'.\nHe asks you if you can find his friends 'Frits' and 'Gunther'.\nHe doesn't know where to find them, so you just have to start somewhere.\n",
-    'You hear some screaming close by, after you pass some rocks you see a Nisse who\'s lying on the ground. He is badly injured. You ask him if he\'s feeling under the weather.\nThe response you get is "that is a good vending, maybe we should use that in another episode", so you guess he\'s not as badly hurt as you first thought.\nAfter talking for a while you hear from him that his friend Gunther is missing, and that he might have been taken by one of the nasty Nåså\'s.\nYou tell him where you found his friend Hansi, and tell him to wait for you there.\n',
-    'last story']
-ENDING = '''
-   :::     ::: ::::::::::: :::::::: ::::::::::: ::::::::  :::::::::  :::   :::  ::: 
-  :+:     :+:     :+:    :+:    :+:    :+:    :+:    :+: :+:    :+: :+:   :+:  :+:  
- +:+     +:+     +:+    +:+           +:+    +:+    +:+ +:+    +:+  +:+ +:+   +:+   
-+#+     +:+     +#+    +#+           +#+    +#+    +:+ +#++:++#:    +#++:    +#+    
-+#+   +#+      +#+    +#+           +#+    +#+    +#+ +#+    +#+    +#+     +#+     
-#+#+#+#       #+#    #+#    #+#    #+#    #+#    #+# #+#    #+#    #+#             
- ###     ########### ########     ###     ########  ###    ###    ###     ###       '''
-ENDING_MSG = 'You have completed the initial story, feel free to roam around.'
 
 class Board(list):
 
@@ -30,11 +15,9 @@ class WorldMap():
     DIRECTIONS = ["west", '%', "east", "north", '%', "south"]
     START = [randint(0, 4), randint(0, 4)] # Starting location for the player
     STARTINGBOARD = []
-    #STARTINGBOARD = ["#" * 5 for x in range(5)] # Set up the starting map
 
-
-    def __init__(self):
-        self.createLocations()
+    def __init__(self, scenario):
+        self.createLocations(scenario)
         self.theMap = Board(WorldMap.STARTINGBOARD)
         self.currentPosition = self.START[:]
         self.previousPosition = self.START[:]
@@ -43,18 +26,18 @@ class WorldMap():
         self.storylocIndex = 0
         self.maxStorylocIndex = 2
         self.victory = False
-        self.setStartLoc() # Sets the starting location on the map
+        self.setStartLoc(scenario) # Sets the starting location on the map
         self.setStoryLoc() # Set the story locations
 
-    def createLocations(self):
+    def createLocations(self, scenario):
             # Set up objects for every location/tile on the map
             locations = [] # The complete list of 5 lists with 5 locations. [[5][5][5][5][5]]
             for i in range(5):
                 templist = [] # Reset temp list for every iteration of the loop
                 for i in range(5):
                     # Add flavor description for every location
-                    description = gm_scenarios.forest["description"][random.randint(0, len(gm_scenarios.forest["description"]) -1)] 
-                    examineText = gm_scenarios.forest["examination"][random.randint(0, len(gm_scenarios.forest["examination"]) -1)] 
+                    description = scenario["description"][random.randint(0, len(scenario["description"]) -1)] 
+                    examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)] 
                     #print(examineText, description) # test to print location info, to verify the constructor is doing it's thing
                     templist.append(gm_locations.Locationforest(description, examineText)) # Call the constructur with desc that is defined in line above.
                 locations.append(templist)
@@ -95,17 +78,17 @@ class WorldMap():
             # If you reached the max amount of story locations, do this.
             if len(gameState.enemy) <= 0:
                 print()
-                printThis(gm_scenarios.forest["storylocation"][self.storylocIndex], speed=0.05)
+                printThis(gameState.scenario["storylocation"][self.storylocIndex], speed=0.05)
                 gm_badguys.createBoss(gameState)
                 gameState.player.inCombat = True
-                self.victory = True            
+                self.victory = True
         else:            
             print()
-            printThis(gm_scenarios.forest["storylocation"][self.storylocIndex], speed=0.05)
+            printThis(gameState.scenario["storylocation"][self.storylocIndex], speed=0.05)
             self.storylocIndex += 1
             self.setStoryLoc()
 
-    def setStartLoc(self):
+    def setStartLoc(self, scenario):
         # Validates if the move entered is on the board and executes it.
         previousX, previousY = self.previousPosition
         currentX, currentY = self.currentPosition
@@ -113,7 +96,8 @@ class WorldMap():
             # If current move if on the board, the move will be performed.
             self.theMap[previousY][previousX].mapTile = WorldMap.heroPrevPos
             self.theMap[currentY][currentX].mapTile = WorldMap.heroCurrentPos
-            #self.theMap[currentY][currentX] = WorldMap.heroCurrentPos
+            self.theMap[currentY][currentX].visitedText = scenario["startlocationagain"] # Set flavor text on the starting location of the game.
+            self.theMap[currentY][currentX].startLocation = True # Set startlocation to True so that we know where it is.
 
     def whatToDo(self, gameState):
         # Ask the player what to do when on the map, choices move, examine, rest. "move" takes you to the "submenu" where player is promted for a direction.
@@ -139,14 +123,17 @@ class WorldMap():
         currentX, currentY = self.currentPosition
         if (-1 < currentX < 5) and (-1 < currentY < 5):
             # If current move if on the board, the move will be performed.
+            playerLocation = gameState.map.theMap[gameState.map.currentPosition[1]][gameState.map.currentPosition[0]] # Set player loc to make more readable code.
             self.theMap[previousY][previousX].mapTile = WorldMap.heroPrevPos
             self.theMap[currentY][currentX].mapTile = WorldMap.heroCurrentPos
             self.visitedPosition.append(self.previousPosition) # might be removed must refactor
             self.theMap[currentY][currentX].visited = True
             if self.checkIfOnStoryLoc() == True:
                 self.printStoryLoc(gameState)
+            elif playerLocation.startLocation == True and playerLocation.visited == True:
+                printThis(playerLocation.visitedText)
             else:
-                playerLocation = gameState.map.theMap[gameState.map.currentPosition[1]][gameState.map.currentPosition[0]] # Set player loc to make more readable code.
+                # playerLocation = gameState.map.theMap[gameState.map.currentPosition[1]][gameState.map.currentPosition[0]] # Set player loc to make more readable code.
                 printThis(playerLocation.description)
                 time.sleep(1)
                 gameState.player.inCombat = self.checkCombat(playerLocation.encounterChance) # Checks if the player gets into combat.
@@ -187,7 +174,8 @@ class WorldMap():
             # print('# Log: no combat')
             return False
     
-    def drawMap(self):
+    def drawMapOLD(self):
+        # Old map drawing function. Keeping it here just in case. 
         # Draw the game map data structure.
         print('' + ('\t\t  +----MAP----+'))
         # Print each line of the rows.
@@ -200,6 +188,64 @@ class WorldMap():
                 boardRow += ' '
             print('\t\t  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
         print('' + ('\t\t  +- You = @ -+'))
+
+    def drawMap(self, gameState):
+            # Merged printing of map together with printing of the player information.
+            # setting up the player info prints:
+            spacing = 45           
+            plInfoDashedLine = gameState.player.plInfoDashedLine # +---- < Player information > ----+
+            nameLvlXpPrint = gameState.player.nameLvlXpPrint     # Name lvl xp 
+            dashedLine = gameState.player.dashedLine             # -------
+            plAttributesPrint = gameState.player.plAttributesPrint # attributes
+            
+            # Set up boolean checks so that the right lines are printed at the right place. 
+            nameLvlXpPrintP1 = False
+            plAttributesP2 = False
+            filler1 = False
+            filler2 = False
+            nlxpLine1P2 = False
+
+            # Check if inventory needs to be printed
+            inventoryinfoPrint = gameState.player.getInventoryForPrint()
+            weaponPrint = gameState.player.getWeaponForPrint()
+            if inventoryinfoPrint == None:
+                inventoryinfoPrint = ' Inventory: '
+            if weaponPrint == None: 
+                weaponPrint = ' Weapon: '
+
+            # Draw the game map data structure together with the player information data structure.
+            print('' + plInfoDashedLine + ('+- < MAP > -+'))
+            # Print each line of the rows.
+            for column in range(len(self.theMap)):
+                extraSpace = ''
+                # Create the string for this row on the board.
+                boardRow = ''
+                for row in range(len(self.theMap)):
+                    boardRow += self.theMap[column][row].mapTile
+                    boardRow += ' '
+                if nameLvlXpPrintP1 == False:
+                    print('  ' + nameLvlXpPrint + '  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    nameLvlXpPrintP1 = True
+                    continue
+                if plAttributesP2 == False:
+                    print(plAttributesPrint + ' %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    plAttributesP2 = True
+                    continue
+                if nlxpLine1P2 == False:
+                    print(dashedLine + '%s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    nlxpLine1P2 = True
+                    continue
+                if filler1 == False:
+                    print(inventoryinfoPrint.center(spacing) + '    %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    filler1 = True
+                    continue
+                if filler2 == False:
+                    print(weaponPrint.center(spacing) + '    %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    filler2 = True
+                    continue
+                print('  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                
+            print('' + dashedLine + ('+- You = @ -+'))
 
     def showmap(self, tryAgain=False):
         # Draw the game map when it is called from command prompt
@@ -246,3 +292,5 @@ TITLE2 = '''
 TITLE3 ='''  ############################################################
  ###                Forest's and Nåså's                   ###
 ############################################################\n'''
+
+ENDING_MSG = 'You have completed the initial story, feel free to roam around.'

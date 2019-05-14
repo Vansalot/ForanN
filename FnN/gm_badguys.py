@@ -38,17 +38,20 @@ class Enemy:
     def printEnemyStats(self):
         # Print enemy stats when player is in combat. 
         # First set up alignment of the text to be printed (49 is the lengt of the player information frame). 
-        headSpacing = 49
+        spacing = 60
+        header = '+---------------- <<< Enemy Information >>> -----------------+'
         eNameLvl = ' Enemy: %s Level: %s ' % (self.enemy_name.title(), self.enemy_lvl)
-        eNameLvlPrint = eNameLvl.center(headSpacing)
+        eNameLvlPrint = eNameLvl.center(spacing)
         eArmHp = '    Armor: %s HP: %s / %s      ' % (self.enemy_currentArmor, self.enemy_current_hp, self.enemy_maxhp)
-        eArmHpPrint = eArmHp.center(headSpacing)
-        header = len(eNameLvl) * '#'
-        headerPrint = header.center(headSpacing)
-        print(' ', headerPrint)
-        print(' ', eNameLvlPrint)
-        print(' ', eArmHpPrint)
-        print(' ', headerPrint)
+        eArmHpPrint = eArmHp.center(spacing)
+        filler = ''
+        fillerP = filler.center(spacing)
+        print(header)
+        print(eNameLvlPrint, '|')
+        print(eArmHpPrint, '|')
+        print(fillerP,'|')
+
+
 
 class Boss:
     # Initializes Boss
