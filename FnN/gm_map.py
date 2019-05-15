@@ -1,5 +1,6 @@
 #     Game map and movement functions
 # Movement will be issued by compass directions North, East, South and West.
+
 import random, math, sys, time, os
 import gm_charstats, gm_badguys, gm_scenarios, gm_locations
 
@@ -114,9 +115,15 @@ class WorldMap():
             self.whatToDo(gameState)
         elif ctrl.lower() == 'map' or ctrl.lower().startswith('m'):
             self.navigateTheMap(gameState)
+        elif ctrl.lower() == 'experience':
+            # Added for debug purposes, remove or you got a decent cheat ;)
+            print('# Log: You gain 500 experience. You CHEATER!')
+            gameState.player.plXpGain(500)
+            self.whatToDo(gameState)
         elif ctrl.lower() == 'examine' or ctrl.lower().startswith('e'):
             gameState.player.examineLocation(gameState)
             self.whatToDo(gameState)
+        
 
     def move_player(self, gameState):
         # Validates if the move entered is on the board and executes it.
@@ -193,14 +200,15 @@ class WorldMap():
     def drawMap(self, gameState):
             # Merged printing of map together with printing of the player information.
             # setting up the player info prints:
-            spacing = 45           
+            spacing = 48
             # Printed player information
             lvlIndex = gameState.player.attributes.pl_lvl - 1
-            plInfoDashedLine = '+----------- <<< Player information >>> ---------'
-            nameLvlXp = '%s | Level: %s | %s / %s xp' % (gameState.player.name.title(), gameState.player.attributes.pl_lvl, gameState.player.attributes.pl_xp, gameState.player.attributes.levelup[lvlIndex])
+            plInfoDashedLine = '+------------ <<< Player information >>> -----------'
+            nameLvlXp = '  %s | Level: %s | %s / %s xp  ' % (gameState.player.name.title(), gameState.player.attributes.pl_lvl, gameState.player.attributes.pl_xp, gameState.player.attributes.levelup[lvlIndex])
             nameLvlXpPrint = nameLvlXp.center(spacing)
-            dashedLine = '+------------------------------------------------'
-            plAttributes= ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
+            dashedLine = '+---------------------------------------------------'
+            #plAttributes= ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s    ' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
+            plAttributes= '  Str: %s  Agi: %s  Fort: %s | AC: %s HP: %s / %s  ' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
             plAttributesPrint = plAttributes.center(spacing)
             
             # Set up boolean checks so that the right lines are printed at the right place. 
@@ -231,11 +239,11 @@ class WorldMap():
                     boardRow += self.theMap[column][row].mapTile
                     boardRow += ' '
                 if nameLvlXpPrintP1 == False:
-                    print('  ' + nameLvlXpPrint + '  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    print('  ' + nameLvlXpPrint.center(spacing) + '  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
                     nameLvlXpPrintP1 = True
                     continue
                 if plAttributesP2 == False:
-                    print(plAttributesPrint + ' %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    print('  ' + plAttributesPrint.center(spacing) + '  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
                     plAttributesP2 = True
                     continue
                 if nlxpLine1P2 == False:

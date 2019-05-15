@@ -15,12 +15,12 @@ class Enemy:
         self.pl_lvl = pl_lvl
         self.enemy_lvl = randint(self.pl_lvl, self.pl_lvl + 2)
         self.nameList = ['Benny', 'bjarte', 'roger', 'bent', 'are', 'franz', 'preben', 'hans', 'patrick', 'Roy', 'egil', 'Kent', 'Robin', 'Ola', 'Jonny', 'Ronny', 'Raymond', 'Bendik', 'Henrik', 'Jens', 'Peder', 'Preben', 'William', 'Axel', 'Erlend', 'Fredrik', 'Hans', 'Jacob', 'Johan', 'Karl', 'Nicolai', 'Oscar', 'Sondre', 'Tobias']
-        self.payexNames = ['Jens Egil', 'Jørn Efteland', 'Jørn Tharaldsen', 'Hallstein', 'Petter storaas', 'Jon Terje', 'Christian Slater', 'Andreas Jakobsen', 'Jan-Phillippe', 'Giresse Kadima', 'Nicolas Lopez']
+        self.payexNames = ['Jens Egil', 'Jørn Efteland', 'Jørn Tharaldsen', 'Hallstein Skjølsvik', 'Petter storaas', 'Jon Terje', 'Christian Slater', 'Andreas Jakobsen', 'Jan-Phillippe', 'Giresse Kadima', 'Nicolas Lopez', 'Dani Berentzen']
         self.enemy_name = choice(self.nameList) + '-' + choice(self.nameList)
-        self.enemy_hitmod = round(self.enemy_lvl / 2)
         self.enemy_str = 1 * self.enemy_lvl
         self.enemy_agi = 1 * self.enemy_lvl
         self.enemy_fort = 1 * self.enemy_lvl
+        self.enemy_hitmod = round(self.enemy_lvl / 2) + int(self.enemy_str / 4)
         self.enemy_base_hp = 10
         self.enemy_maxhp = self.enemy_base_hp + self.enemy_fort         
         self.enemy_current_hp = self.enemy_maxhp
@@ -38,8 +38,8 @@ class Enemy:
     def printEnemyStats(self):
         # Print enemy stats when player is in combat. 
         # First set up alignment of the text to be printed (49 is the lengt of the player information frame). 
-        spacing = 60
-        header = '+---------------- <<< Enemy Information >>> -----------------+'
+        spacing = 63
+        header = '+------------ <<< Enemy Information >>> ------------------------+'
         eNameLvl = ' Enemy: %s Level: %s ' % (self.enemy_name.title(), self.enemy_lvl)
         eNameLvlPrint = eNameLvl.center(spacing)
         eArmHp = '    Armor: %s HP: %s / %s      ' % (self.enemy_currentArmor, self.enemy_current_hp, self.enemy_maxhp)

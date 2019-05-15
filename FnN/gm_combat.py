@@ -33,6 +33,19 @@ def initiativeRoll(gameState):
 def combatRoll():
     # Returns a random number in the range of 1-20.
     hitRoll = randint(8, 20) # changed for debug purposes default value (1,20)
+    rollist = []
+    rollPrint = ''
+    while len(rollist) < 10:
+        rollist.append(randint(1, 20)) 
+    rollPrint = ''.join(str(e) for e in rollist)
+    print('# Rolling for hit',end='')
+    gm_map.printThis('.....')
+    gm_map.printThis(rollPrint, speed=0.04)
+    finalnumber = str(rollist[-1])
+    endmessage = '......' + finalnumber + '!'
+    gm_map.printThis('....'+str(hitRoll)+'!', speed=0.04)
+    time.sleep(1)
+    print()
     return hitRoll
     
 def hitDecider(gameState, hit_roll, currentArmor, enemy):
@@ -115,7 +128,7 @@ def modifiedDamage(gameState, baseDamage, enemy):
         # If the player is doing damage
         modDmg = baseDamage + gameState.player.attributes.pl_str + wepDmg
         if modDmg < 0:
-            modDmg = 0
+            modDmg = 1
         if len(gameState.player.weapon) > 0:
             print('# %s (base) + %s (mod from str) + %s (mod from Weapon) = %s damage dealt.' % (baseDamage, gameState.player.attributes.pl_str, wepDmg, modDmg))
         else:
@@ -157,7 +170,7 @@ def hpUpdater(gameState, modifiedDmg, enemy):
                 gameState.player.dead = True
                 gameState.player.inCombat = False
             else:
-                print()
+                pass
 
 def critHandling(gameState, enemy):
     # Handling of critical hits.
@@ -212,7 +225,7 @@ def combatLoop(gameState):
     print()
     print('(Que funky cool combat music)', end='')
     time.sleep(0.3)
-    gm_map.printThis(' DU DU DU DU DU DU DU DU DUUUUUUUUUUU DU DU DUDUDU...\n',speed=0.05)
+    gm_map.printThis(' * DU DU DU DU DU DU DU DU DUUUUUUUUUUU DU DU DUDUDU... *\n',speed=0.05)
     time.sleep(1)
     print()
     turn = initiativeRoll(gameState)
@@ -228,7 +241,9 @@ def combatLoop(gameState):
             if gameState.player.attributes.pl_current_hp <= 0: # If the player is dead, break out of the loop.
                 break
 
-            input('Press enter to continue...')
+            print('\nYour turn. Press enter to continue...',end='')
+            gm_map.printThis(' * DU DU DU DU DU DUUUUUU DU DU DU *\n')
+            input()
             gameState.enemy[gameState.enemyIndex].printEnemyStats() # print enemy stats
             gameState.map.drawMap(gameState)
             # gameState.player.printNameLevelXp() # print player stats
@@ -262,7 +277,6 @@ def combatLoop(gameState):
                             continue
                     elif enteredAction == 'heal' or enteredAction == 'healing potion':
                         gm_items.drinkHealingPot(gameState)
-                        time.sleep(1)
                         turn = 'enemy'
                         continue
                     else:
@@ -274,11 +288,9 @@ def combatLoop(gameState):
                         print('# You rolled %s (+%s hit modifier) = %s. * %s *' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod, hitResult))
                         damageHandling(gameState, damageRoll(), gameState.player.isENEMY)
                         turn = 'enemy'
-                        time.sleep(2)
                     elif hitResult == 'Miss' and 'parry' in gameState.enemy[gameState.enemyIndex].enemy_statusEffects:
                         # If player misses when enemy is in parry mode
                         print('# You rolled %s (+%s hit modifier) = %s. * Parry *' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod))
-                        time.sleep(0.5)
                         counterattack(gameState, gameState.enemy[gameState.enemyIndex].isEnemy)
                         turn = 'enemy'    
                         continue
@@ -292,11 +304,9 @@ def combatLoop(gameState):
         #
         elif turn == 'enemy':
             try:
-                input('\n# %s\'s turn. Press enter to continue...' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()))
+                input('\n# %s\'s turn. Press enter to continue...\n' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()))
             except EOFError:
                 continue
-            #input('Press enter to continue...\n')
-            #time.sleep(1)
             if 'parry' in gameState.enemy[gameState.enemyIndex].enemy_statusEffects:
                 # If enemy in parrymode remove parrymode at the start of his next turn.
                 gameState.enemy[gameState.enemyIndex].enemy_statusEffects.remove('parry')
@@ -305,7 +315,6 @@ def combatLoop(gameState):
                 if randint(0,10) > 4: #  ~60% chance of going into parry mode.
                     gameState.enemy[gameState.enemyIndex].enemy_statusEffects.append('parry')
                     print('%s hunker down into a defensive pose.' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()))
-                    time.sleep(1)
                     turn = 'player'
                     continue
             
@@ -326,11 +335,9 @@ def combatLoop(gameState):
                 print('# %s rolled %s (+%s hit modifier) = %s. * %s *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitResult))
                 damageHandling(gameState, damageRoll(), gameState.enemy[gameState.enemyIndex].isEnemy)
                 turn = 'player'
-                #time.sleep(2)
             elif hitResult == 'Miss' and 'parry' in gameState.player.statusEffects:
                 # If enemy misses when player is in parry mode
                 print('# %s rolled %s (+%s hit modifier) = %s. * Parry *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod))
-                #time.sleep(0.5)
                 counterattack(gameState, gameState.player.isENEMY)
                 turn = 'player'
             else: # Also known as 'miss'

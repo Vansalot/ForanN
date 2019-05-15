@@ -25,15 +25,6 @@ class Player():
         self.weapon = []
         self.specialItem = {}
 
-        # Printed player information
-        #self.lvlIndex = self.attributes.pl_lvl - 1
-        #self.spacing = 45
-        #self.plInfoDashedLine = '+----------- <<< Player information >>> ---------'
-        #self.nameLvlXp = '%s | Level: %s | %s / %s xp' % (self.name.title(), self.attributes.pl_lvl, self.attributes.pl_xp, self.attributes.levelup[self.lvlIndex])
-        #self.nameLvlXpPrint = self.nameLvlXp.center(self.spacing)
-        #self.dashedLine = '+------------------------------------------------'
-        #self.plAttributes= ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s' % (self.attributes.pl_str,self.attributes.pl_agi, self.attributes.pl_fort, self.attributes.pl_currentArmor, self.attributes.pl_current_hp, self.attributes.pl_maxhp)
-        #self.plAttributesPrint = self.plAttributes.center(self.spacing)
 
     def printNameLevelXp(self):
         # Prints player information in a box structure. Used almost every time the player is asked to perform an action.
@@ -54,9 +45,6 @@ class Player():
     def printPlayerPossibleactions(self):
         # Prints the possible actions the player can perform, depending on if the player is in combat or not.
         if self.inCombat == True:
-            '''if len(self.inventory) > 0 or len(self.weapon) > 0:
-                # Print inventory if there are items in inventory
-                self.printInventory()'''
             print('You are in combat, your possible actions are: ', end='')
             print(*self.possibleCombatActions, sep=', ', end='') 
             print('.', end='')
@@ -184,14 +172,16 @@ class Player():
 
     def playerHitModChange(self):
         # Part of level up routine, updates hit modifier. Can also be called from items module if player find an item that changes hit modifier.
-        if self.attributes.pl_lvl > 10:
-            self.attributes.pl_hitmod = round(self.attributes.pl_lvl / 2) + 2
-        elif self.attributes.pl_lvl > 20:
-            self.attributes.pl_hitmod = round(self.attributes.pl_lvl / 2) + 4        
-        else:
-            self.attributes.pl_hitmod = round(self.attributes.pl_lvl / 2)
-        if len(self.weapon) > 0:
-            self.attributes.pl_hitmod += self.specialItem["hitbonus"]
+        newHitModifier = 0
+        newHitModifier += round(self.attributes.pl_lvl / 2)
+        newHitModifier += int(self.attributes.pl_str / 4)
+        if self.attributes.pl_lvl > 10: # If you hit lvl 10 add some more hit.
+            newHitModifier += 2
+        elif self.attributes.pl_lvl > 20: # If you hit lvl 20 add some more hit.
+            newHitModifier += 4        
+        if len(self.weapon) > 0: # Add hit bonus from weapon
+            newHitModifier += self.specialItem["hitbonus"]
+        self.attributes.pl_hitmod = newHitModifier # set the new hit modifier to the players attribute
 
 class Gamestate():
     def __init__(self, scenarioDict):
@@ -308,6 +298,9 @@ def enterDifficulty(newPlayer):
             break # totalPointsAllocated default = 6 so no change is needed.
         elif difficulty == 'hard' or difficulty == 'h':
             newPlayer.player.totalPointsAllocated = 4
+            break
+        if difficulty == 'god': # god mode, for show and tell
+            newPlayer.player.totalPointsAllocated = 20
             break
 
 def setPayexMode(newPlayer):
