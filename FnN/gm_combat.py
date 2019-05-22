@@ -42,7 +42,7 @@ def combatRoll():
     gm_map.printThis('.....')
     gm_map.printThis(rollPrint, speed=0.04)
     finalnumber = str(rollist[-1])
-    endmessage = '......' + finalnumber + '!'
+    #endmessage = '......' + finalnumber + '!'
     gm_map.printThis('....'+str(hitRoll)+'!', speed=0.04)
     time.sleep(1)
     print()
@@ -138,7 +138,7 @@ def modifiedDamage(gameState, baseDamage, enemy):
         # If the enemy is doing damage
         modDmg = baseDamage + gameState.enemy[gameState.enemyIndex].enemy_str - gameState.player.attributes.pl_agi
         if modDmg < 0:
-            modDmg = 0
+            modDmg = 1
         # Modified from player agi should maybe be tweaked, high agi might cause full damage mitigation. 
         print('# %s (base) + %s (mod from enemy str) - %s (mod from player agi) = %s damage dealt.' % (baseDamage, gameState.enemy[gameState.enemyIndex].enemy_str, gameState.player.attributes.pl_agi, modDmg))
         return modDmg
@@ -175,10 +175,11 @@ def hpUpdater(gameState, modifiedDmg, enemy):
 def critHandling(gameState, enemy):
     # Handling of critical hits.
     # First there will occur a new roll for hit, if hit occurs again, critical damage is dealt. If hit does not occur, normal damage is called.
-    hitRoll = combatRoll()
+    #hitRoll = combatRoll()
     if enemy == False:
         # Handling for player
-        print('# You: Critical chance, rolling for hit: ', end='')
+        print('# You: Critical chance!')
+        hitRoll = combatRoll()
         hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, enemy)
         if hitResult == 'Hit' or hitResult == 'CRITICAL':
             time.sleep(1)
@@ -194,7 +195,8 @@ def critHandling(gameState, enemy):
     
     elif enemy == True:
         # Handling for enemy
-        print('# %s Critical chance, rolling for hit: ' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()), end='')
+        print('# %s Critical chance!' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()), end='')
+        hitRoll = combatRoll()
         hitResult = hitDecider(gameState, hitRoll, gameState.player.attributes.pl_currentArmor, enemy)
         if hitResult == 'Hit' or hitResult == 'CRITICAL':
             time.sleep(1)
@@ -246,8 +248,6 @@ def combatLoop(gameState):
             input()
             gameState.enemy[gameState.enemyIndex].printEnemyStats() # print enemy stats
             gameState.map.drawMap(gameState)
-            # gameState.player.printNameLevelXp() # print player stats
-            #gameState.player.printPlayerPossibleactions() # print player's possible actions
             enteredAction = ''
 
             while enteredAction.isalpha() != True: # Loop that will ask the player to enter correct action.

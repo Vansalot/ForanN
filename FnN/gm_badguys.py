@@ -77,26 +77,32 @@ class Boss:
         self.isEnemy = True  
 
     def printEnemyStats(self):
-        headSpacing = 49
+        # Print enemy stats when player is in combat. 
+        # First set up alignment of the text to be printed (49 is the lengt of the player information frame). 
+        spacing = 63
+        header = '+------------ <<< Enemy Information >>> ------------------------+'
         eNameLvl = ' Enemy: %s Level: %s ' % (self.enemy_name.title(), self.enemy_lvl)
-        eNameLvlPrint = eNameLvl.center(headSpacing)
+        eNameLvlPrint = eNameLvl.center(spacing)
         eArmHp = '    Armor: %s HP: %s / %s      ' % (self.enemy_currentArmor, self.enemy_current_hp, self.enemy_maxhp)
-        eArmHpPrint = eArmHp.center(headSpacing)
-        header = len(eNameLvl) * '#'
-        headerPrint = header.center(headSpacing)
-        print(' ', headerPrint)
-        print(' ', eNameLvlPrint)
-        print(' ', eArmHpPrint)
-        print(' ', headerPrint)
+        eArmHpPrint = eArmHp.center(spacing)
+        filler = ''
+        fillerP = filler.center(spacing)
+        print(header)
+        print(eNameLvlPrint, '|')
+        print(eArmHpPrint, '|')
+        print(fillerP,'|')
+
 
 
 def createBoss(gameState):
     # Creates a boss that is more powerful than normal enemies.
     boss = Boss(gameState.player.attributes.pl_lvl)
+    if boss.enemy_currentArmor > 18:
+        boss.enemy_currentArmor = 18
     gameState.enemy.append(boss)
     time.sleep(2)
     print()
-    print('A big ass mother dude lunges through the bushes. Screams that he\'s going to turn you into an ear ornament! DEFEND YOURSELF!')
+    print('A big ass mother dude lunges at you. He\'s yelling that he\'s going to turn you into an ear ornament! DEFEND YOURSELF!')
     time.sleep(1)
 
 def createEnemy(gameState):
@@ -106,7 +112,7 @@ def createEnemy(gameState):
     gameState.enemy.append(enemy)
     time.sleep(1)
     print()
-    message = 'A raving madman who calls himself %s lunges through the bushes. He looks like he wants to introduce you to a can of whoop-ass! ' % (enemy.enemy_name.title())
+    message = 'A raving madman who calls himself %s lunges at you. He looks like he wants to introduce you to a can of whoop-ass! ' % (enemy.enemy_name.title())
     for character in message:
         sys.stdout.write(character)
         sys.stdout.flush()

@@ -1,5 +1,5 @@
-import time, sys, os, random
-import gm_combat, gm_map, gm_badguys, gm_items, gm_scenarios, gm_locations
+import time, sys, random
+import gm_combat, gm_map, gm_items, gm_scenarios, gm_locations
 # Main file for the game, will also contain the game loop.
 # Note that print() and time.sleep(x) statements have been added in most files to try and smooth the flow of information on the screen.
 # os.system('cls') Clear the screen, not sure if needed, keeping it here just in case.
@@ -18,29 +18,27 @@ class Player():
         self.dead = False # Used to determine if the player is dead and the game is over.
         self.statusEffects = [] # For now, only used for parry function, new effects can be added and put in here.
         self.possibleCombatActions = ['hit', 'parry'] # Possible actions for player when in combat, new actions can be added if they are implemented.
-        self.possibleMapActions = ['(M)ap/move', '(E)xamine', '(R)est'] # Possible actions for player not in combat, new actions can be added if they are implemented.
+        self.possibleMapActions = ['Map/move', 'Examine', 'Rest','Help'] # Possible actions for player not in combat, new actions can be added if they are implemented.
         self.moveActions = ['(W)est', '(E)ast', '(N)orth', '(S)outh'] # Possible move actions on the map
         self.totalPointsAllocated = 6 # Default points player can allocate to skills at the beginning of the game.
         self.inventory = []
         self.weapon = []
         self.specialItem = {}
 
-
-    def printNameLevelXp(self):
-        # Prints player information in a box structure. Used almost every time the player is asked to perform an action.
-        index = self.attributes.pl_lvl - 1
-        spacing = 45 # Value for centerspacing of the topInfo print message.
-        topInfo = '%s | Level: %s | %s / %s xp' % (self.name.title(), self.attributes.pl_lvl, self.attributes.pl_xp,self.attributes.levelup[index])
-        bottInfo = ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s' % (self.attributes.pl_str,self.attributes.pl_agi, self.attributes.pl_fort, self.attributes.pl_currentArmor, self.attributes.pl_current_hp, self.attributes.pl_maxhp)
-        topInfoPrint = topInfo.center(spacing) # Centers topInfo text
-        printedLine = "+" + (len(bottInfo)) * '-' + "+" # Creates a +----+ structure based on how long the bottInfo message are.
-        
-        print(printedLine)
-        print('           ### Player information: ###           ')
-        print(printedLine)
-        print(' ', topInfoPrint)
-        print(bottInfo)
-        print(printedLine)
+    def printHelpText(self):
+        # work in progress. Help text printed on the screen.
+        import os
+        os.system('cls')
+        print('          +------------------------------ <<< Help >>> -----------------------------------+')
+        print('Map actions:')
+        for action in self.possibleMapActions:
+	        if action.lower() in gm_scenarios.itemsAndAbilities:
+		        print(gm_scenarios.itemsAndAbilities[action.lower()])
+        print('\nCombat actions: ')
+        for action in self.possibleCombatActions:
+	        if action.lower() in gm_scenarios.itemsAndAbilities:
+		        print(gm_scenarios.itemsAndAbilities[action.lower()])
+        input("Hit 'Enter' to continue... ")
 
     def printPlayerPossibleactions(self):
         # Prints the possible actions the player can perform, depending on if the player is in combat or not.
@@ -114,7 +112,7 @@ class Player():
         time.sleep(2)
         self.attributes.pl_current_hp = self.attributes.pl_maxhp
 
-    #  vvv Xp gain, check if player has leveled up, and levelup mechanics vvv
+    '''  vvv Xp gain, check if player has leveled up, and levelup mechanics vvv '''
     
     def plXpGain(self, enemy_xp_reward):
         # Updates experience gain of the player, and calls plCheckLvlup to check if the character has leveled up.
@@ -129,7 +127,6 @@ class Player():
             self.plLevelUp()
         else:
             pass
-            # print('# Log: No level up today.') # Added for debug purposes, so show that this function is called.
 
     def plLevelUp(self):
         # Asks which stat you want to increase when you level up and calls pl_stat_change to update the stat.
@@ -158,7 +155,6 @@ class Player():
             self.playerHitModChange()
 
     def playerStatChange(self, strength, agility, fortitude):
-        # (int, int, int) -> (int, int, int)
         # Procedure to change character stats. 
         self.attributes.pl_str += strength 
         self.attributes.pl_agi += agility
@@ -183,16 +179,30 @@ class Player():
             newHitModifier += self.specialItem["hitbonus"]
         self.attributes.pl_hitmod = newHitModifier # set the new hit modifier to the players attribute
 
+        ''' ^^^ Levelup functions ^^^ '''
+
 class Gamestate():
-    def __init__(self, scenarioDict):
+    def __init__(self):
         # Groups up all game information(hopefully) in one class, so that it can be passed around in the functions.
-        self.allScenarios = ['forest', 'lake'] # possible way to iterate throught the scenarios?
-        self.scenario = scenarioDict # contains the dictionary of the first scenario.
+        self.scenarioIndex = 0 # Index to iterate over scenarios
+        self.scenario = gm_scenarios.SCENARIOS[self.scenarioIndex] # Inserts the dictionary of the scenario
         self.player = Player()
-        self.map = gm_map.WorldMap(self.scenario)
+        self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex)
         self.payexMode = False
+        self.gameIsDone = False
         self.enemy = []
         self.enemyIndex = len(self.enemy) - 1
+
+    def iterateScenario(self):
+        # updates gamestate when you change to the next scenario. 
+        try:
+            self.scenarioIndex += 1
+        except IndexError:
+            self.gameIsDone = True
+            gm_map.printThis(gm_scenarios.ENDING_MSG)
+        self.scenario = gm_scenarios.SCENARIOS[self.scenarioIndex] # Inserts the dictionary of the scenario
+        self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex) # set up the next map based on the dictionary in self.scenario
+        self.map.victory = False # reset victory flag
 
 class PlayerAttributes():
     # Initializes the player attributes, they are part of the Player class.
@@ -212,7 +222,7 @@ class PlayerAttributes():
 
 
 ''' vvv End of classes, game procedures follows vvv '''
-def getStarted(newPlayer):
+def enterPlayerName(gameState):
     #starts the game, prompts for user to enter player name and calls playerStartingStats()
     playerName = ""
     # Set player name, with input validation.
@@ -220,18 +230,19 @@ def getStarted(newPlayer):
         playerName = (input('Please enter player name: ').lower())
         for letter in playerName:
             if letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ':
-                newPlayer.player.name = playerName
+                gameState.player.name = playerName
             else:
                 print("Name must be written with letters, avoid numbers and special characters")
                 playerName = ""
     
+def setPlayerAttributes(gameState):
     # Set the starting attributes of the newPlayer
-    getStartingStats(newPlayer.player)
+    getStartingStats(gameState.player)
     # update player stats based on the changes done prior.
-    newPlayer.player.playerarmHpChange()
-    newPlayer.player.playerHitModChange()
-    # player is returned to the main() function.
-    return newPlayer
+    gameState.player.playerarmHpChange()
+    gameState.player.playerHitModChange()
+    # gameState is returned to the main() function.
+    return gameState
 
 def getStartingStats(gameState):
     # Setting the starting stats of the player. Default max attribute points(variable: totalPointsAllocated) are changed by difficulty settings.
@@ -284,7 +295,7 @@ def getStartingAttribute(prompt, min_value, max_value):
         else:
             print("You did not enter a number, please enter a number.")
 
-def enterDifficulty(newPlayer):
+def enterDifficulty(gameState):
     # Set game difficulty, with input validation.
     difficulty = ''
     while True:
@@ -292,80 +303,75 @@ def enterDifficulty(newPlayer):
         print('Please enter difficulty (easy, medium, hard): ', end='')
         difficulty = input().lower()
         if difficulty == 'easy' or difficulty == 'e':
-            newPlayer.player.totalPointsAllocated = 10
+            gameState.player.totalPointsAllocated = 10
             break
         elif difficulty == 'medium' or difficulty == 'm':
             break # totalPointsAllocated default = 6 so no change is needed.
         elif difficulty == 'hard' or difficulty == 'h':
-            newPlayer.player.totalPointsAllocated = 4
+            gameState.player.totalPointsAllocated = 4
             break
         if difficulty == 'god': # god mode, for show and tell
-            newPlayer.player.totalPointsAllocated = 20
+            gameState.player.totalPointsAllocated = 20
             break
 
-def setPayexMode(newPlayer):
+def setPayexMode(gameState):
     # Set payex mode, it's just for naming enemies differently. For funs.
     mode = input('Do you want PayEx mode? (\'yes\' for yes, any other input for NO. PayEx mode is a internal thing): ').lower()
     if mode == 'yes':
-        newPlayer.payexMode = True
-
-def titleScreen():
-    print(gm_map.TITLE2) # prints the title.
-    print()
-    print(gm_map.TITLE3)
-    time.sleep(2)
-    firstScenario = gm_scenarios.forest
-    newPlayer = Gamestate(firstScenario) # Create a new gamestate with player, adds the forest scenario
-    setPayexMode(newPlayer) # Can be commented out to remove payex functionality.
-    enterDifficulty(newPlayer) # Set up difficulty
-    getStarted(newPlayer) # Set up new player, This will also print prompts and player information to the player.
-    return newPlayer
+        gameState.payexMode = True
 
 def nextScenario(gameState):
     # When a scenario is finished, ititiate the next scenario.
-    gameState.scenario = gm_scenarios.lakes # Set the next scenario, this must be changed if we are having more scenarios.
-    gameState.map = gm_map.WorldMap(gameState.scenario) # Set up the map according to the scenario.
+    gameState.iterateScenario() # Set up the next scenario in gamestate object.
     gameState.player.attributes.pl_current_hp = gameState.player.attributes.pl_maxhp # Reset player hp to max.
-
     # Print scenario stuff
     gm_map.printThis(gameState.scenario["intro"])
-
     gameLoop(gameState) # go back to the game loop after the setup is complete.
+
+def titleScreen():
+    # prints the title of the game.
+    print(gm_map.TITLE2) 
+    print()
+    print(gm_map.TITLE3)
+    time.sleep(2)
 
 def main():
     # Starts the game, calls the game loop
-    gameState = titleScreen() # Creates a new game, prints the title screen and initiates the character creation.
+    gameState = titleScreen() # print the title of the game.    
+    # Setting the game up
+    gameState = Gamestate()
+    setPayexMode(gameState) # Can be commented out to remove payex functionality.
+    enterDifficulty(gameState) # Set up difficulty
+    enterPlayerName(gameState) # Set up new player, This will also print prompts and player information to the player.
+    setPlayerAttributes(gameState)
+    # Game is starting Print map info and introduction text.    
     gameState.map.drawMap(gameState) # Draw the map on the screen.
     gm_map.printThis(gameState.scenario["intro"])
     time.sleep(1)
     gameState.map.whatToDo(gameState) # Start the first "what would you like to do dialogue" before entering the game loop.
+    # Move on to the game loop
     gameLoop(gameState)
 
 def gameLoop(gameState):
     # Main game loop
     while True:
-        # Main game loop starts here.
-        # player stats is printed on the screen with the map.
-        # and you are prompted for actions to perform
+        # Main game loop starts here
         if gameState.map.victory == True and gameState.player.inCombat == False:
             # If the game is finished, print game ending messages.
             gm_map.printThis(gameState.scenario["ending"])
             time.sleep(4)
             print()
-            print(gm_scenarios.ENDING)
+            print(gm_scenarios.VICTORY)
             print()
-            print(gm_scenarios.ENDING_MSG) # To be printed when all is done
             time.sleep(4)
-            # TO BE ADDED:
-                # print(gm_scenarios.SCENARIO_COMPLETE)
-                # nextScenario(gameState) # New function to start a new scenario.
+            # Add to "you are done stuff" #print(gm_scenarios.ENDING_MSG) # To be printed when all is done
+            nextScenario(gameState) # New function to start a new scenario.
 
         if gameState.player.inCombat == True:
             # If the player is in combat prior to movement, call the combat loop.
             gm_combat.combatLoop(gameState)
         
-        # Normal loop
-        # time.sleep(1)
+        # Movement loop
         gameState.map.drawMap(gameState) # draw the map
         gameState.map.whatToDo(gameState) # If the player is not in combat, it will be looped around the map
         time.sleep(1)
@@ -375,22 +381,7 @@ def gameLoop(gameState):
             gm_combat.combatLoop(gameState) 
             
         if gameState.player.dead == True: #if the player is dead, print game over, and ask if you want to play again.
-            print('''
-                       ::::::::      :::       :::   :::   ::::::::::          ::::::::  :::     ::: :::::::::: :::::::::   ::: 
-                     :+:    :+:   :+: :+:    :+:+: :+:+:  :+:                :+:    :+: :+:     :+: :+:        :+:    :+:  :+:  
-                    +:+         +:+   +:+  +:+ +:+:+ +:+ +:+                +:+    +:+ +:+     +:+ +:+        +:+    +:+  +:+   
-                   :#:        +#++:++#++: +#+  +:+  +#+ +#++:++#           +#+    +:+ +#+     +:+ +#++:++#   +#++:++#:   +#+    
-                  +#+   +#+# +#+     +#+ +#+       +#+ +#+                +#+    +#+  +#+   +#+  +#+        +#+    +#+  +#+     
-                 #+#    #+# #+#     #+# #+#       #+# #+#                #+#    #+#   #+#+#+#   #+#        #+#    #+#          
-                 ########  ###     ### ###       ### ##########          ########      ###     ########## ###    ###  ###       ''')
-            time.sleep(2)
-            print()
-            print('Do you want to play again? (yes or no)')
-            if not input().lower().startswith('y'):
-                sys.exit()
-            else:
-                os.system('cls')
-                main()
+            gm_scenarios.gameOver()
     
     print("# Game loop has ended.") # Print that the application is out of the loop, meant for debug purposes.
 

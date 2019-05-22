@@ -17,18 +17,26 @@ class WorldMap():
     START = [randint(0, 4), randint(0, 4)] # Starting location for the player
     STARTINGBOARD = []
 
-    def __init__(self, scenario):
-        self.createLocations(scenario)
+    def __init__(self, scenario, scenarioIndex):
+        self.createLocationDecider(scenario, scenarioIndex)
         self.theMap = Board(WorldMap.STARTINGBOARD)
         self.currentPosition = self.START[:]
         self.previousPosition = self.START[:]
         self.visitedPosition = []
         self.storyLocations = [] 
         self.storylocIndex = 0
-        self.maxStorylocIndex = 2
+        self.maxStorylocIndex = scenario["maxStorylocIndex"]
         self.victory = False
-        self.setStartLoc(scenario) # Sets the starting location on the map
-        self.setStoryLoc() # Set the story locations
+        self.setStartLoc(scenario, scenarioIndex) # Sets the starting location on the map
+        self.setStoryLoc(scenario, scenarioIndex) # Set the story locations
+        self.movesSinceCombat = 0
+
+    def createLocationDecider(self,scenario, scenarioIndex):
+        # Select which map constructior to use. If the first scenario, use random map gen. If not, use the map specific one.
+        if scenarioIndex == 0:
+            self.createLocations(scenario)
+        else:
+            self.createLocations4Scenario(scenario)
 
     def createLocations(self, scenario):
             # Set up objects for every location/tile on the map
@@ -44,16 +52,32 @@ class WorldMap():
                 locations.append(templist)
             WorldMap.STARTINGBOARD = locations
 
-    def setStoryLoc(self):
+    def createLocations4Scenario(self, scenario):
+        # Set up locations from the 2nd scenario and on. Sets a map that's not ranomized. Do not use for first scenario!!!
+        # Set up objects for every location/tile on the map
+            locations = [] # The complete list of 5 lists with 5 locations. [[5][5][5][5][5]]
+            for description_list in scenario["description"]:
+                templist = [] # Reset temp list for every iteration of the loop
+                for string in description_list:
+                    #examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)]
+                    templist.append(gm_locations.Locationforest(string, ''))
+                locations.append(templist)
+            WorldMap.STARTINGBOARD = locations
+
+    def setStoryLoc(self, scenario, scenarioIndex):
         # Set the story locations on the map, they will be hidden from the player, setting up 3 to start with, so increase the players chances of ladning on a storyloc.
         # When the player visit these locations it will get some flavortext.
         from random import randint
-        while len(self.storyLocations) < 4:
-            storyLoc = [randint(0, 4), randint(0, 4)]
-            startingLocation = self.START[:]
-            while storyLoc in startingLocation or storyLoc in self.storyLocations:
+        if scenarioIndex == 0:
+            while len(self.storyLocations) < 10:
                 storyLoc = [randint(0, 4), randint(0, 4)]
-            self.storyLocations.append(storyLoc)
+                startingLocation = self.START[:]
+                while storyLoc in startingLocation or storyLoc in self.storyLocations:
+                    storyLoc = [randint(0, 4), randint(0, 4)]
+                self.storyLocations.append(storyLoc)
+        else:
+            #storyLoc = scenario["storylocations"]
+            self.storyLocations = scenario["storylocations"]
 
     def checkIfOnStoryLoc(self):
         # change the board data structure with a sonar device character
@@ -87,16 +111,28 @@ class WorldMap():
             print()
             printThis(gameState.scenario["storylocation"][self.storylocIndex], speed=0.05)
             self.storylocIndex += 1
-            self.setStoryLoc()
+            if gameState.scenarioIndex == 0:
+                self.setStoryLoc(gameState.scenario, gameState.scenarioIndex)
             time.sleep(3)
 
-    def setStartLoc(self, scenario):
+    def setStartLocFirstScenario(self, scenario, scenarioIndex):
         # Validates if the move entered is on the board and executes it.
         previousX, previousY = self.previousPosition
         currentX, currentY = self.currentPosition
         if (-1 < currentX < 5) and (-1 < currentY < 5):
             # If current move if on the board, the move will be performed.
             self.theMap[previousY][previousX].mapTile = WorldMap.heroPrevPos
+            self.theMap[currentY][currentX].mapTile = WorldMap.heroCurrentPos
+            self.theMap[currentY][currentX].visitedText = scenario["startlocationagain"] # Set flavor text on the starting location of the game.
+            self.theMap[currentY][currentX].startLocation = True # Set startlocation to True so that we know where it is.
+
+    def setStartLoc(self, scenario, scenarioIndex):
+        # Set player position on the map according to the scenariotext
+        if scenarioIndex == 0: # if the first scenario, proceed as before. 
+            self.setStartLocFirstScenario(scenario, scenarioIndex)
+        else: # If second or later scenario set up according to scenario.
+            self.currentPosition = self.previousPosition = scenario["startinglocation"]
+            currentX, currentY = self.currentPosition
             self.theMap[currentY][currentX].mapTile = WorldMap.heroCurrentPos
             self.theMap[currentY][currentX].visitedText = scenario["startlocationagain"] # Set flavor text on the starting location of the game.
             self.theMap[currentY][currentX].startLocation = True # Set startlocation to True so that we know where it is.
@@ -115,6 +151,8 @@ class WorldMap():
             self.whatToDo(gameState)
         elif ctrl.lower() == 'map' or ctrl.lower().startswith('m'):
             self.navigateTheMap(gameState)
+        elif ctrl.lower() == 'help':
+            gameState.player.printHelpText()
         elif ctrl.lower() == 'experience':
             # Added for debug purposes, remove or you got a decent cheat ;)
             print('# Log: You gain 500 experience. You CHEATER!')
@@ -146,7 +184,6 @@ class WorldMap():
                 time.sleep(1)
                 gameState.player.inCombat = self.checkCombat(playerLocation.encounterChance) # Checks if the player gets into combat.
         else:
-            #print("Can't go further in that direction, please select another direction.")
             self.currentPosition = self.previousPosition[:]
             self.navigateTheMap(gameState, tryAgain=True)
 
@@ -174,12 +211,15 @@ class WorldMap():
 
     def checkCombat(self, encounterChance):
         # Randomly encounter checker, (0,1) = 50% chance of encounter
-        checkCombatRoll = random.randint(0, 10)
-        # print('# Log: Roll: %s vs Chance: %s' % (checkCombatRoll, encounterChance)) # Logline for testing
+        checkCombatRoll = random.randint(1, 10)
         if checkCombatRoll < encounterChance:
             return True
         else:
-            # print('# Log: no combat')
+            if encounterChance <= 4: # added mechanic, just in case you get a situation where you never end up in combat
+                self.movesSinceCombat += 1 
+                if (checkCombatRoll - self.movesSinceCombat) < encounterChance:
+                    self.movesSinceCombat = 0
+                    return True
             return False
     
     def drawMapOLD(self):
@@ -208,7 +248,7 @@ class WorldMap():
             nameLvlXpPrint = nameLvlXp.center(spacing)
             dashedLine = '+---------------------------------------------------'
             #plAttributes= ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s    ' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
-            plAttributes= '  Str: %s  Agi: %s  Fort: %s | AC: %s HP: %s / %s  ' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
+            plAttributes= ' Str: %s  Agi: %s  Fort: %s | AC: %s HP: %s / %s ' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
             plAttributesPrint = plAttributes.center(spacing)
             
             # Set up boolean checks so that the right lines are printed at the right place. 
@@ -264,7 +304,6 @@ class WorldMap():
 
     def showmap(self, tryAgain=False):
         # Draw the game map when it is called from command prompt
-        #print('' + ('\t\t  +----MAP----+'))
         os.system('cls')
         print('''                  _____________
                 =(_ ___  __ __ )=
@@ -286,6 +325,7 @@ class WorldMap():
 
 def printThis(message, speed=0.02):
     # Possible usable function to call when you want to print fluid messages. time will show /12.03.19
+
     for character in message:
                     sys.stdout.write(character)
                     sys.stdout.flush()
@@ -307,5 +347,3 @@ TITLE2 = '''
 TITLE3 ='''  ############################################################
  ###                Forest's and Nåså's                   ###
 ############################################################\n'''
-
-ENDING_MSG = 'You have completed the initial story, feel free to roam around.'
