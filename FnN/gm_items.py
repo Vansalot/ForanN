@@ -36,13 +36,40 @@ def itemFound(gameState):
     gameState.player.inventory.append(itemFound)
     #print()
     
-def critItemFound(gameState):
-    playerLocation = gameState.map.theMap[gameState.map.currentPosition[0]][gameState.map.currentPosition[0]]
-    itemFound = gameState.scenario["specialitem"]["type"]["ability"]
-    gm_map.printThis(playerLocation.examineText)
-    print('You have found a %s!' % (itemFound.title()))
-    # Set up stuff to add the item to the inventory
-    if itemFound not in gameState.player.weapon:
-        gameState.player.specialItem = gameState.scenario["specialitem"]
-        gameState.player.weapon.append(itemFound)
-        gameState.player.playerHitModChange()
+def specialItemFound(gameState):
+    from random import choice
+    playerLocation = gameState.map.theMap[gameState.map.currentPosition[0]][gameState.map.currentPosition[0]] # set up variable for playerlocation.
+    itemFound = choice(itemlist) # Get a random item from the itemlist.
+    while itemFound in gameState.player.equipped: # If the player already has the item, try again
+         itemFound = choice(itemlist)
+    itemName = itemFound["type"]
+    gameState.map.specialItemFound = True # You can only find 1 special item per scenario.
+    if gameState.map.victory == False:
+        gm_map.printThis(playerLocation.examineText)
+    if gameState.map.victory == True:
+         gm_map.printThis('After finishing up the fight you lean down and... ',end='')
+    print('You have found a %s!' % (itemName.title()))
+    # Set up stuff to add the item to the player, update stats based on item stats.
+    if itemFound not in gameState.player.equipped: # Should set up own function for this!!
+        gameState.player.equipped.append(itemFound) # append the item dict in equipped list.
+        # gameState.player.eqipped.append(itemName) might not need this, tbd
+        gameState.player.playerHitModChange() # might need to change this to an own "change stats based on item function" (below)
+        gameState.player.ItemBonusUpdate() # create this function
+
+
+''' 
+    ** Itemlist, for now, items can be represented in the following way: **
+    'type' : sword / shield / breastplate / etc (string)
+    'armorbonus' : int
+    'hitbonus' : int
+    'dmgbonus' : int
+    'ability' : eg. cleave / power attack / point blank shot (string)
+
+'''
+
+itemlist = [
+{'type':'sword', 'hitbonus': 2, 'dmgbonus': 1, 'armorbonus': 0, 'ability': 'power attack'},
+{'type':'shield', 'hitbonus': 0, 'dmgbonus': 0, 'armorbonus': 1, 'ability': 'shield bash'},
+{'type':'helmet', 'hitbonus': 0, 'dmgbonus': 0, 'armorbonus': 1, 'ability': None},
+{'type':'chainmail', 'hitbonus': 0, 'dmgbonus': 0, 'armorbonus': 2, 'ability': None},
+]

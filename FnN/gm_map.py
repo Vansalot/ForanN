@@ -27,6 +27,7 @@ class WorldMap():
         self.storylocIndex = 0
         self.maxStorylocIndex = scenario["maxStorylocIndex"]
         self.victory = False
+        self.specialItemFound = False
         self.setStartLoc(scenario, scenarioIndex) # Sets the starting location on the map
         self.setStoryLoc(scenario, scenarioIndex) # Set the story locations
         self.movesSinceCombat = 0
@@ -47,7 +48,6 @@ class WorldMap():
                     # Add flavor description for every location
                     description = scenario["description"][random.randint(0, len(scenario["description"]) -1)] 
                     examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)] 
-                    #print(examineText, description) # test to print location info, to verify the constructor is doing it's thing
                     templist.append(gm_locations.Locationforest(description, examineText)) # Call the constructur with desc that is defined in line above.
                 locations.append(templist)
             WorldMap.STARTINGBOARD = locations
@@ -59,8 +59,8 @@ class WorldMap():
             for description_list in scenario["description"]:
                 templist = [] # Reset temp list for every iteration of the loop
                 for string in description_list:
-                    #examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)]
-                    templist.append(gm_locations.Locationforest(string, ''))
+                    examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)]
+                    templist.append(gm_locations.Locationforest(string, examineText))
                 locations.append(templist)
             WorldMap.STARTINGBOARD = locations
 
@@ -69,33 +69,40 @@ class WorldMap():
         # When the player visit these locations it will get some flavortext.
         from random import randint
         if scenarioIndex == 0:
-            while len(self.storyLocations) < 10:
+            while len(self.storyLocations) < 5:
                 storyLoc = [randint(0, 4), randint(0, 4)]
                 startingLocation = self.START[:]
                 while storyLoc in startingLocation or storyLoc in self.storyLocations:
                     storyLoc = [randint(0, 4), randint(0, 4)]
                 self.storyLocations.append(storyLoc)
         else:
-            #storyLoc = scenario["storylocations"]
             self.storyLocations = scenario["storylocations"]
 
-    def checkIfOnStoryLoc(self):
+    def checkIfOnStoryLoc(self, gameState):
         # change the board data structure with a sonar device character
         # Return False if this is an invalid move.
-        smallestDistance = 100
-        from math import sqrt
-        x = self.currentPosition[0]
-        y = self.currentPosition[1]
-        for cx, cy in self.storyLocations:
-            distance = math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y))
-            if distance < smallestDistance: # We want the closest story location
-                smallestDistance = distance
-        if smallestDistance == 0:
-            # Player is on a story location!
-            self.storyLocations.remove([x,y])
-            return True
-        else:
-            return False          
+        index = gameState.scenarioIndex
+        if index == 0: # If in first scenario
+            smallestDistance = 100
+            from math import sqrt
+            x = self.currentPosition[0]
+            y = self.currentPosition[1]
+            for cx, cy in self.storyLocations:
+                distance = math.sqrt((cx - x) * (cx - x) + (cy - y) * (cy - y))
+                if distance < smallestDistance: # We want the closest story location
+                    smallestDistance = distance
+            if smallestDistance == 0:
+                # Player is on a story location!
+                self.storyLocations.remove([x,y])
+                return True
+            else:
+                return False          
+
+        else: # if other than first scenario
+            if self.currentPosition == gameState.scenario["storylocations"][self.storylocIndex]:
+                return True
+            else:
+                return False
 
     def printStoryLoc(self, gameState):
         # Prints flavortext for the story locations
@@ -162,7 +169,6 @@ class WorldMap():
             gameState.player.examineLocation(gameState)
             self.whatToDo(gameState)
         
-
     def move_player(self, gameState):
         # Validates if the move entered is on the board and executes it.
         previousX, previousY = self.previousPosition
@@ -174,7 +180,7 @@ class WorldMap():
             self.theMap[currentY][currentX].mapTile = WorldMap.heroCurrentPos
             self.visitedPosition.append(self.previousPosition) # might be removed must refactor
             self.theMap[currentY][currentX].visited = True
-            if self.checkIfOnStoryLoc() == True:
+            if self.checkIfOnStoryLoc(gameState) == True:
                 self.printStoryLoc(gameState)
             elif playerLocation.startLocation == True and playerLocation.visited == True:
                 printThis(playerLocation.visitedText)
@@ -212,7 +218,7 @@ class WorldMap():
     def checkCombat(self, encounterChance):
         # Randomly encounter checker, (0,1) = 50% chance of encounter
         checkCombatRoll = random.randint(1, 10)
-        if checkCombatRoll < encounterChance:
+        if checkCombatRoll > encounterChance:
             return True
         else:
             if encounterChance <= 4: # added mechanic, just in case you get a situation where you never end up in combat
@@ -260,11 +266,11 @@ class WorldMap():
 
             # Check if inventory needs to be printed
             inventoryinfoPrint = gameState.player.getInventoryForPrint()
-            weaponPrint = gameState.player.getWeaponForPrint()
+            equippedPrint = gameState.player.getequippedForPrint()
             if inventoryinfoPrint == None:
                 inventoryinfoPrint = ' Inventory: '
-            if weaponPrint == None: 
-                weaponPrint = ' Weapon: '
+            if equippedPrint == None: 
+                equippedPrint = ' Equipped: '
 
             # Draw the game map data structure together with the player information data structure.
             if gameState.player.inCombat == False:
@@ -295,7 +301,7 @@ class WorldMap():
                     filler1 = True
                     continue
                 if filler2 == False:
-                    print(weaponPrint.center(spacing) + '    %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    print(equippedPrint.center(spacing) + '    %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
                     filler2 = True
                     continue
                 print('  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))

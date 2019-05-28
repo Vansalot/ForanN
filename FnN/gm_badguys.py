@@ -1,7 +1,7 @@
 """
     Initialization of enemies and bosses.
 """
-import gm_charstats, gm_combat
+import gm_charstats, gm_combat, gm_map, gm_scenarios
 import time, sys
 from random import randint
 from random import choice
@@ -104,6 +104,7 @@ def createBoss(gameState):
     print()
     print('A big ass mother dude lunges at you. He\'s yelling that he\'s going to turn you into an ear ornament! DEFEND YOURSELF!')
     time.sleep(1)
+    
 
 def createEnemy(gameState):
     # creates a new enemy
@@ -112,12 +113,13 @@ def createEnemy(gameState):
     gameState.enemy.append(enemy)
     time.sleep(1)
     print()
-    message = 'A raving madman who calls himself %s lunges at you. He looks like he wants to introduce you to a can of whoop-ass! ' % (enemy.enemy_name.title())
-    for character in message:
-        sys.stdout.write(character)
-        sys.stdout.flush()
-        time.sleep(0.02)
+    #description = scenario["description"][random.randint(0, len(scenario["description"]) -1)]
+    from random import randint
+    gm_map.printThis(gm_scenarios.COMBAT_FLAVOR["combatintrostart"][randint(0, len(gm_scenarios.COMBAT_FLAVOR["combatintrostart"]) -1)])
+    print(enemy.enemy_name.title(),end='')
+    gm_map.printThis(gm_scenarios.COMBAT_FLAVOR["combatintroending"][randint(0, len(gm_scenarios.COMBAT_FLAVOR["combatintroending"]) -1)])
     time.sleep(1.5)
     message2 = 'DEFEND YOURSELF!'
     print(message2)
     time.sleep(2)
+    message = 'A raving madman who calls himself %s lunges at you. He looks like he wants to introduce you to a can of whoop-ass! ' % (enemy.enemy_name.title())

@@ -1,6 +1,3 @@
-
-
-
 # Scenario file. Contains map data. Thought is that you can generate a new map/scenario after completing first scenario based on data in this file. 
 
 #
@@ -22,6 +19,7 @@ forest = {
     'Thousands of vendings kvern around in your head as you wander further into the forest.\n',
     'Tired, you wander along the path in front of you, if you only had some juløl.\n',
     'Humming to the song "knuckle pokel man" you gaze further into the deep forest. You can only hear some rustling in the bushes nearby\n',
+    'There\'s many problems in this world, and to you it seems that trees ain\'t one of them, or is it?\n', 
     ],
 
     "startlocationagain": ['After a while of struggling through a shrubbery you finally get into a clearing in the forest, you look around and find out that this is the place that you woke up earlier.\nYou immidiately find out that you have to move on.\n'],
@@ -31,12 +29,14 @@ forest = {
     'You almost fall over a treestump, after regaining your balance you see something shining on the ground.\n', 
     'You look around the nearby bushes, you look in a birds nest...\n',
     'You search through the rubble and...\n'
+    'Hey, this was lying right in front of you the whole time.\n',
     ],
     
     "failedexamine": [
     'You look around the nearby bushes and realise that there\'s nothing here.\n',
     'The area does not seem to contain anything of interest.\n',
     'You find nothing.\n'
+    'You rummage through an rock outcropping. Finding nothing but a rock\n',
     ],
     
     "alreadyexamined": ['You have already examined this location. You look around, but there\'s nothing of interest.\n'],
@@ -44,20 +44,19 @@ forest = {
     "notexaminable": ['You take a quick sweep over the area and decide that there\'s not much to find here.\n'],
     
     "storylocation": [
-    "You traverse through some bushes and come out into a clearing. In front of you stand a Nissemann, he tells you that 'it's hard to be a nissemann'.\nHe asks you if you can find his friends 'Frits' and 'Gunther'.\nHe doesn't know where to find them, so you decide to just continue on your journey.\n",
+    "You traverse through some bushes and come out into a clearing. In front of you stands a Nissemann, he tells you that 'it's hard to be a nissemann'.\nHe asks you if you can find his friends 'Frits' and 'Gunther'.\nHe doesn't know where to find them, so you decide to just continue on your journey.\n",
     "You hear some screaming close by, after you pass some rocks you see a Nisse who\'s lying on the ground. He seems badly injured. You ask him if he\'s feeling under the weather.\nThe response you get is 'that is a good vending, maybe we should use that in another episode', so you guess he\'s not as badly hurt as you first thought.\nAfter talking for a while you hear from him that his friend Gunther is missing, and that he might have been taken by one of the nasty Nåså\'s.\nYou tell him where you found his friend Hansi, and tell him to wait for you there.\n",
     "When you come through a clearing in the forest you see a Nisse who\'s tied up against a tree. He looks pretty beaten up. \nYou ask him if he\'s alright. After muttering for a bit, he manages to inform you that he\'s a 'spikker' so he\'s more than alright. \nJust as you finish untying him, you realize that you are not alone...\n"   
     ],
     "ending": '\nWhen the fight ends, you take Gunther and help him back to his friends. In the evening you drink beer and dance støveldæns.\n',
-    "specialitem" : {'type':'sword', 'hitbonus':2, 'dmgbonus': 1, 'ability': 'powerattack'},
-    "maxStorylocIndex": 1,
+    "maxStorylocIndex": 2,
 }
 #
 # Scenario 2. town
 #
 
 town = {
-    "intro": 'Intro Town: You wake up with a thundering headache. The nisse\'s are no where to be seen.\nWhile sorting out your business you realize that you are in the edge of the forest, which is scarser here.\nYou can see rooftops in the distance to the south east...\n',
+    "intro": 'Intro Town: You wake up with a thundering headache. The nisse\'s are nowhere to be seen.\nWhile sorting out your business you realize that you are in the edge of the forest, which is scarser here.\nYou can see rooftops in the distance to the south east...\n',
     "description": [
         [
             '00: You are in the edge of the forest, you see that the trees are more scarse here than in the thick forest you were in earlier.\nTo the south east you can see rooftops of the nearby village.\n',
@@ -84,45 +83,75 @@ town = {
             '15: You come to an open area with a road leading east to the village.\nTheres a fenced area here, it seems like it\'s been used for cattle, but now it looks in a state of disrepair\n',
             '16: You\'re standing by a barn next to some fields. The fields look like they\'ve had better days.\n To the south there are more fields. You see the village to the east.\n',
             '17: You are in the southern part of the village, there\'s a bit fewer buildings here. To the south you see some fields.\n',
-            '18: You\'re standing in a field. There are several fields around you, with some buildings to the north',
-            '19: test',
+            '18: You\'re standing in a field. There are several fields around you, with some buildings to the north\n',
+            '19: You are standing on a small road leading into a deep forest. There\'s a stream between you and the village to the north west.\n',
         ],
         [
-            '20: test',
-            '06: test',
-            '07: test',
-            '08: test',
-            '24: test',
+            '20: You are in the forest south west of the village that you saw earlier. For some reason there\'s squirrels everywhere.\n',
+            '21: You are standing in a cornfield, it doesn\'t look well maintained. To the far north by north east you can see the village.\nNear you there are even more fields.\n',
+            '22: You\'re standing in a field. There are several fields around you. To the east you can see what only can be the village cemetery. You aren\'t too keen on going over there\n.',
+            '23: You are standing by the stream that runs east of the village.\nThe water looks dirty, probably because of the rain. Near you there are (more) fields.',
+            '24: You are in the forest south west of the village that you saw earlier.\nThere are some not so happy noises coming from deep within the forest.\n',
         ],
     ],
     
     "startlocationagain":'',
-    "examination": ['Examination 1', 'Examination 2', 'Examination 3'],
+    "examination": [
+    'You search around some junk on the ground and\n',
+    'To your surprise you stumble over something.\n',
+    ],
     "failedexamine": [
-    'You look around the nearby bushes and realise that there\'s nothing here.\n',
+    'You look around your near vicinity and realise that there\'s nothing here.\n',
     'The area does not seem to contain anything of interest.\n',
     'You find nothing.\n'
     ],
     "notexaminable": ['You take a quick sweep over the area and decide that there\'s not much to find here.\n'],
     "alreadyexamined": ['You have already examined this location. You look around, but there\'s nothing of interest.\n'],
-    "storylocation": ['storylocation 1', 'storylocation 2', 'storylocation 3', 'Storylocation 4'],
-    "ending": '',
+    "storylocation": [
+    'When you arrive at the edge of the village. You meet a nisse who looks very tired.\nAfter talking for a while you find out that they are having trouble with someone abducting their fjøsnisser.\nYou should investigate.\n',
+    'You meet a nissemor with teary eyes, she\'s sad cause her fjøsnisse dissappeared the other day.\nShe also told you that when she went by the cemetary she think that she saw someone suspicious.\n', 
+    'Upon arriving at the cemetary you see someone run away, he ran north east!\n',
+    'Finally, just by the bridge leading out to the eastern area you catch him, he turn\'s around and...\n'],
+    
+    "ending": 'After kicking the ass of the supposed abductor. You go to the closest thing that can be called a tavern. Then you enjoy many juløl...\n',
     "maxStorylocIndex": 3,
     "startinglocation": [0, 0],
-    "storylocations": [[0,1],[0,2],[0,3], [0,4]],
+    "storylocations": [[1, 1],[3, 1],[2, 4], [4, 1]],
 }
 
 itemsAndAbilities = {
     "rest": '* Rest *: Player rests and restores his hp. Can only be used while traveling.',
     "examine": '* Examine *: Attempt to search for items in the location you are in. There\'s a random chance to find items.\nNot all locations are examinable.',
-    "hit": '* Hit *: Player tries to hit the enemy, hit is modified by player strenght and weapon bonus.\nIf hit roll + bonus(es) is equal to enemy armor, you score a hit.\n',
+    "hit": '* Hit *: Player tries to hit the enemy, hit is modified by player strenght, level, and weapon bonus.\nIf hit roll + bonus(es) are equal to enemy armor, you score a hit.\n',
     "parry": '* Parry * : Player enter parry mode. In this mode you skip your attack, but get more armor value until the next round.\nIf enemy misses his hit when you are in parry mode, you can counterattack. Counterattack is not modified by hit bonuses, and can not crit.\n',
-    "healing potion": '* Healing potion *: Heals the player for x hp. You can only use this item while in combat.\nYou spend your round using a healing potion.',
-    "powerattack": '* Power attack *: Attempt to strike the enemy. You get a slight reduction to your hit bonus, but you get +2 dmg if you hit.'
-
+    "healing potion": '* Healing potion *: Heals the player for x hp. You can only use this item while in combat.\nYou spend your round using a healing potion.\n',
+    "power attack": '* Power attack *: Attempt to strike the enemy. You get a slight reduction to your hit bonus, but you get +2 dmg if you hit.\n',
+    "sword": '* Sword * : Adds +2 to hit rolls, and +1 to damage rolls. Also can give access to "power attack" ability.\n',
+    "shield": '* Shield * : Adds +1 to armor. Can also give access to "shield bash" ability(**TBI**).\n',
+    "chainmail": '* Chainmail * : Adds +2 to armor.'
 }
 
 SCENARIOS = [forest, town] # List of scenario dictionaries. used for initializing scenarios. New scenarios should be added to this list. 
+
+COMBAT_FLAVOR = {
+    "combatintrostart": [
+    'A raving madman who calls himself ',
+    'Some dude named ',
+    'As you were just minding your own business, ',
+    'Oh snap! Shit has just hit the fan! ',
+    '"Bob, bob, bob, ikke sant", you hear someone say behind you. You turn around and '
+    ],
+    "combatintroending": [
+    ' lunges at you. He looks like he wants to introduce you to a can of whoop-ass! ',
+    ' shows up and seems eager to wear you like a hat! ',
+    ' sneaks up on you. He raises his hand in the air... ',
+    ' tells you to respect his authority! ',
+    ' slaps you around with a trout! '
+    ],   
+    "combatwonstart": ['You whooped'],
+    "combatwonending": ['ass, real goood.'],
+}   
+
 
 VICTORY = '''
    :::     ::: ::::::::::: :::::::: ::::::::::: ::::::::  :::::::::  :::   :::  ::: 

@@ -22,8 +22,8 @@ class Player():
         self.moveActions = ['(W)est', '(E)ast', '(N)orth', '(S)outh'] # Possible move actions on the map
         self.totalPointsAllocated = 6 # Default points player can allocate to skills at the beginning of the game.
         self.inventory = []
-        self.weapon = []
-        self.specialItem = {}
+        self.equipped = []
+        self.specialItem = []
 
     def printHelpText(self):
         # work in progress. Help text printed on the screen.
@@ -38,6 +38,13 @@ class Player():
         for action in self.possibleCombatActions:
 	        if action.lower() in gm_scenarios.itemsAndAbilities:
 		        print(gm_scenarios.itemsAndAbilities[action.lower()])
+        if len(self.equipped) > 0:
+            for itemDict in range(len(self.equipped)):
+                if self.equipped[itemDict]["type"] not in gm_scenarios.itemsAndAbilities:
+                    print('# Log:', self.equipped[itemDict]["type"], 'Item not in gm_scenarios.itemsAndAbilities. From printHelpText()')
+                    pass # This line could be removed. 
+                else:
+                    print(gm_scenarios.itemsAndAbilities[equipped[itemDict]["type"].lower()])
         input("Hit 'Enter' to continue... ")
 
     def printPlayerPossibleactions(self):
@@ -61,15 +68,19 @@ class Player():
         else:
             return None
 
-    def getWeaponForPrint(self):
-        if len(self.weapon) > 0:
-            # if player has a weapon
+    def getequippedForPrint(self):
+        if len(self.equipped) > 0:
+            # if player has something equipped
             spacing = 45 # set centerspace for the printed text
-            weapon = ' Weapon: %s' % (self.weapon[-1].title())
-            weaponInfoPrint = weapon.center(spacing)
-            return(weaponInfoPrint)
-        else:
-            return None
+            equippedPrint = []
+            for idemDict in range(len(self.equipped)):
+                equippedPrint.append(self.equipped[idemDict]["type"])
+                strEquipList = ', '.join(equippedPrint).title() # set eqipped list up as string with capital first letter.
+                equipped = ' Equipped: %s' % (strEquipList) # put together another string with the list of items so that they can be .center(ed)
+                equippedInfoPrint = equipped.center(spacing) # center the text
+                return(equippedInfoPrint) # return the string
+            else:
+                return None
 
     def printMoveActions(self):
         # Prints directions that player can move. invoked when player enters "move" or "map".
@@ -87,14 +98,14 @@ class Player():
             gm_map.printThis(gameState.scenario["notexaminable"][-1])
         elif playerLocation.examineable == True and playerLocation.beenExamined == False:
             # If the location is examinable, and haven't been examined before.
-            examineRoll = random.randint(1,10)
+            examineRoll = random.randint(1,10) # !!! #
             examineChance = playerLocation.examineChance
             #examineChance = gameState.map.theMap[gameState.map.currentPosition[0]][gameState.map.currentPosition[0]].examineChance
-            if examineRoll == 10 and gameState.scenario["specialitem"]["type"] not in self.weapon:
+            if examineRoll == 10 and gameState.map.specialItemFound == False:
                 # If you roll a 10 on examine, and you have not found the "special" item yet, you can find it.
                 #print('# Log: Critical Examine')
                 gm_locations.setExamined(playerLocation) # Set examined to True, so that it can not be examined again.
-                gm_items.critItemFound(gameState)
+                gm_items.specialItemFound(gameState)
             elif examineRoll >= examineChance:
                 # If the examine roll succeeds
                 gm_locations.setExamined(playerLocation) # Set examined to True, so that it can not be examined again.
@@ -152,7 +163,20 @@ class Player():
                 print("Please enter a valid stat to increase(str, agi, fort).")
                 print()
             self.playerarmHpChange()
-            self.playerHitModChange()
+        self.playerHitModChange()
+        self.checkSkilLearn()
+        
+    def checkSkilLearn(self):
+        # During levelup, if player has an item, 
+        if len(self.equipped) > 0:
+            for itemDict in range(len(self.equipped)):
+                if self.equipped[itemDict]["ability"] != None and self.equipped[itemDict]["ability"] not in self.possibleCombatActions:
+                    self.possibleCombatActions.append(self.equipped[itemDict]["ability"])
+                    print('\nYou have learned to use the "%s" ability with your %s!' % (self.equipped[itemDict]["ability"], self.equipped[itemDict]["type"]))
+                else:
+                    print('# Log: No new abilities learned, ability is already learned')
+        else:
+            print('# Log: No new abilities learned, no items in equipped')
 
     def playerStatChange(self, strength, agility, fortitude):
         # Procedure to change character stats. 
@@ -164,27 +188,50 @@ class Player():
         # Part of the level up routine, updates hp and armor.
         self.attributes.pl_maxhp += self.attributes.pl_fort
         self.attributes.pl_current_hp = self.attributes.pl_maxhp
-        self.attributes.pl_currentArmor = self.attributes.pl_base_armor + self.attributes.pl_agi
+        self.attributes.pl_currentArmor = self.attributes.pl_base_armor + self.attributes.pl_agi + self.attributes.pl_armorBonusFromEquipped
 
     def playerHitModChange(self):
         # Part of level up routine, updates hit modifier. Can also be called from items module if player find an item that changes hit modifier.
         newHitModifier = 0
-        newHitModifier += round(self.attributes.pl_lvl / 2)
+        newHitModifier += int(self.attributes.pl_lvl / 2)
         newHitModifier += int(self.attributes.pl_str / 4)
+        newHitModifier += self.attributes.pl_hitBonusFromEquipped
         if self.attributes.pl_lvl > 10: # If you hit lvl 10 add some more hit.
             newHitModifier += 2
         elif self.attributes.pl_lvl > 20: # If you hit lvl 20 add some more hit.
             newHitModifier += 4        
-        if len(self.weapon) > 0: # Add hit bonus from weapon
-            newHitModifier += self.specialItem["hitbonus"]
         self.attributes.pl_hitmod = newHitModifier # set the new hit modifier to the players attribute
 
         ''' ^^^ Levelup functions ^^^ '''
 
+    def ItemBonusUpdate(self):
+        # update bonuses from items in player attributes.
+        if len(self.equipped) > 0: # incase of exceptions
+            tothibB = 0
+            totdmgB = 0
+            totarmB = 0
+            for dictionary in range(len(self.equipped)):
+                hitB = self.equipped[dictionary]["hitbonus"]
+                dmgB = self.equipped[dictionary]["dmgbonus"] 
+                armB = self.equipped[dictionary]["armorbonus"]
+                tothibB += hitB
+                totdmgB += dmgB
+                totarmB += armB
+                print('# LOG: tothitB = %s, totdmgB = %s, totarmB = %s' % (tothibB, totdmgB, totarmB))
+            self.attributes.pl_hitBonusFromEquipped = tothibB
+            self.attributes.pl_dmgBonusFromEquipped = totdmgB
+            self.attributes.pl_armorBonusFromEquipped = totarmB
+            if tothibB > 0:
+                self.playerHitModChange()
+            if totdmgB > 0:
+                pass # handling not needed at the moment
+            if totarmB > 0:
+                self.attributes.pl_currentArmor += totarmB
+
 class Gamestate():
     def __init__(self):
         # Groups up all game information(hopefully) in one class, so that it can be passed around in the functions.
-        self.scenarioIndex = 0 # Index to iterate over scenarios
+        self.scenarioIndex = 1 # Index to iterate over scenarios
         self.scenario = gm_scenarios.SCENARIOS[self.scenarioIndex] # Inserts the dictionary of the scenario
         self.player = Player()
         self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex)
@@ -208,7 +255,7 @@ class PlayerAttributes():
     # Initializes the player attributes, they are part of the Player class.
     def __init__(self):
         self.pl_lvl = 1 # Player level
-        self.pl_hitmod = 0 # Player hit modifier, normally lvl / 2, which is added to attack rolls.
+        self.pl_hitmod = 0 # Player hit modifier, modified by lvl, str, and items
         self.pl_xp = 0 # player experience
         self.pl_str = 0 # player strenght
         self.pl_agi = 0 # player agility
@@ -218,6 +265,9 @@ class PlayerAttributes():
         self.pl_current_hp = self.pl_maxhp # Current hp, to track how much hp you have during combat.
         self.pl_base_armor = 10 # player base armor
         self.pl_currentArmor = self.pl_base_armor + self.pl_agi # player armor modified by agility.
+        self.pl_hitBonusFromEquipped = 0    # vvv Affects pl_hitmod
+        self.pl_dmgBonusFromEquipped = 0    # bonuses from items, used in combat calculations
+        self.pl_armorBonusFromEquipped = 0  # ^^^ Affects pl_currentArmor
         self.levelup = [1000, 2000, 3500, 5000, 7000, 8500, 10000, 12500, 15000, 17500, 20000, 23000, 26000, 30000, 35000, 41000, 47000, 52000, 58000, 65000] # xp thresholds for levelup.
 
 
@@ -326,6 +376,7 @@ def nextScenario(gameState):
     gameState.player.attributes.pl_current_hp = gameState.player.attributes.pl_maxhp # Reset player hp to max.
     # Print scenario stuff
     gm_map.printThis(gameState.scenario["intro"])
+    input("\nHit 'Enter' to continue...")
     gameLoop(gameState) # go back to the game loop after the setup is complete.
 
 def titleScreen():
@@ -357,7 +408,9 @@ def gameLoop(gameState):
     while True:
         # Main game loop starts here
         if gameState.map.victory == True and gameState.player.inCombat == False:
-            # If the game is finished, print game ending messages.
+            # If the game is finished, start prep for next scenario and print game ending messages.
+            if gameState.map.specialItemFound == False:
+                gm_items.specialItemFound(gameState)
             gm_map.printThis(gameState.scenario["ending"])
             time.sleep(4)
             print()
