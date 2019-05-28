@@ -80,8 +80,8 @@ town = {
             '14: You are standing in some fields by a stream that\'s going south, to the south you see a bridge going over the stream\n',
         ],
         [
-            '15: You come to an open area with a road leading east to the village.\nTheres a fenced area here, it seems like it\'s been used for cattle, but now it looks in a state of disrepair\n',
-            '16: You\'re standing by a barn next to some fields. The fields look like they\'ve had better days.\n To the south there are more fields. You see the village to the east.\n',
+            '15: You come to an open area with a road leading east to the village.\nTheres a fenced area here, it seems like it\'s been used for cattle, but now it looks in a state of disrepair.\n',
+            '16: You\'re standing by a barn next to some fields. The fields look like they\'ve had better days.\nTo the south there are more fields. You see the village to the east.\n',
             '17: You are in the southern part of the village, there\'s a bit fewer buildings here. To the south you see some fields.\n',
             '18: You\'re standing in a field. There are several fields around you, with some buildings to the north\n',
             '19: You are standing on a small road leading into a deep forest. There\'s a stream between you and the village to the north west.\n',

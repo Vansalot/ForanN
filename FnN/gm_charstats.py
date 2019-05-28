@@ -44,7 +44,7 @@ class Player():
                     print('# Log:', self.equipped[itemDict]["type"], 'Item not in gm_scenarios.itemsAndAbilities. From printHelpText()')
                     pass # This line could be removed. 
                 else:
-                    print(gm_scenarios.itemsAndAbilities[equipped[itemDict]["type"].lower()])
+                    print(gm_scenarios.itemsAndAbilities[self.equipped[itemDict]["type"].lower()])
         input("Hit 'Enter' to continue... ")
 
     def printPlayerPossibleactions(self):

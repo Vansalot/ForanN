@@ -13,22 +13,22 @@ def initiativeRoll(gameState):
         if (enemyInitiative == playerInitiative) and (playerInitiative and enemyInitiative != 0):
             print('#Log: Identical initiative roll, rerolling')
         
-        print('# Initiative roll: %s: %s, ' % (gameState.player.name.title(), playerInitiative), end='')
-        time.sleep(1)
-        print('%s: %s' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), enemyInitiative),end='')
-        time.sleep(1)
+    print('# Initiative roll: %s: %s, ' % (gameState.player.name.title(), playerInitiative), end='')
+    time.sleep(1)
+    print('%s: %s' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), enemyInitiative),end='')
+    time.sleep(1)
         
-        if playerInitiative > enemyInitiative:
-            # if player wins the roll
-            print(' * %s begins combat *' % (gameState.player.name.title()),end='')            
-            time.sleep(2)
-            return 'player'
-        
-        elif enemyInitiative > playerInitiative:
-            # if enemy wins the roll
-            print(' * %s begins combat *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()),end='') 
-            time.sleep(2)
-            return 'enemy'
+    if playerInitiative > enemyInitiative:
+        # if player wins the roll
+        print(' * %s begins combat *' % (gameState.player.name.title()),end='')            
+        time.sleep(2)
+        return 'player'
+    
+    elif enemyInitiative > playerInitiative:
+        # if enemy wins the roll
+        print(' * %s begins combat *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()),end='') 
+        time.sleep(2)
+        return 'enemy'
             
 def combatRoll():
     # Returns a random number in the range of 1-20.
