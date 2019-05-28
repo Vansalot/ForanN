@@ -231,7 +231,7 @@ class Player():
 class Gamestate():
     def __init__(self):
         # Groups up all game information(hopefully) in one class, so that it can be passed around in the functions.
-        self.scenarioIndex = 1 # Index to iterate over scenarios
+        self.scenarioIndex = 0 # Index to iterate over scenarios
         self.scenario = gm_scenarios.SCENARIOS[self.scenarioIndex] # Inserts the dictionary of the scenario
         self.player = Player()
         self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex)
