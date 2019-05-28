@@ -269,12 +269,13 @@ def combatLoop(gameState):
             for combatAction in gameState.player.possibleCombatActions:
                 if combatAction.lower().startswith(enteredAction):
                     if enteredAction == 'power attack':
+                        powerAttack = True
                         message = 'You take a deep breath and swing your blade like you mean it!\n'
                         gm_map.printThis(message)
                         hitRoll = combatRoll() 
-                        hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, gameState.player.isENEMY, powerAttack=True)
+                        hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, gameState.player.isENEMY, powerAttack)
                         if hitResult == 'CRITICAL':
-                            critHandling(gameState, gameState.player.isENEMY, powerAttack=True)
+                            critHandling(gameState, gameState.player.isENEMY, powerAttack)
                             turn = 'enemy'
                             continue
                         #turn = 'enemy'
