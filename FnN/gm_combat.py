@@ -122,25 +122,30 @@ def damageRoll():
 
 def modifiedDamage(gameState, baseDamage, enemy, powerAttack=False):
     # Returns damage modified by player/enemy stats
-    modDmg = 0 + gameState.player.attributes.pl_dmgBonusFromEquipped
-    equippeddmg = 0
+    equippeddmg = gameState.player.attributes.pl_dmgBonusFromEquipped
+    modDmg = 0 + equippeddmg
     
-    if powerAttack == True:
-        modDmg += 2
     if enemy != True:       
         # If the player is doing damage
         modDmg += baseDamage + gameState.player.attributes.pl_str
-        if modDmg < 0:
+        if modDmg <= 0:
             modDmg = 1
         if len(gameState.player.equipped) > 0:
-            print('# %s (base) + %s (mod from str) + %s (mod from equipped items) = %s damage dealt.' % (baseDamage, gameState.player.attributes.pl_str, equippeddmg, modDmg))
+            for index in range(len(gameState.player.equipped)):
+                if gameState.player.equipped[index]["type"] == 'sword':
+                    if powerAttack == True:
+                        powerAttackDmg = 2
+                        modDmg += powerAttackDmg
+                        print('# %s (base) + %s (mod from str) + %s (mod from equipped items) + %s (power attack) = %s damage dealt.' % (baseDamage, gameState.player.attributes.pl_str, equippeddmg, powerAttackDmg, modDmg))
+                    else:
+                        print('# %s (base) + %s (mod from str) + %s (mod from equipped items) = %s damage dealt.' % (baseDamage, gameState.player.attributes.pl_str, equippeddmg, modDmg))
         else:
             print('# %s (base) + %s (mod from str) = %s damage dealt.' % (baseDamage, gameState.player.attributes.pl_str, modDmg))
         return modDmg
     else:
         # If the enemy is doing damage
         modDmg = baseDamage + gameState.enemy[gameState.enemyIndex].enemy_str - gameState.player.attributes.pl_agi
-        if modDmg < 0:
+        if modDmg <= 0:
             modDmg = 1
         # Modified from player agi should maybe be tweaked, high agi might cause full damage mitigation. 
         print('# %s (base) + %s (mod from enemy str) - %s (mod from player agi) = %s damage dealt.' % (baseDamage, gameState.enemy[gameState.enemyIndex].enemy_str, gameState.player.attributes.pl_agi, modDmg))
@@ -175,7 +180,7 @@ def hpUpdater(gameState, modifiedDmg, enemy):
             else:
                 pass
 
-def critHandling(gameState, enemy):
+def critHandling(gameState, enemy, powerAttack=False):
     # Handling of critical hits.
     # First there will occur a new roll for hit, if hit occurs again, critical damage is dealt. If hit does not occur, normal damage is called.
     #hitRoll = combatRoll()
@@ -186,11 +191,13 @@ def critHandling(gameState, enemy):
         hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, enemy)
         if hitResult == 'Hit' or hitResult == 'CRITICAL':
             time.sleep(1)
-            print('# You rolled %s (+%s hit modifier) = %s ' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod), end='')
+            print('# You rolled %s + %s (hit modifier) = %s ' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod), end='')
             time.sleep(1)
             print('CRITICAL HIT!!!')
             time.sleep(1)
             critDmg = damageRoll() + damageRoll()
+            if powerAttack == True:
+                critDmg 
             damageHandling(gameState, critDmg, gameState.player.isENEMY)
         else:
             print('Miss, crit becomes normal attack')
@@ -203,7 +210,7 @@ def critHandling(gameState, enemy):
         hitResult = hitDecider(gameState, hitRoll, gameState.player.attributes.pl_currentArmor, enemy)
         if hitResult == 'Hit' or hitResult == 'CRITICAL':
             time.sleep(1)
-            print('# %s rolled %s (+%s hit modifier) = %s ' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod), end='')
+            print('# %s rolled %s + %s (hit modifier) = %s ' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod), end='')
             time.sleep(1)
             print('CRITICAL HIT!!!')
             time.sleep(1)
@@ -252,21 +259,26 @@ def combatLoop(gameState):
             input()
             gameState.enemy[gameState.enemyIndex].printEnemyStats() # print enemy stats
             gameState.map.drawMap(gameState)
-            
+            powerAttack = False
+
             enteredAction = ''
-            while enteredAction.isalpha() != True: # Loop that will ask the player to enter correct action.
+            while enteredAction.replace(" ", "").isalpha() != True: # Loop that will ask the player to enter correct action.
                 gameState.player.printPlayerPossibleactions() # print player's possible actions
                 enteredAction = input(' Please enter your action: ').lower()
                 print()
             for combatAction in gameState.player.possibleCombatActions:
                 if combatAction.lower().startswith(enteredAction):
-                    if enteredAction == 'power attack' or enteredAction == 'powerattack':
-                        message = 'You take a deep breath and swing your blade like you mean it!'
+                    if enteredAction == 'power attack':
+                        message = 'You take a deep breath and swing your blade like you mean it!\n'
                         gm_map.printThis(message)
                         hitRoll = combatRoll() 
                         hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, gameState.player.isENEMY, powerAttack=True)
-                        turn = 'enemy'
-                        continue
+                        if hitResult == 'CRITICAL':
+                            critHandling(gameState, gameState.player.isENEMY, powerAttack=True)
+                            turn = 'enemy'
+                            continue
+                        #turn = 'enemy'
+                        #continue
                     elif enteredAction == 'parry':
                         gameState.player.statusEffects.append(enteredAction)
                         print('You hunker down into a defensive pose.')
@@ -294,19 +306,19 @@ def combatLoop(gameState):
                         print(enteredAction + ', not valid command.')
 
                     # If the player get a hit, it goes through normal hit handling.
-                    #print('# You rolled %s (+%s hit modifier) = %s. * %s *' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod, hitResult))
                     if hitResult == 'Hit':
-                        print('# You rolled %s (+%s hit modifier) = %s. * %s *' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod, hitResult))
-                        damageHandling(gameState, damageRoll(), gameState.player.isENEMY, powerAttack=True)
+                        print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod, hitResult))
+                        damageHandling(gameState, damageRoll(), gameState.player.isENEMY, powerAttack)
                         turn = 'enemy'
+                        continue
                     elif hitResult == 'Miss' and 'parry' in gameState.enemy[gameState.enemyIndex].enemy_statusEffects:
                         # If player misses when enemy is in parry mode
-                        print('# You rolled %s (+%s hit modifier) = %s. * Parry *' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod))
+                        print('# You rolled %s + %s (hit modifier) = %s. * Parry *' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod))
                         counterattack(gameState, gameState.enemy[gameState.enemyIndex].isEnemy)
                         turn = 'enemy'    
                         continue
                     else: # If player misses, it's the enemy's turn
-                        print('# You rolled %s (+%s hit modifier) = %s. * %s *' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod, hitResult))
+                        print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod, hitResult))
                         turn = 'enemy'    
                         continue
         
@@ -343,16 +355,16 @@ def combatLoop(gameState):
                 turn = 'player'
                 continue
             elif hitResult == 'Hit':
-                print('# %s rolled %s (+%s hit modifier) = %s. * %s *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitResult))
+                print('# %s rolled %s + %s (hit modifier) = %s. * %s *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitResult))
                 damageHandling(gameState, damageRoll(), gameState.enemy[gameState.enemyIndex].isEnemy)
                 turn = 'player'
             elif hitResult == 'Miss' and 'parry' in gameState.player.statusEffects:
                 # If enemy misses when player is in parry mode
-                print('# %s rolled %s (+%s hit modifier) = %s. * Parry *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod))
+                print('# %s rolled %s + %s (hit modifier) = %s. * Parry *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod))
                 counterattack(gameState, gameState.player.isENEMY)
                 turn = 'player'
             else: # Also known as 'miss'
-                print('# %s rolled %s (+%s hit modifier) = %s. * %s *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitResult))
+                print('# %s rolled %s + %s (hit modifier) = %s. * %s *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitResult))
                 turn = 'player'
         if gameState.player.dead == True: # If player is dead when enemy turn is finished, exit the loop.
                 break

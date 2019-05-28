@@ -24,7 +24,7 @@ class Enemy:
         self.enemy_base_hp = 10
         self.enemy_maxhp = self.enemy_base_hp + self.enemy_fort         
         self.enemy_current_hp = self.enemy_maxhp
-        self.enemy_base_armor = 10
+        self.enemy_base_armor = 8
         self.enemy_currentArmor = self.enemy_base_armor + self.enemy_agi
         self.enemy_xp_reward = 250 * self.enemy_lvl
         self.enemy_statusEffects = []
@@ -70,7 +70,7 @@ class Boss:
         self.enemy_base_hp = 10
         self.enemy_maxhp = self.enemy_base_hp + self.enemy_fort         
         self.enemy_current_hp = self.enemy_maxhp
-        self.enemy_base_armor = 12
+        self.enemy_base_armor = 10
         self.enemy_currentArmor = self.enemy_base_armor + self.enemy_agi
         self.enemy_xp_reward = 300 * self.enemy_lvl
         self.enemy_statusEffects = []

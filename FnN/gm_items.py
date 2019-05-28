@@ -47,7 +47,7 @@ def specialItemFound(gameState):
     if gameState.map.victory == False:
         gm_map.printThis(playerLocation.examineText)
     if gameState.map.victory == True:
-         gm_map.printThis('After finishing up the fight you lean down and... ',end='')
+         gm_map.printThis('After finishing up the fight you lean down and... ')
     print('You have found a %s!' % (itemName.title()))
     # Set up stuff to add the item to the player, update stats based on item stats.
     if itemFound not in gameState.player.equipped: # Should set up own function for this!!

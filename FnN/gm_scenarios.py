@@ -35,7 +35,7 @@ forest = {
     "failedexamine": [
     'You look around the nearby bushes and realise that there\'s nothing here.\n',
     'The area does not seem to contain anything of interest.\n',
-    'You find nothing.\n'
+    'You find nothing.\n',
     'You rummage through an rock outcropping. Finding nothing but a rock\n',
     ],
     
@@ -120,15 +120,16 @@ town = {
 }
 
 itemsAndAbilities = {
-    "rest": '* Rest *: Player rests and restores his hp. Can only be used while traveling.',
-    "examine": '* Examine *: Attempt to search for items in the location you are in. There\'s a random chance to find items.\nNot all locations are examinable.',
-    "hit": '* Hit *: Player tries to hit the enemy, hit is modified by player strenght, level, and weapon bonus.\nIf hit roll + bonus(es) are equal to enemy armor, you score a hit.\n',
-    "parry": '* Parry * : Player enter parry mode. In this mode you skip your attack, but get more armor value until the next round.\nIf enemy misses his hit when you are in parry mode, you can counterattack. Counterattack is not modified by hit bonuses, and can not crit.\n',
-    "healing potion": '* Healing potion *: Heals the player for x hp. You can only use this item while in combat.\nYou spend your round using a healing potion.\n',
-    "power attack": '* Power attack *: Attempt to strike the enemy. You get a slight reduction to your hit bonus, but you get +2 dmg if you hit.\n',
-    "sword": '* Sword * : Adds +2 to hit rolls, and +1 to damage rolls. Also can give access to "power attack" ability.\n',
-    "shield": '* Shield * : Adds +1 to armor. Can also give access to "shield bash" ability(**TBI**).\n',
-    "chainmail": '* Chainmail * : Adds +2 to armor.'
+    "rest": '* Rest * Player rests and restores his hp. Can only be used while traveling.\n',
+    "examine": '* Examine * Attempt to search for items in the location you are in. There\'s a random chance to find items.\n  Not all locations are examinable.',
+    "hit": '* Hit * Player tries to hit the enemy, hit is modified by player strenght, level, and weapon bonus.\n  If hit roll + bonus(es) are equal to enemy armor, you score a hit.\n',
+    "parry": '* Parry * Player enter parry mode. In this mode you skip your attack, but get more armor value until the next round.\n  If enemy misses his hit when you are in parry mode, you can counterattack. Counterattack is not modified by hit bonuses, and can not crit.\n',
+    "healing potion": '* Healing potion * Heals the player for x hp. You can only use this item while in combat.\n  You spend your round using a healing potion.\n',
+    "power attack": '* Power attack * Attempt to strike the enemy. You get a slight reduction to your hit bonus, but you get +2 dmg if you hit.\n',
+    "sword": '* Sword * Adds +2 to hit rolls, and +1 to damage rolls. Also can give access to "power attack" ability.\n',
+    "shield": '* Shield * Adds +1 to armor. Can also give access to "shield bash" ability(**TBI**).\n',
+    "chainmail": '* Chainmail * Adds +2 to armor.\n',
+    "helmet": '* Helmet * Adds +1 to armor.\n',
 }
 
 SCENARIOS = [forest, town] # List of scenario dictionaries. used for initializing scenarios. New scenarios should be added to this list. 

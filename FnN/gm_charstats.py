@@ -78,9 +78,9 @@ class Player():
                 strEquipList = ', '.join(equippedPrint).title() # set eqipped list up as string with capital first letter.
                 equipped = ' Equipped: %s' % (strEquipList) # put together another string with the list of items so that they can be .center(ed)
                 equippedInfoPrint = equipped.center(spacing) # center the text
-                return(equippedInfoPrint) # return the string
-            else:
-                return None
+            return(equippedInfoPrint) # return the string
+        else:
+            return None
 
     def printMoveActions(self):
         # Prints directions that player can move. invoked when player enters "move" or "map".
@@ -162,7 +162,7 @@ class Player():
             else:
                 print("Please enter a valid stat to increase(str, agi, fort).")
                 print()
-            self.playerarmHpChange()
+        self.playerarmHpChange()
         self.playerHitModChange()
         self.checkSkilLearn()
         
@@ -173,8 +173,9 @@ class Player():
                 if self.equipped[itemDict]["ability"] != None and self.equipped[itemDict]["ability"] not in self.possibleCombatActions:
                     self.possibleCombatActions.append(self.equipped[itemDict]["ability"])
                     print('\nYou have learned to use the "%s" ability with your %s!' % (self.equipped[itemDict]["ability"], self.equipped[itemDict]["type"]))
-                else:
+                if self.equipped[itemDict]["ability"] != None and self.equipped[itemDict]["ability"] in self.possibleCombatActions:
                     print('# Log: No new abilities learned, ability is already learned')
+                    input("Hit 'Enter' to continue...")
         else:
             print('# Log: No new abilities learned, no items in equipped')
 
@@ -217,7 +218,7 @@ class Player():
                 tothibB += hitB
                 totdmgB += dmgB
                 totarmB += armB
-                print('# LOG: tothitB = %s, totdmgB = %s, totarmB = %s' % (tothibB, totdmgB, totarmB))
+                print('# LOG: type = %s tothitB = %s, totdmgB = %s, totarmB = %s' % (self.equipped[dictionary]["type"],tothibB, totdmgB, totarmB))
             self.attributes.pl_hitBonusFromEquipped = tothibB
             self.attributes.pl_dmgBonusFromEquipped = totdmgB
             self.attributes.pl_armorBonusFromEquipped = totarmB
@@ -263,7 +264,7 @@ class PlayerAttributes():
         self.pl_base_hp = 10 # player base hp
         self.pl_maxhp = self.pl_base_hp + self.pl_fort # player max hp, base hp + fortitude.
         self.pl_current_hp = self.pl_maxhp # Current hp, to track how much hp you have during combat.
-        self.pl_base_armor = 10 # player base armor
+        self.pl_base_armor = 8 # player base armor
         self.pl_currentArmor = self.pl_base_armor + self.pl_agi # player armor modified by agility.
         self.pl_hitBonusFromEquipped = 0    # vvv Affects pl_hitmod
         self.pl_dmgBonusFromEquipped = 0    # bonuses from items, used in combat calculations

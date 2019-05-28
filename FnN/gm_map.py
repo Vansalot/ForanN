@@ -2,7 +2,7 @@
 # Movement will be issued by compass directions North, East, South and West.
 
 import random, math, sys, time, os
-import gm_charstats, gm_badguys, gm_scenarios, gm_locations
+import gm_charstats, gm_badguys, gm_scenarios, gm_locations, gm_items
 
 class Board(list):
 
@@ -164,6 +164,10 @@ class WorldMap():
             # Added for debug purposes, remove or you got a decent cheat ;)
             print('# Log: You gain 500 experience. You CHEATER!')
             gameState.player.plXpGain(500)
+            self.whatToDo(gameState)
+        elif ctrl.lower() == 'item':
+            print('# Log: Item cheat. CHEATER!')
+            gm_items.specialItemFound(gameState)
             self.whatToDo(gameState)
         elif ctrl.lower() == 'examine' or ctrl.lower().startswith('e'):
             gameState.player.examineLocation(gameState)
