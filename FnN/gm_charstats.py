@@ -407,34 +407,29 @@ def main():
 def gameLoop(gameState):
     # Main game loop
     while True:
-        # Main game loop starts here
         if gameState.map.victory == True and gameState.player.inCombat == False:
-            # If the game is finished, start prep for next scenario and print game ending messages.
+            # First, check if the victory conditions are met, start prep for next scenario and print game ending messages.
             if gameState.map.specialItemFound == False:
-                gm_items.specialItemFound(gameState)
+                gm_items.specialItemFound(gameState) # if special item is not found yet, player recieve it at the end of the scenario
             gm_map.printThis(gameState.scenario["ending"])
             time.sleep(4)
-            print()
-            print(gm_scenarios.VICTORY)
-            print()
+            print(gm_scenarios.VICTORY) # print victory ascii art
             time.sleep(4)
-            # Add to "you are done stuff" #print(gm_scenarios.ENDING_MSG) # To be printed when all is done
-            nextScenario(gameState) # New function to start a new scenario.
+            nextScenario(gameState) # start a new scenario.
 
         if gameState.player.inCombat == True:
-            # If the player is in combat prior to movement, call the combat loop.
+            # Before starting map movement check if player is in combat, if so, call the combat loop.
             gm_combat.combatLoop(gameState)
         
         # Movement loop
         gameState.map.drawMap(gameState) # draw the map
-        gameState.map.whatToDo(gameState) # If the player is not in combat, it will be looped around the map
-        time.sleep(1)
+        gameState.map.whatToDo(gameState) # ask the player what to do
         
         if gameState.player.inCombat == True:
             # check If the player is in combat after movement.
             gm_combat.combatLoop(gameState) 
             
-        if gameState.player.dead == True: #if the player is dead, print game over, and ask if you want to play again.
+        if gameState.player.dead == True: # if the player is dead, print game over, and ask if you want to play again.
             gm_scenarios.gameOver()
     
     print("# Game loop has ended.") # Print that the application is out of the loop, meant for debug purposes.

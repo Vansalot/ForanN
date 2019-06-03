@@ -1,11 +1,9 @@
 #     Game map and movement functions
-# Movement will be issued by compass directions North, East, South and West.
 
 import random, math, sys, time, os
 import gm_charstats, gm_badguys, gm_scenarios, gm_locations, gm_items
 
 class Board(list):
-
     def __str__(self):
         return "\n".join(" ".join(row) for row in self)
 
@@ -107,14 +105,14 @@ class WorldMap():
     def printStoryLoc(self, gameState):
         # Prints flavortext for the story locations
         if self.storylocIndex == self.maxStorylocIndex:
-            # If you reached the max amount of story locations, do this.
+            # If you reached the max amount of story locations, print the final story and initate boss stuff.
             if len(gameState.enemy) <= 0:
                 print()
                 printThis(gameState.scenario["storylocation"][self.storylocIndex], speed=0.05)
                 gm_badguys.createBoss(gameState)
                 gameState.player.inCombat = True
                 self.victory = True
-        else:            
+        else: # print story information          
             print()
             printThis(gameState.scenario["storylocation"][self.storylocIndex], speed=0.05)
             self.storylocIndex += 1
