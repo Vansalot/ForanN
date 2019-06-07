@@ -230,21 +230,6 @@ class WorldMap():
                     return True
             return False
     
-    def drawMapOLD(self):
-        # Old map drawing function. Keeping it here just in case. 
-        # Draw the game map data structure.
-        print('' + ('\t\t  +----MAP----+'))
-        # Print each line of the rows.
-        for column in range(len(self.theMap)):
-            extraSpace = ''
-            # Create the string for this row on the board.
-            boardRow = ''
-            for row in range(len(self.theMap)):
-                boardRow += self.theMap[column][row].mapTile
-                boardRow += ' '
-            print('\t\t  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
-        print('' + ('\t\t  +- You = @ -+'))
-
     def drawMap(self, gameState):
             # Merged printing of map together with printing of the player information.
             # setting up the player info prints:
@@ -255,7 +240,6 @@ class WorldMap():
             nameLvlXp = '  %s | Level: %s | %s / %s xp  ' % (gameState.player.name.title(), gameState.player.attributes.pl_lvl, gameState.player.attributes.pl_xp, gameState.player.attributes.levelup[lvlIndex])
             nameLvlXpPrint = nameLvlXp.center(spacing)
             dashedLine = '+---------------------------------------------------'
-            #plAttributes= ' Str: %s  Agi: %s  Fort: %s | Armor: %s HP: %s / %s    ' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
             plAttributes= ' Str: %s  Agi: %s  Fort: %s | AC: %s HP: %s / %s ' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
             plAttributesPrint = plAttributes.center(spacing)
             

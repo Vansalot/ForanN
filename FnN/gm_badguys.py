@@ -28,6 +28,7 @@ class Enemy:
         self.enemy_currentArmor = self.enemy_base_armor + self.enemy_agi
         self.enemy_xp_reward = 250 * self.enemy_lvl
         self.enemy_statusEffects = []
+        self.enemy_abilityActive = [] # For storing abilities used in combat. (taking over for self.statusEffects)
         self.isEnemy = True
         self.setPayexName(gameState)
 
@@ -74,6 +75,7 @@ class Boss:
         self.enemy_currentArmor = self.enemy_base_armor + self.enemy_agi
         self.enemy_xp_reward = 300 * self.enemy_lvl
         self.enemy_statusEffects = []
+        self.enemy_abilityActive = [] # For storing abilities used in combat. (taking over for self.statusEffects)
         self.isEnemy = True  
 
     def printEnemyStats(self):
@@ -116,7 +118,7 @@ def createEnemy(gameState):
     #description = scenario["description"][random.randint(0, len(scenario["description"]) -1)]
     from random import randint
     gm_map.printThis(gm_scenarios.COMBAT_FLAVOR["combatintrostart"][randint(0, len(gm_scenarios.COMBAT_FLAVOR["combatintrostart"]) -1)])
-    print(enemy.enemy_name.title(),end='')
+    gm_map.printThis(enemy.enemy_name.title())
     gm_map.printThis(gm_scenarios.COMBAT_FLAVOR["combatintroending"][randint(0, len(gm_scenarios.COMBAT_FLAVOR["combatintroending"]) -1)])
     time.sleep(1.5)
     message2 = 'DEFEND YOURSELF!'

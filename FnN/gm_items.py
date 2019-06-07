@@ -66,7 +66,7 @@ def specialItemFound(gameState):
     'ability' : eg. cleave / power attack / point blank shot (string)
 
 '''
-
+# Possible equippable items to get in the game
 itemlist = [
 {'type':'sword', 'hitbonus': 2, 'dmgbonus': 1, 'armorbonus': 0, 'ability': 'power attack'},
 {'type':'shield', 'hitbonus': 0, 'dmgbonus': 0, 'armorbonus': 1, 'ability': 'shield bash'},

@@ -28,7 +28,7 @@ forest = {
     'You find a tree with a hole in it, you put your hand inside.... Hey, what\'s this? \n', 
     'You almost fall over a treestump, after regaining your balance you see something shining on the ground.\n', 
     'You look around the nearby bushes, you look in a birds nest...\n',
-    'You search through the rubble and...\n'
+    'You search through the rubble and...\n',
     'Hey, this was lying right in front of you the whole time.\n',
     ],
     
@@ -48,7 +48,7 @@ forest = {
     "You hear some screaming close by, after you pass some rocks you see a Nisse who\'s lying on the ground. He seems badly injured. You ask him if he\'s feeling under the weather.\nThe response you get is 'that is a good vending, maybe we should use that in another episode', so you guess he\'s not as badly hurt as you first thought.\nAfter talking for a while you hear from him that his friend Gunther is missing, and that he might have been taken by one of the nasty Nåså\'s.\nYou tell him where you found his friend Hansi, and tell him to wait for you there.\n",
     "When you come through a clearing in the forest you see a Nisse who\'s tied up against a tree. He looks pretty beaten up. \nYou ask him if he\'s alright. After muttering for a bit, he manages to inform you that he\'s a 'spikker' so he\'s more than alright. \nJust as you finish untying him, you realize that you are not alone...\n"   
     ],
-    "ending": '\nWhen the fight ends, you take Gunther and help him back to his friends. In the evening you drink beer and dance støveldæns.\n',
+    "ending": '\nWhen the fight ends, you take Gunther and help him back to his friends. In the evening you drink juløl and dance støveldæns.\n',
     "maxStorylocIndex": 2,
 }
 #
@@ -121,7 +121,7 @@ town = {
 
 itemsAndAbilities = {
     "rest": '* Rest * Player rests and restores his hp. Can only be used while traveling.\n',
-    "examine": '* Examine * Attempt to search for items in the location you are in. There\'s a random chance to find items.\n  Not all locations are examinable.',
+    "examine": '* Examine * Attempt to search for items in the location you are in. There\'s a random chance to find items.\n  Not all locations are examinable.\n',
     "hit": '* Hit * Player tries to hit the enemy, hit is modified by player strenght, level, and weapon bonus.\n  If hit roll + bonus(es) are equal to enemy armor, you score a hit.\n',
     "parry": '* Parry * Player enter parry mode. In this mode you skip your attack, but get more armor value until the next round.\n  If enemy misses his hit when you are in parry mode, you can counterattack. Counterattack is not modified by hit bonuses, and can not crit.\n',
     "healing potion": '* Healing potion * Heals the player for x hp. You can only use this item while in combat.\n  You spend your round using a healing potion.\n',

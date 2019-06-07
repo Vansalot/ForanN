@@ -15,11 +15,6 @@ class Locationforest():
         self.description = description
         self.mapTile = '#'
         self.startLocation = False
-        
-
-    def printstuff(self):
-        # Made for testing the constructor, might be removed. 
-        print(self.description, self.encounterChance, self.searchPossible)
 
 def setExamined(location):
     # Set self.examined to True when a player has examined location.
