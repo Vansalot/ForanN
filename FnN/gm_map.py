@@ -5,6 +5,7 @@ import gm_charstats, gm_badguys, gm_scenarios, gm_locations, gm_items
 
 class Board(list):
     def __str__(self):
+        # Setting up the map so that it looks like it should
         return "\n".join(" ".join(row) for row in self)
 
 class WorldMap():
@@ -16,7 +17,7 @@ class WorldMap():
     STARTINGBOARD = []
 
     def __init__(self, scenario, scenarioIndex):
-        self.createLocationDecider(scenario, scenarioIndex)
+        self.createLocations(scenario, scenarioIndex)
         self.theMap = Board(WorldMap.STARTINGBOARD)
         self.currentPosition = self.START[:]
         self.previousPosition = self.START[:]
@@ -30,25 +31,31 @@ class WorldMap():
         self.setStoryLoc(scenario, scenarioIndex) # Set the story locations
         self.movesSinceCombat = 0
 
-    def createLocationDecider(self,scenario, scenarioIndex):
-        # Select which map constructior to use. If the first scenario, use random map gen. If not, use the map specific one.
-        if scenarioIndex == 0:
-            self.createLocations(scenario)
-        else:
-            self.createLocations4Scenario(scenario)
-
-    def createLocations(self, scenario):
+    def createLocations(self, scenario, scenarioIndex):
             # Set up objects for every location/tile on the map
-            locations = [] # The complete list of 5 lists with 5 locations. [[5][5][5][5][5]]
-            for i in range(5):
-                templist = [] # Reset temp list for every iteration of the loop
+            if scenarioIndex == 0:
+                locations = [] # The complete list of 5 lists with 5 locations. [[5][5][5][5][5]]
                 for i in range(5):
-                    # Add flavor description for every location
-                    description = scenario["description"][random.randint(0, len(scenario["description"]) -1)] 
-                    examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)] 
-                    templist.append(gm_locations.Locationforest(description, examineText)) # Call the constructur with desc that is defined in line above.
-                locations.append(templist)
-            WorldMap.STARTINGBOARD = locations
+                    templist = [] # Reset temp list for every iteration of the loop
+                    for i in range(5):
+                        # Add flavor description for every location
+                        description = scenario["description"][random.randint(0, len(scenario["description"]) -1)] 
+                        examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)] 
+                        templist.append(gm_locations.Locationforest(description, examineText)) # Call the constructur with desc that is defined in line above.
+                    locations.append(templist)
+                WorldMap.STARTINGBOARD = locations
+
+            else: 
+                # Set up locations from the 2nd scenario and on. Sets a map that's not ranomized. Do not use for first scenario!!!
+                # Set up objects for every location/tile on the map
+                locations = [] # The complete list of 5 lists with 5 locations. [[5][5][5][5][5]]
+                for description_list in scenario["description"]:
+                    templist = [] # Reset temp list for every iteration of the loop
+                    for string in description_list:
+                        examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)]
+                        templist.append(gm_locations.Locationforest(string, examineText))
+                    locations.append(templist)
+                WorldMap.STARTINGBOARD = locations
 
     def createLocations4Scenario(self, scenario):
         # Set up locations from the 2nd scenario and on. Sets a map that's not ranomized. Do not use for first scenario!!!
@@ -120,8 +127,8 @@ class WorldMap():
                 self.setStoryLoc(gameState.scenario, gameState.scenarioIndex)
             time.sleep(3)
 
-    def setStartLocFirstScenario(self, scenario, scenarioIndex):
-        # Validates if the move entered is on the board and executes it.
+    #def setStartLocFirstScenario(self, scenario, scenarioIndex):
+    '''    # Validates if the move entered is on the board and executes it.
         previousX, previousY = self.previousPosition
         currentX, currentY = self.currentPosition
         if (-1 < currentX < 5) and (-1 < currentY < 5):
@@ -129,12 +136,21 @@ class WorldMap():
             self.theMap[previousY][previousX].mapTile = WorldMap.heroPrevPos
             self.theMap[currentY][currentX].mapTile = WorldMap.heroCurrentPos
             self.theMap[currentY][currentX].visitedText = scenario["startlocationagain"] # Set flavor text on the starting location of the game.
-            self.theMap[currentY][currentX].startLocation = True # Set startlocation to True so that we know where it is.
+            self.theMap[currentY][currentX].startLocation = True # Set startlocation to True so that we know where it is.'''
 
     def setStartLoc(self, scenario, scenarioIndex):
         # Set player position on the map according to the scenariotext
         if scenarioIndex == 0: # if the first scenario, proceed as before. 
-            self.setStartLocFirstScenario(scenario, scenarioIndex)
+            # self.setStartLocFirstScenario(scenario, scenarioIndex)
+            previousX, previousY = self.previousPosition
+            currentX, currentY = self.currentPosition
+            if (-1 < currentX < 5) and (-1 < currentY < 5):
+                # If current move if on the board, the move will be performed.
+                self.theMap[previousY][previousX].mapTile = WorldMap.heroPrevPos
+                self.theMap[currentY][currentX].mapTile = WorldMap.heroCurrentPos
+                self.theMap[currentY][currentX].visitedText = scenario["startlocationagain"] # Set flavor text on the starting location of the game.
+                self.theMap[currentY][currentX].startLocation = True # Set startlocation to True so that we know where it is.
+
         else: # If second or later scenario set up according to scenario.
             self.currentPosition = self.previousPosition = scenario["startinglocation"]
             currentX, currentY = self.currentPosition
@@ -149,14 +165,14 @@ class WorldMap():
         while ctrl.isalpha() != True:
             gameState.player.printPlayerPossibleactions()
             ctrl = input('. What do you do? ').lower().strip()
-        if ctrl.lower() == 'rest' or ctrl.lower().startswith('r'):
+        
+        if ctrl.lower() == 'rest' or ctrl.lower().startswith('r'): # Rest, player gets full hp and continues.
             gm_charstats.Player.rest(gameState.player)
             print('You get up and look around.')
-            #gameState.player.printPlayerPossibleactions()
             self.whatToDo(gameState)
-        elif ctrl.lower() == 'map' or ctrl.lower().startswith('m'):
+        elif ctrl.lower() == 'map' or ctrl.lower().startswith('m'): # Movement, calls the map
             self.navigateTheMap(gameState)
-        elif ctrl.lower() == 'help':
+        elif ctrl.lower() == 'help': # Shows the help screen, which shows information based on what actions are available to the player.
             gameState.player.printHelpText()
         elif ctrl.lower() == 'experience':
             # Added for debug purposes, remove or you got a decent cheat ;)
@@ -164,10 +180,11 @@ class WorldMap():
             gameState.player.plXpGain(500)
             self.whatToDo(gameState)
         elif ctrl.lower() == 'item':
+            # Added for debug purposes, remove or you got a decent cheat ;)
             print('# Log: Item cheat. CHEATER!')
             gm_items.specialItemFound(gameState)
             self.whatToDo(gameState)
-        elif ctrl.lower() == 'examine' or ctrl.lower().startswith('e'):
+        elif ctrl.lower() == 'examine' or ctrl.lower().startswith('e'): # Examine the location
             gameState.player.examineLocation(gameState)
             self.whatToDo(gameState)
         
@@ -218,8 +235,8 @@ class WorldMap():
             print('You entered an invalid direction')
 
     def checkCombat(self, encounterChance):
-        # Randomly encounter checker, (0,1) = 50% chance of encounter
-        checkCombatRoll = random.randint(1, 10)
+        # Randomly encounter checker
+        checkCombatRoll = random.randint(1, 10) ### !!! 1, 10
         if checkCombatRoll > encounterChance:
             return True
         else:
@@ -312,11 +329,12 @@ class WorldMap():
         print('''                  |__  ___   _|
                 =(_____________)=''')
         print('Map: You are @, Unvisited location are #, visited location are ¤')
+        
         if tryAgain == True:
             print(" * Can't go further in that direction, please select another direction. *")
 
 def printThis(message, speed=0.02):
-    # Possible usable function to call when you want to print fluid messages. time will show /12.03.19
+    # Function that prints text in a cascading way. Gives the game a more story like feel than text instantly popping onto the screen.
 
     for character in message:
                     sys.stdout.write(character)
@@ -325,17 +343,17 @@ def printThis(message, speed=0.02):
 
 
 
-TITLE2 = '''
-   	    ###########################################################
+TITLE1 = '''
+   	            ###########################################################
 
-	  ::::::::::    :::      ::::    :::
-	 :+:         :+: :+:    :+:+:   :+:    : "¨'/\¨`@@@' \@\#_
-	+:+        +:+   +:+   :+:+:+  +:+   * /\^`/##\@@@@@'\##/_@
-       :#::+::#  +#++:++#++:  +#+ +:+ +#+    ^/##\/####\||@/\'##\ *
-      +#+       +#+     +#+  +#+  +#+#+#     /####\#####\|/##\||`¨ 
-     #+#       #+#     #+#  #+#   #+#+#     ~~~!!~~~!!~~!!~!!~!!~
-    ###       ###     ###  ###    ####'''       
+	          ::::::::::    :::      ::::    :::
+	         :+:         :+: :+:    :+:+:   :+:    : "¨'/\¨`@@@' \@\#_
+	        +:+        +:+   +:+   :+:+:+  +:+   * /\^`/##\@@@@@'\##/_@
+               :#::+::#  +#++:++#++:  +#+ +:+ +#+    ^/##\/####\||@/\'##\ *
+              +#+       +#+     +#+  +#+  +#+#+#     /####\#####\|/##\||`¨ 
+             #+#       #+#     #+#  #+#   #+#+#     ~~~!!~~~!!~~!!~!!~!!~
+            ###       ###     ###  ###    ####'''       
 
-TITLE3 ='''  ############################################################
- ###                Forest's and Nåså's                   ###
-############################################################\n'''
+TITLE2 ='''          ############################################################
+         ###                Forest's and Nåså's                   ###
+        ############################################################\n'''

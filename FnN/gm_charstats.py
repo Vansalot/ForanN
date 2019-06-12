@@ -25,7 +25,7 @@ class Player():
         self.equipped = []
 
     def printHelpText(self):
-        # work in progress. Help text printed on the screen.
+        # Prints a screen with information based on what actions/items are available to the player. WIP
         import os
         os.system('cls')
         print('          +------------------------------ <<< Help >>> -----------------------------------+')
@@ -122,6 +122,7 @@ class Player():
         time.sleep(2)
         self.attributes.pl_current_hp = self.attributes.pl_maxhp
 
+
     '''  vvv Xp gain, check if player has leveled up, and levelup mechanics vvv '''
     
     def plXpGain(self, enemy_xp_reward):
@@ -140,7 +141,7 @@ class Player():
 
     def plLevelUp(self):
         # Asks which stat you want to increase when you level up and calls pl_stat_change to update the stat.
-        # After stat, it calls playerarmHpChange to change armor and hp, then playerHitModChange to update the player hit modifier.
+        # After stat, it calls updatePlayerCombatAttributes to update the player modifiers
         print('* You have reached level %s! Current stats: Strength: %s  Agility: %s  Fortitude: %s *'  % (self.attributes.pl_lvl + 1, self.attributes.pl_str,self.attributes.pl_agi, self.attributes.pl_fort))
         chosenStat = ''
         possibleStats = ['s', 'a', 'f', 'str', 'agi', 'fort']
@@ -163,10 +164,16 @@ class Player():
                 print()
         self.updatePlayerCombatAttributes()
 
+    def playerStatChange(self, strength, agility, fortitude):
+        # Procedure to change character stats. 
+        self.attributes.pl_str += strength 
+        self.attributes.pl_agi += agility
+        self.attributes.pl_fort += fortitude
+
     def updatePlayerCombatAttributes(self):
         self.playerHpChange() # update hp
         self.playerArmChange() # update armor
-        self.playerHitModChange() # update hit modifier
+        self.setupModifiers() # update hit, dmg and dmg reduction modifiers
         self.checkSkilLearn() # check if there's any skills to learn
         
     def checkSkilLearn(self):
@@ -183,12 +190,6 @@ class Player():
             pass
             #print('# Log: No new abilities learned, no items in equipped')
 
-    def playerStatChange(self, strength, agility, fortitude):
-        # Procedure to change character stats. 
-        self.attributes.pl_str += strength 
-        self.attributes.pl_agi += agility
-        self.attributes.pl_fort += fortitude
-
     def playerHpChange(self):
         # Part of the level up routine, updates hp and armor.
         self.attributes.pl_maxhp += self.attributes.pl_fort
@@ -196,13 +197,31 @@ class Player():
 
     def playerArmChange(self):
         # Update player current armor
-        self.attributes.pl_currentArmor = self.attributes.pl_base_armor + self.attributes.pl_agi + self.attributes.pl_armorBonusFromEquipped
+        newArmModifier = self.attributes.pl_base_armor # Base armor
+        newArmModifier += int(self.attributes.pl_agi / 2) # modified from lvl
+        newArmModifier += self.attributes.pl_armorBonusFromEquipped # modified from equipped
+        self.attributes.pl_currentArmor = newArmModifier
 
-    def playerHitModChange(self):
-        # Part of level up routine, updates hit modifier. Can also be called from items module if player find an item that changes hit modifier.
+    def setupModifiers(self):
+        # Sets up modifiers for dmg bonus modifier, dmg reduction modifier, and hit modifier
+
+        # set up player dmg modifier
+        self.attributes.pl_dmgFromStr = int(self.attributes.pl_str / 2) # change modifier based on strength
+        newDmgModifier = 0
+        newDmgModifier += self.attributes.pl_dmgFromStr
+        newDmgModifier += self.attributes.pl_dmgBonusFromEquipped # add bonus based on equipped
+        self.attributes.pl_totDmgBonus = newDmgModifier
+
+        # Set up player dmg reduction
+        newDmgReductionModifier = 0
+        newDmgReductionModifier += int(self.attributes.pl_agi / 2) # modified from agi
+        #newDmgReductionModifier += int(self.attributes.pl_currentArmor / 5) # modified from armor
+        self.attributes.pl_dmgReduction = newDmgReductionModifier
+
+        # Set up hit modifier
         newHitModifier = 0
         newHitModifier += int(self.attributes.pl_lvl / 2)
-        newHitModifier += int(self.attributes.pl_str / 4)
+        newHitModifier += int(self.attributes.pl_str / 2)
         newHitModifier += self.attributes.pl_hitBonusFromEquipped
         if self.attributes.pl_lvl > 10: # If you hit lvl 10 add some more hit.
             newHitModifier += 2
@@ -211,6 +230,7 @@ class Player():
         self.attributes.pl_hitmod = newHitModifier # set the new hit modifier to the players attribute
 
         ''' ^^^ Levelup functions ^^^ '''
+
 
     def ItemBonusUpdate(self):
         # update bonuses from items in player attributes.
@@ -229,10 +249,8 @@ class Player():
             self.attributes.pl_hitBonusFromEquipped = tothibB
             self.attributes.pl_dmgBonusFromEquipped = totdmgB
             self.attributes.pl_armorBonusFromEquipped = totarmB
-            if tothibB > 0:
-                self.playerHitModChange() # update player hit modifier
-            if totdmgB > 0:
-                pass # handling not needed at the moment
+            if tothibB > 0 or totdmgB > 0:
+                self.setupModifiers() # update player hit modifier
             if totarmB > 0:
                 self.playerArmChange() # update player armor
 
@@ -240,17 +258,25 @@ class PlayerAttributes():
     # Initializes the player attributes, they are part of the Player class.
     def __init__(self):
         self.pl_lvl = 1 # Player level
-        self.pl_hitmod = 0 # Player hit modifier, modified by lvl, str, and items
         self.pl_xp = 0 # player experience
+        self.levelup = [1000, 2000, 3500, 5000, 7000, 8500, 10000, 12500, 15000, 17500, 20000, 23000, 26000, 30000, 35000, 41000, 47000, 52000, 58000, 65000] # xp thresholds for levelup.
+        
         self.pl_str = 0 # player strenght
+        self.pl_hitmod = 0 # Player hit modifier, modified by lvl, str, and items
+        self.pl_dmgFromStr = 0
+        self.pl_totDmgBonus = 0
+
         self.pl_agi = 0 # player agility
+        self.pl_dmgReduction = 0
+        self.pl_base_armor = 10 # player base armor, will be modified by agi and items
+        self.pl_currentArmor = self.pl_base_armor + self.pl_agi # player armor modified by agility.
+        
         self.pl_fort = 0 # player foritude
         self.pl_base_hp = 10 # player base hp
         self.pl_maxhp = self.pl_base_hp + self.pl_fort # player max hp, base hp + fortitude.
         self.pl_current_hp = self.pl_maxhp # Current hp, to track how much hp you have during combat.
-        self.pl_base_armor = 8 # player base armor
-        self.pl_currentArmor = self.pl_base_armor + self.pl_agi # player armor modified by agility.
+        
         self.pl_hitBonusFromEquipped = 0    # vvv Affects pl_hitmod
         self.pl_dmgBonusFromEquipped = 0    # bonuses from items, used in combat calculations
         self.pl_armorBonusFromEquipped = 0  # ^^^ Affects pl_currentArmor
-        self.levelup = [1000, 2000, 3500, 5000, 7000, 8500, 10000, 12500, 15000, 17500, 20000, 23000, 26000, 30000, 35000, 41000, 47000, 52000, 58000, 65000] # xp thresholds for levelup.
+        

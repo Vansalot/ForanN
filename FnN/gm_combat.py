@@ -70,8 +70,7 @@ def hitDecider(gameState, hit_roll, currentArmor, enemy):
     if hit_roll == 20:
         return 'CRITICAL'
     elif hit_roll == 1:
-        return 'fumble'
-        #Add fumble mechanics and call it
+        return 'Miss'
     elif hit_roll + hitModifier >= (currentArmor + parryModifier) :
         return 'Hit'
     else:
@@ -97,26 +96,27 @@ def modifiedDamage(gameState, baseDamage, enemy):
     
     if enemy != True:       
         # If the player is doing damage
-        equippeddmg = gameState.player.attributes.pl_dmgBonusFromEquipped
-        modDmg += baseDamage + gameState.player.attributes.pl_str + equippeddmg
+        strdmg = gameState.player.attributes.pl_dmgFromStr # for use in print
+        equippeddmg = gameState.player.attributes.pl_dmgBonusFromEquipped # for use in print
+        modDmg += baseDamage + gameState.player.attributes.pl_totDmgBonus # modified dmg is base + player total dmg bonus.
         if modDmg <= 0:
             modDmg = 1
         if 'power attack' in gameState.player.abilityActive:
             powerAttackDmg = 2
             modDmg += powerAttackDmg
-            print('# %s (base) + %s (mod from str) + %s (mod from equipped items) + %s (power attack) = %s damage dealt.' % (baseDamage, gameState.player.attributes.pl_str, equippeddmg, powerAttackDmg, modDmg))
+            print('# %s (base) + %s (mod from str) + %s (mod from equipped items) + %s (power attack) = %s damage dealt.' % (baseDamage, strdmg, equippeddmg, powerAttackDmg, modDmg))
         if equippeddmg > 0 and 'power attack' not in gameState.player.abilityActive:
-            print('# %s (base) + %s (mod from str) + %s (mod from equipped items) = %s damage dealt.' % (baseDamage, gameState.player.attributes.pl_str, equippeddmg, modDmg))
+            print('# %s (base) + %s (mod from str) + %s (mod from equipped items) = %s damage dealt.' % (baseDamage, strdmg, equippeddmg, modDmg))
         if equippeddmg == 0:
-            print('# %s (base) + %s (mod from str) = %s damage dealt.' % (baseDamage, gameState.player.attributes.pl_str, modDmg))
+            print('# %s (base) + %s (mod from str) = %s damage dealt.' % (baseDamage, strdmg, modDmg))
         return modDmg
     else:
         # If the enemy is doing damage
-        modDmg = baseDamage + gameState.enemy[gameState.enemyIndex].enemy_str - gameState.player.attributes.pl_agi
+        modDmg = baseDamage + gameState.enemy[gameState.enemyIndex].enemy_dmgFromStr - gameState.player.attributes.pl_dmgReduction
         if modDmg <= 0:
             modDmg = 1
         # Modified from player agi should maybe be tweaked, high agi might cause full damage mitigation. 
-        print('# %s (base) + %s (mod from enemy str) - %s (mod from player agi) = %s damage dealt.' % (baseDamage, gameState.enemy[gameState.enemyIndex].enemy_str, gameState.player.attributes.pl_agi, modDmg))
+        print('# %s (base) + %s (mod from enemy str) - %s (mod from player agi) = %s damage dealt.' % (baseDamage, gameState.enemy[gameState.enemyIndex].enemy_dmgFromStr, gameState.player.attributes.pl_dmgReduction, modDmg))
         return modDmg
 
 def hpUpdater(gameState, modifiedDmg, enemy):
@@ -220,6 +220,19 @@ def counterattack(gameState, enemy):
         else: # Also known as 'miss'
             print('# Counterattack: %s rolled %s * %s *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, hitResult))
 
+def checkValidAction(gameState):
+    # Validating input during combat. Checks if the input is in the valid combat actions list. if not you are asked to enter the correct action.
+    enteredAction = ''
+    while enteredAction.replace(" ", "").isalpha() != True: # Loop that will ask the player to enter correct action.
+        gameState.player.printPlayerPossibleactions() # print player's possible actions
+        enteredAction = input(' Please enter your action: ').lower()
+        #print()
+        if enteredAction not in gameState.player.possibleCombatActions:
+            print('Entered action is not valid, try again.\n')
+            enteredAction = ''
+
+    return enteredAction
+
 def combatLoop(gameState):
     # General combat loop for the game.
     if len(gameState.enemy) <= 0:
@@ -260,11 +273,10 @@ def combatLoop(gameState):
             currentEnemy.printEnemyStats()
             gameState.map.drawMap(gameState)
 
-            enteredAction = ''
-            while enteredAction.replace(" ", "").isalpha() != True: # Loop that will ask the player to enter correct action.
-                player.printPlayerPossibleactions() # print player's possible actions
-                enteredAction = input(' Please enter your action: ').lower()
-                print()
+            # Get action from player and check if it is valid.
+            enteredAction = checkValidAction(gameState)
+            print()
+
             for combatAction in player.possibleCombatActions:
                 if combatAction.lower().startswith(enteredAction):
                     # first check for ability/feat/special actions
@@ -323,7 +335,7 @@ def combatLoop(gameState):
                         print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, player.attributes.pl_hitmod, hitRoll + player.attributes.pl_hitmod, hitResult))
                         turn = 'enemy'    
                         continue
-        
+
         elif turn == 'enemy':
             #
             # Enemy's turn to act in combat

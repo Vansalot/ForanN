@@ -5,9 +5,7 @@ import gm_charstats, gm_combat, gm_map, gm_scenarios
 import time, sys
 from random import randint
 from random import choice
-
-# add class payexboi?
-
+        
 class Enemy:
     # Initializes Enemy
     def __init__(self, pl_lvl, gameState):
@@ -18,9 +16,10 @@ class Enemy:
         self.payexNames = ['Jens Egil', 'Jørn Efteland', 'Jørn Tharaldsen', 'Hallstein Skjølsvik', 'Petter storaas', 'Jon Terje', 'Christian Slater', 'Andreas Jakobsen', 'Jan-Phillippe', 'Giresse Kadima', 'Nicolas Lopez', 'Dani Berentzen']
         self.enemy_name = choice(self.nameList) + '-' + choice(self.nameList)
         self.enemy_str = 1 * self.enemy_lvl
+        self.enemy_dmgFromStr = int(self.enemy_str / 4) # might be changed. Need to test how weak the enemy gets"
+        self.enemy_hitmod = int(self.enemy_lvl / 2) + int(self.enemy_str / 4)
         self.enemy_agi = 1 * self.enemy_lvl
         self.enemy_fort = 1 * self.enemy_lvl
-        self.enemy_hitmod = round(self.enemy_lvl / 2) + int(self.enemy_str / 4)
         self.enemy_base_hp = 10
         self.enemy_maxhp = self.enemy_base_hp + self.enemy_fort         
         self.enemy_current_hp = self.enemy_maxhp
@@ -33,8 +32,11 @@ class Enemy:
         self.setPayexName(gameState)
 
     def setPayexName(self, gameState):
+        # if payex mode is activated, use payexNames for enemy names
         if gameState.payexMode == True:
             self.enemy_name = choice(self.payexNames)
+        else:
+            pass
 
     def printEnemyStats(self):
         # Print enemy stats when player is in combat. 
@@ -53,7 +55,6 @@ class Enemy:
         print(fillerP,'|')
 
 
-
 class Boss:
     # Initializes Boss
     def __init__(self, pl_lvl):
@@ -64,8 +65,9 @@ class Boss:
         self.enemy_lvl = randint(self.pl_lvl, self.pl_lvl + 3) + 2
         self.nameList = ['Da Governator','El prehidente', 'TrumPetten', 'Mr. Smith', 'Boba Futt', 'Shredder', 'Joffrey', 'lex luthor', 'bubba ho-tep', 'B.J. Blazkowicz', 'The Sherminator']
         self.enemy_name = choice(self.nameList)
-        self.enemy_hitmod = round(self.enemy_lvl / 2)
         self.enemy_str = 1 * self.enemy_lvl
+        self.enemy_dmgFromStr = int(self.enemy_str / 4)
+        self.enemy_hitmod = int(self.enemy_lvl / 2) + int(self.enemy_str / 4)
         self.enemy_agi = 1 * self.enemy_lvl
         self.enemy_fort = 1 * self.enemy_lvl
         self.enemy_base_hp = 10
@@ -80,7 +82,7 @@ class Boss:
 
     def printEnemyStats(self):
         # Print enemy stats when player is in combat. 
-        # First set up alignment of the text to be printed (49 is the lengt of the player information frame). 
+        # First set up alignment of the text to be printed (49 is the lenght of the player information frame). 
         spacing = 63
         header = '+------------ <<< Enemy Information >>> ------------------------+'
         eNameLvl = ' Enemy: %s Level: %s ' % (self.enemy_name.title(), self.enemy_lvl)
@@ -94,8 +96,6 @@ class Boss:
         print(eArmHpPrint, '|')
         print(fillerP,'|')
 
-
-
 def createBoss(gameState):
     # Creates a boss that is more powerful than normal enemies.
     boss = Boss(gameState.player.attributes.pl_lvl)
@@ -104,24 +104,24 @@ def createBoss(gameState):
     gameState.enemy.append(boss)
     time.sleep(2)
     print()
-    print('A big ass mother dude lunges at you. He\'s yelling that he\'s going to turn you into an ear ornament! DEFEND YOURSELF!')
+    gm_map.printThis('A big ass mother dude lunges at you. He\'s yelling that he\'s going to turn you into an ear ornament! DEFEND YOURSELF!')
     time.sleep(1)
     
 
 def createEnemy(gameState):
-    # creates a new enemy
+    # creates a new enemy, Appends the enemy in gamestate list, so that the information is available.
     enemy = Enemy(gameState.player.attributes.pl_lvl, gameState)
-    # Appends the enemy in gamestate list, so that the information is available.
     gameState.enemy.append(enemy)
+    
+    # Flavor print. When you get an enemy encounter.
+    from random import randint
     time.sleep(1)
     print()
-    #description = scenario["description"][random.randint(0, len(scenario["description"]) -1)]
-    from random import randint
+    # Flavor print. When you get an enemy encounter.
     gm_map.printThis(gm_scenarios.COMBAT_FLAVOR["combatintrostart"][randint(0, len(gm_scenarios.COMBAT_FLAVOR["combatintrostart"]) -1)])
     gm_map.printThis(enemy.enemy_name.title())
     gm_map.printThis(gm_scenarios.COMBAT_FLAVOR["combatintroending"][randint(0, len(gm_scenarios.COMBAT_FLAVOR["combatintroending"]) -1)])
+    
     time.sleep(1.5)
-    message2 = 'DEFEND YOURSELF!'
-    print(message2)
+    print('DEFEND YOURSELF!')
     time.sleep(2)
-    message = 'A raving madman who calls himself %s lunges at you. He looks like he wants to introduce you to a can of whoop-ass! ' % (enemy.enemy_name.title())

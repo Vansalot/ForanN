@@ -5,7 +5,7 @@ import gm_scenarios, gm_map
 POSSIBLE_ITEMS = ['healing potion']
 
 class Healingpotion():
-
+    # NOT IN USE ATM
     def __init__(self, pl_lvl):
         # Initialize healing potion.
         self.name = 'healing potion'
@@ -52,8 +52,6 @@ def specialItemFound(gameState):
     # Set up stuff to add the item to the player, update stats based on item stats.
     if itemFound not in gameState.player.equipped: # Should set up own function for this!!
         gameState.player.equipped.append(itemFound) # append the item dict in equipped list.
-        # gameState.player.eqipped.append(itemName) might not need this, tbd
-        gameState.player.playerHitModChange() # might need to change this to an own "change stats based on item function" (below)
         gameState.player.ItemBonusUpdate() # create this function
 
 
@@ -63,7 +61,7 @@ def specialItemFound(gameState):
     'armorbonus' : int
     'hitbonus' : int
     'dmgbonus' : int
-    'ability' : eg. cleave / power attack / point blank shot (string)
+    'ability' : eg. cleave / power attack / point blank shot (string) / None if no ability is to be learned.
 
 '''
 # Possible equippable items to get in the game

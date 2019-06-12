@@ -36,7 +36,7 @@ def enterPlayerName(gameState):
     while len(playerName) == 0:
         playerName = (input('Please enter player name: ').lower())
         for letter in playerName:
-            if letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ':
+            if letter in 'abcdefghijklmnopqrstuvwxyzæøå ':
                 gameState.player.name = playerName
             else:
                 print("Name must be written with letters, avoid numbers and special characters")
@@ -48,32 +48,32 @@ def setPlayerAttributes(gameState):
     # update player stats based on the changes done prior.
     gameState.player.playerArmChange()
     gameState.player.playerHpChange()
-    gameState.player.playerHitModChange()
+    gameState.player.setupModifiers()
     # gameState is returned to the main() function.
     return gameState
 
 def getStartingStats(gameState):
     # Setting the starting stats of the player. Default max attribute points(variable: totalPointsAllocated) are changed by difficulty settings.
-    minPointsAllowedInOneStat = 1 # You can not have less than 1 point in 1 stat.
+    minPointsAllowedInOneStat = 1 # You can not have less than 1 point in each stat.
     maxPointsAllowedInOneStat = gameState.totalPointsAllocated - 2 # When setting starting stats, you can not have all your points in one stat, atleast 2 points are reserved to the last 2 stats.
     modifiedmaxPointsAllowedInOneStat = gameState.totalPointsAllocated - 2 
     totalPointsLeft = gameState.totalPointsAllocated 
+    
     # Setting variables for the calculation of allotted player stat points
     # Variables for the stats, s =strength a =agility f =fortitude
     str = 0
     agi = 0 
     fort = 0
-    print()
-    print("Now you have to enter your characters stats, they are Strenght, Agility and Fortitude. You got %s points to distribute between the stats." % (gameState.totalPointsAllocated))
-    print("You can allocate 1-%s points to the first category." % (maxPointsAllowedInOneStat))
-    print()
+    print("\nNow you have to enter your characters stats, they are Strenght, Agility and Fortitude. You got %s points to distribute between the stats." % (gameState.totalPointsAllocated))
+    print("You can allocate 1-%s points to the first category.\n" % (maxPointsAllowedInOneStat))
+
     # Calls getStartingAttribute which returns the value that the user enters for the strength stat
     str = getStartingAttribute( "Enter player strength: ", minPointsAllowedInOneStat, maxPointsAllowedInOneStat)
     totalPointsLeft = totalPointsLeft - str
     # Calculates the points that are lefts for the next stats and displays it to the user, the -1 is there to ensure that there is 1 point left for the last stat.
     modifiedmaxPointsAllowedInOneStat = gameState.totalPointsAllocated - str - 1
-    print()
-    print("You have",modifiedmaxPointsAllowedInOneStat,"point(s) left to use for the next stat.")
+    
+    print("\nYou have",modifiedmaxPointsAllowedInOneStat,"point(s) left to use for the next stat.")
     # Checks that if there are less points available than max point allowed, then sets total points left -1(for last stat) as max points you can use for the next stat
     if totalPointsLeft < modifiedmaxPointsAllowedInOneStat:
         modifiedmaxPointsAllowedInOneStat = totalPointsLeft - 1
@@ -107,7 +107,6 @@ def enterDifficulty(gameState):
     # Set game difficulty, with input validation.
     difficulty = ''
     while True:
-    #difficulty.isalpha() == False: # If a letter is not written prompt again
         print('Please enter difficulty (easy, medium, hard): ', end='')
         difficulty = input().lower()
         if difficulty == 'easy' or difficulty == 'e':
@@ -118,8 +117,8 @@ def enterDifficulty(gameState):
         elif difficulty == 'hard' or difficulty == 'h':
             gameState.player.totalPointsAllocated = 4
             break
-        if difficulty == 'god': # god mode, for show and tell
-            gameState.player.totalPointsAllocated = 20
+        elif difficulty == 'god': # god mode, for show and tell
+            gameState.player.totalPointsAllocated = 30
             break
 
 def setPayexMode(gameState):
@@ -139,25 +138,28 @@ def nextScenario(gameState):
 
 def titleScreen():
     # prints the title of the game.
-    print(gm_map.TITLE2) 
+    print(gm_map.TITLE1) 
     print()
-    print(gm_map.TITLE3)
+    print(gm_map.TITLE2)
     time.sleep(2)
 
 def main():
     # Starts the game, calls the game loop
-    gameState = titleScreen() # print the title of the game.    
+    titleScreen() # print the title of the game.    
+    
     # Setting the game up
     gameState = Gamestate()
     setPayexMode(gameState) # Can be commented out to remove payex functionality.
     enterDifficulty(gameState) # Set up difficulty
     enterPlayerName(gameState) # Set up new player, This will also print prompts and player information to the player.
     setPlayerAttributes(gameState)
+    
     # Game is starting Print map info and introduction text.    
     gameState.map.drawMap(gameState) # Draw the map on the screen.
     gm_map.printThis(gameState.scenario["intro"])
     time.sleep(1)
     gameState.map.whatToDo(gameState) # Start the first "what would you like to do dialogue" before entering the game loop.
+    
     # Move on to the game loop
     gameLoop(gameState)
 
@@ -170,7 +172,7 @@ def gameLoop(gameState):
             gameState.gameIsDone = False
 
         if gameState.map.victory == True and gameState.player.inCombat == False:
-            # First, check if the victory conditions are met, start prep for next scenario and print game ending messages.
+            # Check if the victory conditions are met, start prep for next scenario and print game ending messages.
             if gameState.map.specialItemFound == False:
                 gm_items.specialItemFound(gameState) # if special item is not found yet, player recieve it at the end of the scenario
             gm_map.printThis(gameState.scenario["ending"])
