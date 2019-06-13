@@ -18,7 +18,7 @@ class Player():
         self.statusEffects = [] # For now, only used for parry function, new effects can be added and put in here.
         self.abilityActive = [] # For storing abilities used in combat. (taking over for self.statusEffects)
         self.possibleCombatActions = ['hit', 'parry'] # Possible actions for player when in combat, new actions can be added if they are implemented.
-        self.possibleMapActions = ['Map/move', 'Examine', 'Rest','Help'] # Possible actions for player not in combat, new actions can be added if they are implemented.
+        self.possibleMapActions = ['Map/Move', 'Examine', 'Rest','Help'] # Possible actions for player not in combat, new actions can be added if they are implemented.
         self.moveActions = ['(W)est', '(E)ast', '(N)orth', '(S)outh'] # Possible move actions on the map
         self.totalPointsAllocated = 6 # Default points player can allocate to skills at the beginning of the game.
         self.inventory = []
@@ -33,11 +33,16 @@ class Player():
         for action in self.possibleMapActions:
 	        if action.lower() in gm_scenarios.itemsAndAbilities:
 		        print(gm_scenarios.itemsAndAbilities[action.lower()])
+
         print('\nCombat actions: ')
         for action in self.possibleCombatActions:
-	        if action.lower() in gm_scenarios.itemsAndAbilities:
-		        print(gm_scenarios.itemsAndAbilities[action.lower()])
+            if action.lower() not in gm_scenarios.itemsAndAbilities:
+                print('# Log:', action,' Item not in gm_scenarios.itemsAndAbilities. From printHelpText()')
+            else:
+                print(gm_scenarios.itemsAndAbilities[action.lower()])            
+
         if len(self.equipped) > 0:
+            print('\nEquipped items: ')
             for itemDict in range(len(self.equipped)):
                 if self.equipped[itemDict]["type"] not in gm_scenarios.itemsAndAbilities:
                     print('# Log:', self.equipped[itemDict]["type"], 'Item not in gm_scenarios.itemsAndAbilities. From printHelpText()')
@@ -183,9 +188,10 @@ class Player():
                 if self.equipped[itemDict]["ability"] != None and self.equipped[itemDict]["ability"] not in self.possibleCombatActions:
                     self.possibleCombatActions.append(self.equipped[itemDict]["ability"])
                     print('\nYou have learned to use the "%s" ability with your %s!' % (self.equipped[itemDict]["ability"], self.equipped[itemDict]["type"]))
-                if self.equipped[itemDict]["ability"] != None and self.equipped[itemDict]["ability"] in self.possibleCombatActions:
+                if self.equipped[itemDict]["ability"] != None or self.equipped[itemDict]["ability"] in self.possibleCombatActions:
                     # print('# Log: No new abilities learned, ability is already learned')
-                    input("Hit 'Enter' to continue...")
+                    #input("Hit 'Enter' to continue...")
+                    pass
         else:
             pass
             #print('# Log: No new abilities learned, no items in equipped')

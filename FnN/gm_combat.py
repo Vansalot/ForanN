@@ -50,19 +50,21 @@ def combatRoll():
 def hitDecider(gameState, hit_roll, currentArmor, enemy):
     # If hit roll >= the opponents CurrentArmor(armorclass) it will result in a normal hit, then hitDecider returns 'Hit'.
     # If parry is in the picture call the parry function
+    player = gameState.player # verbosification
     parryModifier = 0
     hitModifier = 0
     # Change hit modifier based on if it is player or enemy, and if there are abilities that change hit modifier.
     if enemy == True:
         hitModifier = gameState.enemy[gameState.enemyIndex].enemy_hitmod
     elif enemy == False:
-        hitModifier = gameState.player.attributes.pl_hitmod
-        if 'power attack' in gameState.player.abilityActive:
-            hitModifier -= 2 # If powerattack, hit modifier is reduced.
+        hitModifier = player.attributes.pl_hitmod
+        if 'power attack' in player.abilityActive or 'shield bash' in player.abilityActive:
+            hitpen = 2
+            hitModifier -= hitpen # If powerattack or shield bash, hit modifier is reduced.
     
     # Change parry modifier if player or enemy has activated parry mode.
-    if enemy == True and 'parry' in gameState.player.abilityActive:
-        parryModifier += round(gameState.player.attributes.pl_agi / 2) + 1
+    if enemy == True and 'parry' in player.abilityActive:
+        parryModifier += round(player.attributes.pl_agi / 2) + 1
     elif enemy == False and 'parry' in gameState.enemy[gameState.enemyIndex].enemy_abilityActive:
         parryModifier += round(gameState.enemy[gameState.enemyIndex].enemy_agi / 2) + 1
         
@@ -97,6 +99,15 @@ def modifiedDamage(gameState, baseDamage, enemy):
     if enemy != True:       
         # If the player is doing damage
         strdmg = gameState.player.attributes.pl_dmgFromStr # for use in print
+        if 'shield bash' in gameState.player.abilityActive:
+            shieldBashpen = 2
+            modDmg +=  baseDamage + strdmg - shieldBashpen 
+            if modDmg <= 0:
+                modDmg = 1
+            gameState.enemy[gameState.enemyIndex].enemy_statusEffects.append('shield bash') # append shield bash status to enemy.
+            print('# %s (base) + %s (mod from str) - %s (shield bash penalty) = %s damage dealt.' % (baseDamage, strdmg, shieldBashpen, modDmg))
+            return modDmg
+        
         equippeddmg = gameState.player.attributes.pl_dmgBonusFromEquipped # for use in print
         modDmg += baseDamage + gameState.player.attributes.pl_totDmgBonus # modified dmg is base + player total dmg bonus.
         if modDmg <= 0:
@@ -109,6 +120,7 @@ def modifiedDamage(gameState, baseDamage, enemy):
             print('# %s (base) + %s (mod from str) + %s (mod from equipped items) = %s damage dealt.' % (baseDamage, strdmg, equippeddmg, modDmg))
         if equippeddmg == 0:
             print('# %s (base) + %s (mod from str) = %s damage dealt.' % (baseDamage, strdmg, modDmg))
+
         return modDmg
     else:
         # If the enemy is doing damage
@@ -227,6 +239,9 @@ def checkValidAction(gameState):
         gameState.player.printPlayerPossibleactions() # print player's possible actions
         enteredAction = input(' Please enter your action: ').lower()
         #print()
+        if enteredAction == 'medic': 
+            # in combat cheat, meant for debug purposes
+            gameState.player.attributes.pl_current_hp = gameState.player.attributes.pl_maxhp
         if enteredAction not in gameState.player.possibleCombatActions:
             print('Entered action is not valid, try again.\n')
             enteredAction = ''
@@ -280,7 +295,7 @@ def combatLoop(gameState):
             for combatAction in player.possibleCombatActions:
                 if combatAction.lower().startswith(enteredAction):
                     # first check for ability/feat/special actions
-                    if enteredAction == 'power attack' or enteredAction == 'parry': # power attack or parry. 
+                    if enteredAction == 'power attack' or enteredAction == 'parry' or enteredAction == 'shield bash': # power attack, parry or shield bash. 
                         player.abilityActive.append(enteredAction)
                         if enteredAction == 'power attack': # power attack
                             message = 'You take a deep breath and swing your blade like you mean it!\n'
@@ -291,11 +306,21 @@ def combatLoop(gameState):
                                 critHandling(gameState, player.isENEMY)
                                 turn = 'enemy'
                                 continue
+                        
+                        elif enteredAction == 'shield bash': # Shield bash
+                            message = 'You lean back and swing your hip like you mean it(hips don\'t lie), and slam your shield towards the enemy!\n'
+                            gm_map.printThis(message)
+                            hitRoll = combatRoll()
+                            hitResult = hitDecider(gameState, hitRoll, currentEnemy.enemy_currentArmor, player.isENEMY)
+                            if hitResult == 'CRITICAL':
+                                hitResult = 'Hit'
+
                         elif enteredAction == 'parry': # Parry functionality
                             print('You hunker down into a defensive pose.')
                             time.sleep(1)
                             turn = 'enemy'
                             continue
+                        
 
                     elif enteredAction == 'hit' or enteredAction == 'h':
                         # Roll for hit, and check the result of the hit roll.
@@ -321,7 +346,11 @@ def combatLoop(gameState):
                     # Results after doing hit command
                     if hitResult == 'Hit':
                         # If the player get a hit, it goes through normal hit handling.
-                        print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, player.attributes.pl_hitmod, hitRoll + player.attributes.pl_hitmod, hitResult))
+                        if 'power attack' in player.abilityActive or 'shield bash' in player.abilityActive:
+                            hitpen = 2
+                            print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, player.attributes.pl_hitmod - hitpen, hitRoll + player.attributes.pl_hitmod , hitResult))     
+                        else:    
+                            print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, player.attributes.pl_hitmod, hitRoll + player.attributes.pl_hitmod, hitResult))
                         damageHandling(gameState, damageRoll(), player.isENEMY)
                         turn = 'enemy'
                         continue
@@ -348,6 +377,17 @@ def combatLoop(gameState):
             if len(currentEnemy.enemy_abilityActive) > 0: 
                 currentEnemy.enemy_abilityActive = [] # Remove all active abilities so that it does not carry over to the current round.
 
+            if 'shield bash' in gameState.enemy[gameState.enemyIndex].enemy_statusEffects:
+                # If enemy is affected by shield bash he might loose his round. saving throw.
+                if randint(1, 20) < 15:
+                    gm_map.printThis('%s got smacked senseless from your shield bash and can\'t perform an action this round.\n' % (currentEnemy.enemy_name.title()))
+                    turn = 'player'
+                    gameState.enemy[gameState.enemyIndex].enemy_statusEffects.remove('shield bash')
+                    continue
+                else:
+                    gm_map.printThis('%s got smacked good from your shield bash, he shakes his head and roars "DISAPPOINTED!!!"\n' % (currentEnemy.enemy_name.title()))
+                    gameState.enemy[gameState.enemyIndex].enemy_statusEffects.remove('shield bash')
+                    
             if currentEnemy.enemy_current_hp < (currentEnemy.enemy_maxhp / 2):
                 # If the enemy is under half hp, he will have a chance to enter parrymode.
                 if randint(0,10) > 4: #  ~60% chance of going into parry mode.
@@ -372,7 +412,7 @@ def combatLoop(gameState):
                 print('# %s rolled %s + %s (hit modifier) = %s. * %s *' % (currentEnemy.enemy_name.title(), hitRoll, currentEnemy.enemy_hitmod, hitRoll + currentEnemy.enemy_hitmod, hitResult))
                 damageHandling(gameState, damageRoll(), currentEnemy.isEnemy)
                 turn = 'player'
-            elif hitResult == 'Miss' and 'parry' in player.statusEffects:
+            elif hitResult == 'Miss' and 'parry' in player.abilityActive:
                 # If enemy misses when player is in parry mode
                 print('# %s rolled %s + %s (hit modifier) = %s. * Parry *' % (currentEnemy.enemy_name.title(), hitRoll, currentEnemy.enemy_hitmod, hitRoll + currentEnemy.enemy_hitmod))
                 counterattack(gameState, player.isENEMY)

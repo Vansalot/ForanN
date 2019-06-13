@@ -7,26 +7,48 @@ forest = {
     "intro": '\nYou wake up lying on the ground, you are confused and wondering where you are, around you are a lush forest.\nBirds are chirping, and the noonday sun shines above you.\n',
 
     "description": [
+    [
     'You come through to a clearing in the forest, there\'s traces of a firepit next to some rocks. From the looks of it, someone camped here perhaps a week ago.\n',
     'Cursing after getting stung by a thorn bush, you turn back to the direction you were traveling in and see what you have already been seeing for a while... Trees.\n',
     'You come out from the trees and see a small stream of water. The sun has just moved behind some clouds, you\'re wondering if you should take a break.\n',
     'The terrain is going uphill, you hear a stream somewhere, you aren\'t sure of the direction cause you can\'t see the sun.\n',
     'Just as you climb over a fallen tree, you see a fox that rushes away from you.\n',
+    ],
+    [
     'You almost fall when you hear what you might think is a scream, it sounded like it was wery far away.\n',
     'It\'s getting darker as you get further and further into the forest, you are thinking about HEY! What was that!?! oh.... a dead mouse...\n',
     'You reach a high stone ridge. You can not climb up. You think that you might have to go around it.\n',
     'As you walk down a path you are wondering about why people don\'t spikk as much as they used to.\n',
     'Thousands of vendings kvern around in your head as you wander further into the forest.\n',
+    ],
+    [
     'Tired, you wander along the path in front of you, if you only had some juløl.\n',
     'Humming to the song "knuckle pokel man" you gaze further into the deep forest. You can only hear some rustling in the bushes nearby\n',
     'There\'s many problems in this world, and to you it seems that trees ain\'t one of them, or is it?\n', 
+    'You wander further into the forest, thinking about what good old gammel nok told you in your younger days.\nFor example he said if you sleep in telt, make sure that it is raintett.\n',
+    'The forest clears up in sort of a circle, looks like someone have cleared this area and put up a sick rock in the middle.\n',
+    ],
+    [
+    'You get distracted by a squirrel that is seemingly trying to eat a rock. Strange...\n',
+    'Haven\'t you been here before? Everything looks the same in the forest.\n',
+    'What was that? A strange noise startles you. But it turns out that it\'s just the branch you just stepped on.\n',
+    'You are already tired of this forest, you start to daydream about spikking a large propel for a flying machine.\n',
+    'Man, if you only had a spilldåse, then you would not need to be so bored of walking on into this dark and god forsaken forest.\n',
+    ],
+    [
+    'Your back is killing you, you think you might need a chiropractor chair.\n',
+    'You pass a stream, you see a dead rabbit in it. No water for you it seems.\n',
+    'Gosh darn, you just missed a rabbit that you could have had for dinner.\n',
+    'Don\'t forget, The one who first comes to the mill, is him who first gets painted.\n',
+    'You tear your shirt on a branch.\nThat\'s it simpelthen overhead not nå to do with\n',
+    ]
     ],
 
     "startlocationagain": ['After a while of struggling through a shrubbery you finally get into a clearing in the forest, you look around and find out that this is the place that you woke up earlier.\nYou immidiately find out that you have to move on.\n'],
     
     "examination": [
     'You find a tree with a hole in it, you put your hand inside.... Hey, what\'s this? \n', 
-    'You almost fall over a treestump, after regaining your balance you see something shining on the ground.\n', 
+    'You almost fall over a tree stump, after regaining your balance you see something shining on the ground.\n', 
     'You look around the nearby bushes, you look in a birds nest...\n',
     'You search through the rubble and...\n',
     'Hey, this was lying right in front of you the whole time.\n',
@@ -51,6 +73,8 @@ forest = {
     "ending": '\nWhen the fight ends, you take Gunther and help him back to his friends. In the evening you drink juløl and dance støveldæns.\n',
     "maxStorylocIndex": 2,
 }
+
+
 #
 # Scenario 2. town
 #
@@ -119,6 +143,14 @@ town = {
     "storylocations": [[1, 1],[3, 1],[2, 4], [4, 1]],
 }
 
+hills = {
+
+}
+
+#
+# Helptext for items and abilities
+#
+
 itemsAndAbilities = {
     "rest": '* Rest * Player rests and restores his hp. Can only be used while traveling.\n',
     "examine": '* Examine * Attempt to search for items in the location you are in. There\'s a random chance to find items.\n  Not all locations are examinable.\n',
@@ -127,13 +159,19 @@ itemsAndAbilities = {
     "healing potion": '* Healing potion * Heals the player for x hp. You can only use this item while in combat.\n  You spend your round using a healing potion.\n',
     "power attack": '* Power attack * Attempt to strike the enemy. You get a slight reduction to your hit bonus, but you get +2 dmg if you hit.\n',
     "sword": '* Sword * Adds +2 to hit rolls, and +1 to damage rolls. Also can give access to "power attack" ability.\n',
-    "shield": '* Shield * Adds +1 to armor. Can also give access to "shield bash" ability(**TBI**).\n',
+    "shield": '* Shield * Adds +1 to armor. Can also give access to "shield bash" ability.\n',
     "chainmail": '* Chainmail * Adds +2 to armor.\n',
     "helmet": '* Helmet * Adds +1 to armor.\n',
+    "shield bash": '* Shield bash * Attempt to hit the enemy with your shield, hit and dmg are reduced by 2.\n  If Shield bash hits, there\'s a chance that the enemy will loose his round.\n',
 }
 
+# List of scenarios
 SCENARIOS = [forest, town] # List of scenario dictionaries. used for initializing scenarios. New scenarios should be added to this list. 
 
+
+#
+# Combat flavor text strings
+#
 COMBAT_FLAVOR = {
     "combatintrostart": [
     'A raving madman who calls himself ',

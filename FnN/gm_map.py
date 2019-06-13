@@ -32,30 +32,15 @@ class WorldMap():
         self.movesSinceCombat = 0
 
     def createLocations(self, scenario, scenarioIndex):
-            # Set up objects for every location/tile on the map
-            if scenarioIndex == 0:
-                locations = [] # The complete list of 5 lists with 5 locations. [[5][5][5][5][5]]
-                for i in range(5):
-                    templist = [] # Reset temp list for every iteration of the loop
-                    for i in range(5):
-                        # Add flavor description for every location
-                        description = scenario["description"][random.randint(0, len(scenario["description"]) -1)] 
-                        examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)] 
-                        templist.append(gm_locations.Locationforest(description, examineText)) # Call the constructur with desc that is defined in line above.
-                    locations.append(templist)
-                WorldMap.STARTINGBOARD = locations
-
-            else: 
-                # Set up locations from the 2nd scenario and on. Sets a map that's not ranomized. Do not use for first scenario!!!
-                # Set up objects for every location/tile on the map
-                locations = [] # The complete list of 5 lists with 5 locations. [[5][5][5][5][5]]
-                for description_list in scenario["description"]:
-                    templist = [] # Reset temp list for every iteration of the loop
-                    for string in description_list:
-                        examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)]
-                        templist.append(gm_locations.Locationforest(string, examineText))
-                    locations.append(templist)
-                WorldMap.STARTINGBOARD = locations
+            # Set up objects for every location/tile on the map           
+            locations = [] # The complete list of 5 lists with 5 locations. [[5][5][5][5][5]]
+            for description_list in scenario["description"]:
+                templist = [] # Reset temp list for every iteration of the loop
+                for string in description_list:
+                    examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)]
+                    templist.append(gm_locations.Locationforest(string, examineText))
+                locations.append(templist)
+            WorldMap.STARTINGBOARD = locations
 
     def createLocations4Scenario(self, scenario):
         # Set up locations from the 2nd scenario and on. Sets a map that's not ranomized. Do not use for first scenario!!!
@@ -126,17 +111,6 @@ class WorldMap():
             if gameState.scenarioIndex == 0:
                 self.setStoryLoc(gameState.scenario, gameState.scenarioIndex)
             time.sleep(3)
-
-    #def setStartLocFirstScenario(self, scenario, scenarioIndex):
-    '''    # Validates if the move entered is on the board and executes it.
-        previousX, previousY = self.previousPosition
-        currentX, currentY = self.currentPosition
-        if (-1 < currentX < 5) and (-1 < currentY < 5):
-            # If current move if on the board, the move will be performed.
-            self.theMap[previousY][previousX].mapTile = WorldMap.heroPrevPos
-            self.theMap[currentY][currentX].mapTile = WorldMap.heroCurrentPos
-            self.theMap[currentY][currentX].visitedText = scenario["startlocationagain"] # Set flavor text on the starting location of the game.
-            self.theMap[currentY][currentX].startLocation = True # Set startlocation to True so that we know where it is.'''
 
     def setStartLoc(self, scenario, scenarioIndex):
         # Set player position on the map according to the scenariotext
@@ -250,13 +224,13 @@ class WorldMap():
     def drawMap(self, gameState):
             # Merged printing of map together with printing of the player information.
             # setting up the player info prints:
-            spacing = 48
+            spacing = 50
             # Printed player information
             lvlIndex = gameState.player.attributes.pl_lvl - 1
-            plInfoDashedLine = '+------------ <<< Player information >>> -----------'
+            plInfoDashedLine = '+------------- <<< Player information >>> ------------'
             nameLvlXp = '  %s | Level: %s | %s / %s xp  ' % (gameState.player.name.title(), gameState.player.attributes.pl_lvl, gameState.player.attributes.pl_xp, gameState.player.attributes.levelup[lvlIndex])
             nameLvlXpPrint = nameLvlXp.center(spacing)
-            dashedLine = '+---------------------------------------------------'
+            dashedLine = '+-----------------------------------------------------'
             plAttributes= ' Str: %s  Agi: %s  Fort: %s | AC: %s HP: %s / %s ' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
             plAttributesPrint = plAttributes.center(spacing)
             
