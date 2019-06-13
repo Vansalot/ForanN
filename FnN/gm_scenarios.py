@@ -178,14 +178,23 @@ COMBAT_FLAVOR = {
     'Some dude named ',
     'As you were just minding your own business, ',
     'Oh snap! Shit has just hit the fan! ',
-    '"Bob, bob, bob, ikke sant", you hear someone say behind you. You turn around and '
+    '"Bob, bob, bob, ikke sant", you hear someone say behind you. You turn around and ',
+    'Before you know it ',
+    'Suddenly you notice that it get\'s really cold, you see that the puddle of water in front of you\nfreezes solid.' ,
+    'You suddenly hear.... Is that "Eye of the tiger"..? Before you fathom what song it is ',
+    'You suddenly hear.... Is that "Killing in the name"..? Before you fathom what song it is ',
+    'You suddenly hear.... Is that "Møkkamann"..? Before you fathom what song it is ',
     ],
     "combatintroending": [
     ' lunges at you. He looks like he wants to introduce you to a can of whoop-ass! ',
     ' shows up and seems eager to wear you like a hat! ',
     ' sneaks up on you. He raises his hand in the air... ',
     ' tells you to respect his authority! ',
-    ' slaps you around with a trout! '
+    ' slaps you around with a trout! ',
+    ' starts ranting about irregularities in the pension fund.',
+    ' stops you and start to explain why we need to increase the number of bomstasjoner in Oslo.',
+    ' stops you, and then start\'s giving you a karaoke session of a life time.', 
+    ' pats you on the back, raises a book up to your face and ask you if you have heard the good word of "Jehova".'
     ],   
     "combatwonstart": ['You whooped'],
     "combatwonending": ['ass, real goood.'],

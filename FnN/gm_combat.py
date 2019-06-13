@@ -261,7 +261,7 @@ def combatLoop(gameState):
     print()
     
     # Making enemy and player less verbose
-    currentEnemy = gameState.enemy[gameState.enemyIndex] # trying to make enemy statement shorter
+    currentEnemy = gameState.enemy[gameState.enemyIndex]
     player = gameState.player
 
     while player.inCombat == True:
