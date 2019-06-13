@@ -9,20 +9,20 @@ class Player():
     # Player is stored in the gamestate object.
     def __init__(self):
         # Initialise player
-        # Contains player specific data that does not involve combat related stats.
+        # Contains player specific data that does not involve combat related stats. (self.equipped contain stats, but that data is processed and put into attributes.)
         self.attributes = PlayerAttributes() # see playerattributes for more info
         self.name = ''
         self.inCombat = False # Used to determine if the player is in combat, this changes where the game loop goes.
-        self.isENEMY = False # Used to determine if it's the player of enemy who does actions in combat, also a parameter for enemy class.
+        self.isENEMY = False # Used to determine if it's the player of enemy who does actions in combat, also a attribute for enemy class.
         self.dead = False # Used to determine if the player is dead and the game is over.
-        self.statusEffects = [] # For now, only used for parry function, new effects can be added and put in here.
-        self.abilityActive = [] # For storing abilities used in combat. (taking over for self.statusEffects)
+        self.statusEffects = [] # TBI
+        self.abilityActive = [] # For storing abilities used in combat, e.g "parry" and "shield bash". (taken over for self.statusEffects)
         self.possibleCombatActions = ['hit', 'parry'] # Possible actions for player when in combat, new actions can be added if they are implemented.
         self.possibleMapActions = ['Map/Move', 'Examine', 'Rest','Help'] # Possible actions for player not in combat, new actions can be added if they are implemented.
         self.moveActions = ['(W)est', '(E)ast', '(N)orth', '(S)outh'] # Possible move actions on the map
         self.totalPointsAllocated = 6 # Default points player can allocate to skills at the beginning of the game.
-        self.inventory = []
-        self.equipped = []
+        self.inventory = [] # inventory, will for now only contain healing pots
+        self.equipped = [] # items that the player find will be here, in a list of dicts.
 
     def printHelpText(self):
         # Prints a screen with information based on what actions/items are available to the player. WIP
@@ -50,6 +50,24 @@ class Player():
                 else:
                     print(gm_scenarios.itemsAndAbilities[self.equipped[itemDict]["type"].lower()])
         input("Hit 'Enter' to continue... ")
+        os.system('cls')
+        strEquippedItems = str(self.equipped).replace("[{","").replace("}]","").replace("{","").replace("}","") # Make print of equipped list look nicer.
+        
+        print('          +------------------------ <<< Player Attributes >>> ----------------------------+\n')
+        print('\t\tDamage bonus from strength:      ' ,self.attributes.pl_dmgFromStr)
+        print('\t\tDamage bonus from equipped items:', self.attributes.pl_dmgBonusFromEquipped)
+        print('\t\tTotal damage bonus:              ', self.attributes.pl_totDmgBonus)
+        print()
+        print('\t\tDamage reduction:               ', self.attributes.pl_dmgReduction, '(Based on Agility)')
+        print('\t\tPlayer base armor:              ', self.attributes.pl_base_armor)
+        print('\t\tArmor bonus from equipped items:', self.attributes.pl_armorBonusFromEquipped)
+        print('\t\tTotal armor:                    ', self.attributes.pl_currentArmor, '(Base + Agility bonus + items)')
+        print()
+        print('\t\tHit bonus from equipped items:', self.attributes.pl_hitBonusFromEquipped)
+        print('\t\tTotal hit modifier:           ', self.attributes.pl_hitmod, 'modified by lvl, strenght and items')
+        if len(self.equipped) > 0:
+            print('\n\t\tEquipped items:\n', strEquippedItems)
+        input("\n\t\tHit 'Enter' to continue... ")
 
     def printPlayerPossibleactions(self):
         # Prints the possible actions the player can perform, depending on if the player is in combat or not.
@@ -269,13 +287,13 @@ class PlayerAttributes():
         
         self.pl_str = 0 # player strenght
         self.pl_hitmod = 0 # Player hit modifier, modified by lvl, str, and items
-        self.pl_dmgFromStr = 0
-        self.pl_totDmgBonus = 0
+        self.pl_dmgFromStr = 0 # dmg modifier from strength
+        self.pl_totDmgBonus = 0 # total dmg modifier from strenght and items.
 
         self.pl_agi = 0 # player agility
-        self.pl_dmgReduction = 0
-        self.pl_base_armor = 10 # player base armor, will be modified by agi and items
-        self.pl_currentArmor = self.pl_base_armor + self.pl_agi # player armor modified by agility.
+        self.pl_dmgReduction = 0 # dmg reduction, based on agi
+        self.pl_base_armor = 10 # player base armor
+        self.pl_currentArmor = self.pl_base_armor + self.pl_agi # player armor modified by agility and items.
         
         self.pl_fort = 0 # player foritude
         self.pl_base_hp = 10 # player base hp
