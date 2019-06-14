@@ -142,7 +142,7 @@ class WorldMap():
         
         if ctrl.lower() == 'rest' or ctrl.lower().startswith('r'): # Rest, player gets full hp and continues.
             gm_charstats.Player.rest(gameState.player)
-            print('You get up and look around.')
+            print('\nYou get up and look around.')
             self.whatToDo(gameState)
         elif ctrl.lower() == 'map' or ctrl.lower().startswith('m'): # Movement, calls the map
             self.navigateTheMap(gameState)
@@ -288,6 +288,7 @@ class WorldMap():
     def showmap(self, tryAgain=False):
         # Draw the game map when it is called from command prompt
         os.system('cls')
+        print('          +------------------------ <<< MAP >>> ------------------------+\n')
         print('''                  _____________
                 =(_ ___  __ __ )=
                   |           |''')
@@ -302,7 +303,7 @@ class WorldMap():
             print('\t\t  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
         print('''                  |__  ___   _|
                 =(_____________)=''')
-        print('Map: You are @, Unvisited location are #, visited location are ¤')
+        print('\nYou are @, Unvisited location are #, visited location are ¤')
         
         if tryAgain == True:
             print(" * Can't go further in that direction, please select another direction. *")

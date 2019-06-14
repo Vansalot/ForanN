@@ -8,7 +8,7 @@ forest = {
 
     "description": [
     [
-    'You come through to a clearing in the forest, there\'s traces of a firepit next to some rocks. From the looks of it, someone camped here perhaps a week ago.\n',
+    'You come through to a clearing in the forest, there\'s traces of a firepit next to some rocks.\nFrom the looks of it, someone camped here perhaps a week ago.\n',
     'Cursing after getting stung by a thorn bush, you turn back to the direction you were traveling in and see what you have already been seeing for a while... Trees.\n',
     'You come out from the trees and see a small stream of water. The sun has just moved behind some clouds, you\'re wondering if you should take a break.\n',
     'The terrain is going uphill, you hear a stream somewhere, you aren\'t sure of the direction cause you can\'t see the sun.\n',
@@ -182,20 +182,20 @@ COMBAT_FLAVOR = {
     '"Bob, bob, bob, ikke sant", you hear someone say behind you. You turn around and ',
     'Before you know it ',
     'Suddenly you notice that it get\'s really cold, you see that the puddle of water in front of you\nfreezes solid.' ,
-    'You suddenly hear.... Is that "Eye of the tiger"..? Before you fathom what song it is ',
-    'You suddenly hear.... Is that "Killing in the name"..? Before you fathom what song it is ',
-    'You suddenly hear.... Is that "Møkkamann"..? Before you fathom what song it is ',
+    'You suddenly hear.... Is that "Eye of the tiger"..? Before you fathom what song it is, ',
+    'You suddenly hear.... Is that "Killing in the name"..? Before you fathom what song it is, ',
+    'You suddenly hear.... Is that "Møkkamann"..? Before you fathom what song it is, ',
     ],
     "combatintroending": [
-    ' lunges at you. He looks like he wants to introduce you to a can of whoop-ass! ',
-    ' shows up and seems eager to wear you like a hat! ',
-    ' sneaks up on you. He raises his hand in the air... ',
-    ' tells you to respect his authority! ',
-    ' slaps you around with a trout! ',
-    ' starts ranting about irregularities in the pension fund.',
-    ' stops you and start to explain why we need to increase the number of bomstasjoner in Oslo.',
-    ' stops you, and then start\'s giving you a karaoke session of a life time.', 
-    ' pats you on the back, raises a book up to your face and ask you if you have heard the good word of "Jehova".'
+    '\nlunges at you. He looks like he wants to introduce you to a can of whoop-ass! ',
+    '\nshows up and seems eager to wear you like a hat! ',
+    '\nsneaks up on you. He raises his hand in the air... ',
+    '\ntells you to respect his authority! ',
+    '\nslaps you around with a trout! ',
+    '\nstarts ranting about irregularities in the pension fund. ',
+    '\nstops you, then starts explaining why we need to increase the number of bomstasjoner in Oslo. ',
+    '\nstops you, and then start\'s giving you a karaoke session of a life time. ', 
+    '\npats you on the back, and then...\nRaises a book up to your face and ask you if you have heard the good word of "Jehova". '
     ],   
     "combatwonstart": ['You whooped'],
     "combatwonending": ['ass, real goood.'],

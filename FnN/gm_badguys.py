@@ -24,7 +24,7 @@ class Enemy:
         self.enemy_maxhp = self.enemy_base_hp + self.enemy_fort         
         self.enemy_current_hp = self.enemy_maxhp
         self.enemy_base_armor = 8
-        self.enemy_currentArmor = self.enemy_base_armor + int(self.enemy_agi / 4)
+        self.enemy_currentArmor = self.enemy_base_armor + int(self.enemy_agi / 3)
         self.enemy_xp_reward = 250 * self.enemy_lvl
         self.enemy_statusEffects = []
         self.enemy_abilityActive = [] # For storing abilities used in combat. (taking over for self.statusEffects)

@@ -237,7 +237,7 @@ def checkValidAction(gameState):
     enteredAction = ''
     while enteredAction.replace(" ", "").isalpha() != True: # Loop that will ask the player to enter correct action.
         gameState.player.printPlayerPossibleactions() # print player's possible actions
-        enteredAction = input(' Please enter your action: ').lower()
+        enteredAction = input('\nPlease enter your action: ').lower()
         #print()
         if enteredAction == 'medic': 
             # in combat cheat, meant for debug purposes

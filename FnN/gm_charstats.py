@@ -66,8 +66,9 @@ class Player():
         print('\t\tHit bonus from equipped items:', self.attributes.pl_hitBonusFromEquipped)
         print('\t\tTotal hit modifier:           ', self.attributes.pl_hitmod, 'modified by lvl, strenght and items')
         if len(self.equipped) > 0:
-            print('\n\t\tEquipped items:\n', strEquippedItems)
+            print('\n\t\tEquipped items:\n\t\t', strEquippedItems)
         input("\n\t\tHit 'Enter' to continue... ")
+        os.system('cls')
 
     def printPlayerPossibleactions(self):
         # Prints the possible actions the player can perform, depending on if the player is in combat or not.
