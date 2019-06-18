@@ -283,8 +283,9 @@ class PlayerAttributes():
     # Initializes the player attributes, they are part of the Player class.
     def __init__(self):
         self.pl_lvl = 1 # Player level
-        self.pl_xp = 0 # player experience
-        self.levelup = [1000, 2000, 3500, 5000, 7000, 8500, 10000, 12500, 15000, 17500, 20000, 23000, 26000, 30000, 35000, 41000, 47000, 52000, 58000, 65000] # xp thresholds for levelup.
+        self.pl_xp = 0 # player experience                                        lvl-10 / 30                                                                lvl-20
+        self.levelup = [1000, 2000, 3500, 6000, 9000, 12000, 16000, 21000, 26000, 31000, 38000, 44000, 51000, 58000, 65000, 73000, 81000, 89000, 98000, 106000,
+        114000, 122000, 130000, 138000, 146000, 155000, 164000, 173000, 182000, 191000, 200000, 210000, 220000] # xp thresholds for levelup.
         
         self.pl_str = 0 # player strenght
         self.pl_hitmod = 0 # Player hit modifier, modified by lvl, str, and items

@@ -22,12 +22,12 @@ class Gamestate():
         # updates gamestate when you change to the next scenario. 
         try:
             self.scenarioIndex += 1
+            self.scenario = gm_scenarios.SCENARIOS[self.scenarioIndex] # Inserts the dictionary of the scenario
+            self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex) # set up the next map based on the dictionary in self.scenario
+            self.map.victory = False # reset victory flag
         except IndexError:
             self.gameIsDone = True
             gm_map.printThis(gm_scenarios.ENDING_MSG)
-        self.scenario = gm_scenarios.SCENARIOS[self.scenarioIndex] # Inserts the dictionary of the scenario
-        self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex) # set up the next map based on the dictionary in self.scenario
-        self.map.victory = False # reset victory flag
 
 def enterPlayerName(gameState):
     #starts the game, prompts for user to enter player name and calls playerStartingStats()
@@ -64,7 +64,7 @@ def getStartingStats(gameState):
     str = 0
     agi = 0 
     fort = 0
-    print("\nNow you have to enter your characters stats, they are Strenght, Agility and Fortitude. You got %s points to distribute between the stats." % (gameState.totalPointsAllocated))
+    print("\nNow you have to enter your characters stats, they are Strenght, Agility and Fortitude.\nYou got %s points to distribute between the stats." % (gameState.totalPointsAllocated))
     print("You can allocate 1-%s points to the first category.\n" % (maxPointsAllowedInOneStat))
 
     # Calls getStartingAttribute which returns the value that the user enters for the strength stat

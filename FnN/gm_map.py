@@ -288,7 +288,7 @@ class WorldMap():
     def showmap(self, tryAgain=False):
         # Draw the game map when it is called from command prompt
         os.system('cls')
-        print('          +------------------------ <<< MAP >>> ------------------------+\n')
+        print('+------------------------ <<< MAP >>> ------------------------+\n')
         print('''                  _____________
                 =(_ ___  __ __ )=
                   |           |''')
@@ -308,13 +308,32 @@ class WorldMap():
         if tryAgain == True:
             print(" * Can't go further in that direction, please select another direction. *")
 
-def printThis(message, speed=0.02):
+def printThisOLD(message, speed=0.02):
     # Function that prints text in a cascading way. Gives the game a more story like feel than text instantly popping onto the screen.
 
     for character in message:
                     sys.stdout.write(character)
                     sys.stdout.flush()
                     time.sleep(speed)
+
+def printThis(message, speed=0.02, maxLength=100):
+    # Function that prints text in a cascading way. Gives the game a more story like feel than text instantly popping onto the screen.
+    index = 0
+    newLine = False
+    for character in message:
+        if character == '\n':
+            index = 0
+        if character == ' ' and index + 3 >= maxLength:
+            sys.stdout.write('\n')
+            index = 0
+            newLine = True
+        if newLine == True and character == ' ':
+            character =''
+            newLine = False
+        sys.stdout.write(character)
+        sys.stdout.flush()
+        time.sleep(speed)
+        index += 1
 
 
 
