@@ -26,7 +26,6 @@ class Gamestate():
             self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex) # set up the next map based on the dictionary in self.scenario
             self.map.victory = False # reset victory flag
         except IndexError:
-            self.gameIsDone = True
             gm_map.printThis(gm_scenarios.ENDING_MSG)
 
 def enterPlayerName(gameState):

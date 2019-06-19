@@ -42,18 +42,6 @@ class WorldMap():
                 locations.append(templist)
             WorldMap.STARTINGBOARD = locations
 
-    def createLocations4Scenario(self, scenario):
-        # Set up locations from the 2nd scenario and on. Sets a map that's not ranomized. Do not use for first scenario!!!
-        # Set up objects for every location/tile on the map
-            locations = [] # The complete list of 5 lists with 5 locations. [[5][5][5][5][5]]
-            for description_list in scenario["description"]:
-                templist = [] # Reset temp list for every iteration of the loop
-                for string in description_list:
-                    examineText = scenario["examination"][random.randint(0, len(scenario["examination"]) -1)]
-                    templist.append(gm_locations.Locationforest(string, examineText))
-                locations.append(templist)
-            WorldMap.STARTINGBOARD = locations
-
     def setStoryLoc(self, scenario, scenarioIndex):
         # Set the story locations on the map, they will be hidden from the player, setting up 3 to start with, so increase the players chances of ladning on a storyloc.
         # When the player visit these locations it will get some flavortext.
@@ -318,18 +306,31 @@ def printThisOLD(message, speed=0.02):
 
 def printThis(message, speed=0.02, maxLength=100):
     # Function that prints text in a cascading way. Gives the game a more story like feel than text instantly popping onto the screen.
-    index = 0
-    newLine = False
+    index = 0 # function prints new line based on index.
+    newLine = False # flag that show if new line has been printed
+    sentenceEnd = False # flag that show that , or . has been printed.
     for character in message:
         if character == '\n':
+            # if the character in the message is \n, set index to 0
             index = 0
-        if character == ' ' and index + 3 >= maxLength:
+        if character == ' ' and sentenceEnd == True:
+            # If . or , has been printed and you are almost at the limit, draw a new line.
             sys.stdout.write('\n')
             index = 0
-            newLine = True
+            newLine = True # Set new line to True
+            sentenceEnd = False
+        if character == ' ' and index + 4 >= maxLength:
+            # If you are almost at the limit of text on the line and the next character is not a letter print a new line.
+            sys.stdout.write('\n')
+            index = 0
+            newLine = True # Set new line to True
+        if character in '.,' and index > 85:
+            # If . or , has been printed and you are almost at the limit of the line, set flag that states that you should print new line.
+            sentenceEnd = True
         if newLine == True and character == ' ':
+            # If new line has been printed, if the next character is a blank space, strip it, so that the margin is not indented.
             character =''
-            newLine = False
+            newLine = False # Set new line flag to False after you start on a new line or print.
         sys.stdout.write(character)
         sys.stdout.flush()
         time.sleep(speed)

@@ -67,7 +67,13 @@ def hitDecider(gameState, hit_roll, currentArmor, enemy):
         parryModifier += round(player.attributes.pl_agi / 2) + 1
     elif enemy == False and 'parry' in gameState.enemy[gameState.enemyIndex].enemy_abilityActive:
         parryModifier += round(gameState.enemy[gameState.enemyIndex].enemy_agi / 2) + 1
-        
+    
+    # change hit modifier if it is an counterattack:
+    if enemy == False and 'parry' in player.abilityActive:
+        hitModifier = 0
+    elif enemy == True and 'parry' in gameState.enemy[gameState.enemyIndex].enemy_abilityActive:
+        hitModifier = 0
+
     # Check the result of the hit based on the modified values(above)
     if hit_roll == 20:
         return 'CRITICAL'
@@ -144,10 +150,12 @@ def hpUpdater(gameState, modifiedDmg, enemy):
                 gm_map.printThis('(Funky cool combat music fades away in the background)\n', speed=0.05)
                 time.sleep(1)
                 print()
+                gameState.player.abilityActive = []
                 gameState.player.plXpGain(gameState.enemy[gameState.enemyIndex].enemy_xp_reward) # update player xp
                 gameState.player.inCombat = False # set player out of combat so it can traverse the map
                 del gameState.enemy[gameState.enemyIndex] # remove enemy from enemy list
-        
+                
+
         # enemy deals damage
         elif enemy == True:
             gameState.player.attributes.pl_current_hp -= modifiedDmg
@@ -164,11 +172,15 @@ def critHandling(gameState, enemy):
     if enemy == False:
         # Handling for player
         print('# You: Critical chance!')
+        time.sleep(0.5)
         hitRoll = combatRoll()
         hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, enemy)
         if hitResult == 'Hit' or hitResult == 'CRITICAL':
             time.sleep(1)
-            print('# You rolled %s + %s (hit modifier) = %s ' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod), end='')
+            if 'parry' in gameState.player.abilityActive:
+                print('# You rolled %s ' % (hitRoll), end='')
+            if 'parry' not in gameState.player.abilityActive:
+                print('# You rolled %s + %s (hit modifier) = %s ' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod), end='')
             time.sleep(1)
             print('CRITICAL HIT!!!')
             time.sleep(1)
@@ -181,11 +193,15 @@ def critHandling(gameState, enemy):
     elif enemy == True:
         # Handling for enemy
         print('# %s Critical chance!' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()), end='')
+        time.sleep(0.5)
         hitRoll = combatRoll()
         hitResult = hitDecider(gameState, hitRoll, gameState.player.attributes.pl_currentArmor, enemy)
         if hitResult == 'Hit' or hitResult == 'CRITICAL':
             time.sleep(1)
-            print('# %s rolled %s + %s (hit modifier) = %s ' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod), end='')
+            if 'parry' not in gameState.enemy[gameState.enemyIndex].enemy_abilityActive:
+                print('# %s rolled %s + %s (hit modifier) = %s ' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod), end='')
+            if 'parry' in gameState.enemy[gameState.enemyIndex].enemy_abilityActive:
+                print('# %s rolled %s ' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll), end='')
             time.sleep(1)
             print('CRITICAL HIT!!!')
             time.sleep(1)
@@ -199,7 +215,7 @@ def counterattack(gameState, enemy):
     # Takes over for the hit decider if the defender is in "parry" mode.
     # a character in parry mode has x more armor value, and if the attacker does not hit, the defender gets a chance to counterattack.
     # the counterattack roll does not have hit modifier, so that parry isn't too overpowered.
-    print('# Rolling for counterattack...')
+    print('\n# Attack was parried, provoking a counterattack!')
     time.sleep(1)
     if enemy == False: 
         # Player attempt counterattck
@@ -209,7 +225,7 @@ def counterattack(gameState, enemy):
         if hitResult == 'CRITICAL':
             critHandling(gameState, gameState.player.isENEMY)
         # If the player get a hit, it goes through normal hit handling.
-        if hitResult == 'Hit':
+        elif hitResult == 'Hit':
             print('# Counterattack: You rolled %s * %s *' % (hitRoll, hitResult))
             damageHandling(gameState, damageRoll(), gameState.player.isENEMY)
             time.sleep(2)
@@ -354,7 +370,7 @@ def combatLoop(gameState):
                         damageHandling(gameState, damageRoll(), player.isENEMY)
                         turn = 'enemy'
                         continue
-                    elif hitResult == 'Miss' and 'parry' in currentEnemy.enemy_statusEffects:
+                    elif hitResult == 'Miss' and 'parry' in currentEnemy.enemy_abilityActive:
                         # If player misses when enemy is in parry mode
                         print('# You rolled %s + %s (hit modifier) = %s. * Parry *' % (hitRoll, player.attributes.pl_hitmod, hitRoll + player.attributes.pl_hitmod))
                         counterattack(gameState, currentEnemy.isEnemy)
@@ -391,7 +407,7 @@ def combatLoop(gameState):
             if currentEnemy.enemy_current_hp < (currentEnemy.enemy_maxhp / 2):
                 # If the enemy is under half hp, he will have a chance to enter parrymode.
                 if randint(0,10) > 4: #  ~60% chance of going into parry mode.
-                    currentEnemy.enemy_statusEffects.append('parry')
+                    currentEnemy.enemy_abilityActive.append('parry')
                     print('%s hunker down into a defensive pose.' % (currentEnemy.enemy_name.title()))
                     turn = 'player'
                     continue

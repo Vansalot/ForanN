@@ -25,7 +25,7 @@ class Enemy:
         self.enemy_current_hp = self.enemy_maxhp
         self.enemy_base_armor = 10
         self.enemy_currentArmor = self.enemy_base_armor + int(self.enemy_agi / 3)
-        self.enemy_xp_reward = self.calculateXp()
+        self.enemy_xp_reward = self.calculateXpReward()
         self.enemy_statusEffects = []
         self.enemy_abilityActive = [] # For storing abilities used in combat. (taking over for self.statusEffects)
         self.isEnemy = True
@@ -134,18 +134,15 @@ def createEnemy(gameState):
     from random import randint
     time.sleep(1)
     print()
-    # Flavor print. When you get an enemy encounter.
-    #gm_map.printThis(gm_scenarios.COMBAT_FLAVOR["combatintrostart"][randint(0, len(gm_scenarios.COMBAT_FLAVOR["combatintrostart"]) -1)])
-    #gm_map.printThis(enemy.enemy_name.title())
-    #gm_map.printThis(gm_scenarios.COMBAT_FLAVOR["combatintroending"][randint(0, len(gm_scenarios.COMBAT_FLAVOR["combatintroending"]) -1)])
     
-    # New flavorprint to accomodate changes in printThis function
+    # Flavor print. When you get an enemy encounter.
+    # Setting up the strings
     combamsgStart = gm_scenarios.COMBAT_FLAVOR["combatintrostart"][randint(0, len(gm_scenarios.COMBAT_FLAVOR["combatintrostart"]) -1)]
     combamsgEnd = gm_scenarios.COMBAT_FLAVOR["combatintroending"][randint(0, len(gm_scenarios.COMBAT_FLAVOR["combatintroending"]) -1)]
 
+    # Combine the strings into one message.
     CombatMessage = combamsgStart + enemy.enemy_name.title() + ' ' + combamsgEnd 
     gm_map.printThis(CombatMessage)
-
     time.sleep(1.5)
     print('DEFEND YOURSELF!')
     time.sleep(2)
