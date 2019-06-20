@@ -9,7 +9,7 @@ import gm_combat, gm_map, gm_items, gm_scenarios, gm_locations, gm_charstats
 class Gamestate():
     def __init__(self):
         # Groups up all game information(hopefully) in one class, so that it can be passed around in the functions.
-        self.scenarioIndex = 0 # Index to iterate over scenarios
+        self.scenarioIndex = 1 # Index to iterate over scenarios
         self.scenario = gm_scenarios.SCENARIOS[self.scenarioIndex] # Inserts the dictionary of the scenario
         self.player = gm_charstats.Player()
         self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex)
@@ -20,13 +20,19 @@ class Gamestate():
 
     def iterateScenario(self):
         # updates gamestate when you change to the next scenario. 
-        try:
+        if self.scenarioIndex == len(gm_scenarios.SCENARIOS) - 1:
+            # If you are at the last scenario, start from the first one again.
+            self.scenarioIndex = 0
+            self.scenario = gm_scenarios.SCENARIOS[self.scenarioIndex] # Inserts the dictionary of the scenario
+            self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex) # set up the next map based on the dictionary in self.scenario
+            self.map.victory = False # reset victory flag
+            gm_map.printThis(gm_scenarios.ENDING_MSG)
+            
+        else:
             self.scenarioIndex += 1
             self.scenario = gm_scenarios.SCENARIOS[self.scenarioIndex] # Inserts the dictionary of the scenario
             self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex) # set up the next map based on the dictionary in self.scenario
             self.map.victory = False # reset victory flag
-        except IndexError:
-            gm_map.printThis(gm_scenarios.ENDING_MSG)
 
 def enterPlayerName(gameState):
     #starts the game, prompts for user to enter player name and calls playerStartingStats()

@@ -211,7 +211,7 @@ VICTORY = '''\n
 #+#+#+#       #+#    #+#    #+#    #+#    #+#    #+# #+#    #+#    #+#             
  ###     ########### ########     ###     ########  ###    ###    ###     ###       \n'''
 
-ENDING_MSG = 'You have completed the initial story, feel free to roam around.\n'
+ENDING_MSG = 'You have completed the initial story, starting game from the beginning. Your stats carry over.\n'
 
 
 def gameOver():
