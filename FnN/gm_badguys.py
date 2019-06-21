@@ -1,7 +1,7 @@
 """
     Initialization of enemies and bosses.
 """
-import gm_charstats, gm_combat, gm_map, gm_scenarios
+import gm_charstats, gm_combat, gm_map, gm_scenarios, gm_gameloop
 import time, sys
 from random import randint
 from random import choice
@@ -119,10 +119,10 @@ def createBoss(gameState):
     if boss.enemy_currentArmor > 18:
         boss.enemy_currentArmor = 18
     gameState.enemy.append(boss)
-    time.sleep(2)
+    time.sleep(gameState.sleepTimer * 2)
     print()
     gm_map.printThis('A big ass mother dude lunges at you. He\'s yelling that he\'s going to turn you into an ear ornament! DEFEND YOURSELF!')
-    time.sleep(1)
+    time.sleep(gameState.sleepTimer * 1)
     
 
 def createEnemy(gameState):
@@ -132,7 +132,7 @@ def createEnemy(gameState):
     
     # Flavor print. When you get an enemy encounter.
     from random import randint
-    time.sleep(1)
+    time.sleep(gameState.sleepTimer * 1)
     print()
     
     # Flavor print. When you get an enemy encounter.
@@ -143,6 +143,6 @@ def createEnemy(gameState):
     # Combine the strings into one message.
     CombatMessage = combamsgStart + enemy.enemy_name.title() + ' ' + combamsgEnd 
     gm_map.printThis(CombatMessage)
-    time.sleep(1.5)
+    time.sleep(gameState.sleepTimer * 1.5)
     print('DEFEND YOURSELF!')
-    time.sleep(2)
+    time.sleep(gameState.sleepTimer * 2)

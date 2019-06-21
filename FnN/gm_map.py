@@ -1,7 +1,7 @@
 #     Game map and movement functions
 
 import random, math, sys, time, os
-import gm_charstats, gm_badguys, gm_scenarios, gm_locations, gm_items
+import gm_charstats, gm_badguys, gm_scenarios, gm_locations, gm_items, gm_gameloop
 
 class Board(list):
     def __str__(self):
@@ -129,7 +129,7 @@ class WorldMap():
             ctrl = input('. What do you do? ').lower().strip()
         
         if ctrl.lower() == 'rest' or ctrl.lower().startswith('r'): # Rest, player gets full hp and continues.
-            gm_charstats.Player.rest(gameState.player)
+            gm_charstats.Player.rest(gameState)
             print('\nYou get up and look around.')
             self.whatToDo(gameState)
         elif ctrl.lower() == 'map' or ctrl.lower().startswith('m'): # Movement, calls the map
@@ -168,7 +168,7 @@ class WorldMap():
             else:
                 # playerLocation = gameState.map.theMap[gameState.map.currentPosition[1]][gameState.map.currentPosition[0]] # Set player loc to make more readable code.
                 printThis(playerLocation.description)
-                time.sleep(1)
+                time.sleep(gameState.sleepTimer * 1)
                 gameState.player.inCombat = self.checkCombat(playerLocation.encounterChance) # Checks if the player gets into combat.
         else:
             self.currentPosition = self.previousPosition[:]

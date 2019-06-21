@@ -1,5 +1,5 @@
 import time, sys, random
-import gm_combat, gm_map, gm_items, gm_scenarios, gm_locations
+import gm_combat, gm_map, gm_items, gm_scenarios, gm_locations, gm_gameloop
 # Main file for the game, will also contain the game loop.
 # Note that print() and time.sleep(x) statements have been added in most files to try and smooth the flow of information on the screen.
 
@@ -139,11 +139,11 @@ class Player():
         else:
             print('something strange is happening in examineLocation function')
 
-    def rest(self):
+    def rest(self, gameState):
         # Rest function, player can rest if it is not in combat, restores HP to full.
-        time.sleep(1)
+        time.sleep(gameState.sleepTimer * 1)
         print('You find a nice spot to rest. After a while you feel fresh and fit for another fight.')
-        time.sleep(2)
+        time.sleep(gameState.sleepTimer * 2)
         self.attributes.pl_current_hp = self.attributes.pl_maxhp
 
 

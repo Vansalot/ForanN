@@ -1,6 +1,6 @@
 # items that are possible to get in the game.
 import random
-import gm_scenarios, gm_map
+import gm_scenarios, gm_map, gm_gameloop
 
 POSSIBLE_ITEMS = ['healing potion']
 

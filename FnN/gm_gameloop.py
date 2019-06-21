@@ -3,13 +3,15 @@ import gm_combat, gm_map, gm_items, gm_scenarios, gm_locations, gm_charstats
 
 #
 # File that starts the game, sets up the game and contains the game loop.
-# Contains the gamestate which contains the objects from the other classes.
+# Contains the gamestate class which contains the objects from the other classes.
 #
+
+SLEEPTIMER = 1
 
 class Gamestate():
     def __init__(self):
         # Groups up all game information(hopefully) in one class, so that it can be passed around in the functions.
-        self.scenarioIndex = 1 # Index to iterate over scenarios
+        self.scenarioIndex = 0 # Index to iterate over scenarios
         self.scenario = gm_scenarios.SCENARIOS[self.scenarioIndex] # Inserts the dictionary of the scenario
         self.player = gm_charstats.Player()
         self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex)
@@ -17,6 +19,7 @@ class Gamestate():
         self.gameIsDone = False
         self.enemy = []
         self.enemyIndex = len(self.enemy) - 1
+        self.sleepTimer = 1
 
     def iterateScenario(self):
         # updates gamestate when you change to the next scenario. 
@@ -65,10 +68,9 @@ def getStartingStats(gameState):
     totalPointsLeft = gameState.totalPointsAllocated 
     
     # Setting variables for the calculation of allotted player stat points
-    # Variables for the stats, s =strength a =agility f =fortitude
-    str = 0
-    agi = 0 
-    fort = 0
+    str = 0 # Strenght
+    agi = 0 # Agility
+    fort = 0 # Fortitude
     print("\nNow you have to enter your characters stats, they are Strenght, Agility and Fortitude.\nYou got %s points to distribute between the stats." % (gameState.totalPointsAllocated))
     print("You can allocate 1-%s points to the first category.\n" % (maxPointsAllowedInOneStat))
 
@@ -91,7 +93,7 @@ def getStartingStats(gameState):
     fort = totalPointsLeft
     # Call player stat change with the values that have been input by the user, to update player.        
     gameState.playerStatChange(str, agi, fort)
-    time.sleep(1)
+    time.sleep(SLEEPTIMER * 1)
     print()
 
 def getStartingAttribute(prompt, min_value, max_value):
@@ -131,6 +133,7 @@ def setPayexMode(gameState):
     mode = input('Do you want PayEx mode? (\'yes\' for yes, any other input for NO. PayEx mode is a internal thing): ').lower()
     if mode == 'yes':
         gameState.payexMode = True
+        gameState.sleepTimer = 0.1
 
 def nextScenario(gameState):
     # When a scenario is finished, ititiate the next scenario.
@@ -146,7 +149,7 @@ def titleScreen():
     print(gm_map.TITLE1) 
     print()
     print(gm_map.TITLE2)
-    time.sleep(2)
+    time.sleep(SLEEPTIMER * 2)
 
 def main():
     # Starts the game, calls the game loop
@@ -162,7 +165,7 @@ def main():
     # Game is starting Print map info and introduction text.    
     gameState.map.drawMap(gameState) # Draw the map on the screen.
     gm_map.printThis(gameState.scenario["intro"])
-    time.sleep(1)
+    time.sleep(SLEEPTIMER * 1)
     gameState.map.whatToDo(gameState) # Start the first "what would you like to do dialogue" before entering the game loop.
     
     # Move on to the game loop
@@ -181,9 +184,9 @@ def gameLoop(gameState):
             if gameState.map.specialItemFound == False:
                 gm_items.specialItemFound(gameState) # if special item is not found yet, player recieve it at the end of the scenario
             gm_map.printThis(gameState.scenario["ending"])
-            time.sleep(4)
+            time.sleep(SLEEPTIMER * 4)
             print(gm_scenarios.VICTORY) # print victory ascii art
-            time.sleep(4)
+            time.sleep(SLEEPTIMER * 4)
             nextScenario(gameState) # start a new scenario.
 
         if gameState.player.inCombat == True:

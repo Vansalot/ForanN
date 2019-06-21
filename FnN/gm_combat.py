@@ -1,4 +1,4 @@
-import gm_badguys, gm_charstats, gm_map, gm_items
+import gm_badguys, gm_charstats, gm_map, gm_items, gm_gameloop
 from random import randint
 import time
 
@@ -14,9 +14,9 @@ def initiativeRoll(gameState):
             print('#Log: Identical initiative roll, rerolling')
         
     print('# Initiative roll: %s: %s, ' % (gameState.player.name.title(), playerInitiative), end='')
-    time.sleep(1)
+    time.sleep(gameState.sleepTimer * 1)
     print('%s: %s' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), enemyInitiative),end='')
-    time.sleep(1)
+    time.sleep(gameState.sleepTimer * 1)
         
     if playerInitiative > enemyInitiative:
         # if player wins the roll
@@ -30,7 +30,7 @@ def initiativeRoll(gameState):
         time.sleep(2)
         return 'enemy'
             
-def combatRoll():
+def combatRoll(gameState):
     # Returns a random number in the range of 1-20.
     hitRoll = randint(8, 20) # changed for debug purposes default value (1,20)
     rollist = []
@@ -43,7 +43,7 @@ def combatRoll():
     gm_map.printThis('.....')
     gm_map.printThis(rollPrint, speed=0.04)
     gm_map.printThis('....'+str(hitRoll)+'!', speed=0.04)
-    time.sleep(1)
+    time.sleep(gameState.sleepTimer * 1)
     print()
     return hitRoll
     
@@ -146,9 +146,9 @@ def hpUpdater(gameState, modifiedDmg, enemy):
             if gameState.enemy[gameState.enemyIndex].enemy_current_hp <= 0:
                 print()
                 print('The enemy has been defeated! You have earned', gameState.enemy[gameState.enemyIndex].enemy_xp_reward, 'xp.\n')
-                time.sleep(1)
+                time.sleep(gameState.sleepTimer * 1)
                 gm_map.printThis('(Funky cool combat music fades away in the background)\n', speed=0.05)
-                time.sleep(1)
+                time.sleep(gameState.sleepTimer * 1)
                 print()
                 gameState.player.abilityActive = []
                 gameState.player.plXpGain(gameState.enemy[gameState.enemyIndex].enemy_xp_reward) # update player xp
@@ -173,17 +173,17 @@ def critHandling(gameState, enemy):
         # Handling for player
         print('# You: Critical chance!')
         time.sleep(0.5)
-        hitRoll = combatRoll()
+        hitRoll = combatRoll(gameState)
         hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, enemy)
         if hitResult == 'Hit' or hitResult == 'CRITICAL':
-            time.sleep(1)
+            time.sleep(gameState.sleepTimer * 1)
             if 'parry' in gameState.player.abilityActive:
                 print('# You rolled %s ' % (hitRoll), end='')
             if 'parry' not in gameState.player.abilityActive:
                 print('# You rolled %s + %s (hit modifier) = %s ' % (hitRoll, gameState.player.attributes.pl_hitmod, hitRoll + gameState.player.attributes.pl_hitmod), end='')
-            time.sleep(1)
+            time.sleep(gameState.sleepTimer * 1)
             print('CRITICAL HIT!!!')
-            time.sleep(1)
+            time.sleep(gameState.sleepTimer * 1)
             critDmg = damageRoll() + damageRoll()
             damageHandling(gameState, critDmg, gameState.player.isENEMY)
         else:
@@ -194,17 +194,17 @@ def critHandling(gameState, enemy):
         # Handling for enemy
         print('# %s Critical chance!' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()), end='')
         time.sleep(0.5)
-        hitRoll = combatRoll()
+        hitRoll = combatRoll(gameState)
         hitResult = hitDecider(gameState, hitRoll, gameState.player.attributes.pl_currentArmor, enemy)
         if hitResult == 'Hit' or hitResult == 'CRITICAL':
-            time.sleep(1)
+            time.sleep(gameState.sleepTimer * 1)
             if 'parry' not in gameState.enemy[gameState.enemyIndex].enemy_abilityActive:
                 print('# %s rolled %s + %s (hit modifier) = %s ' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, gameState.enemy[gameState.enemyIndex].enemy_hitmod, hitRoll + gameState.enemy[gameState.enemyIndex].enemy_hitmod), end='')
             if 'parry' in gameState.enemy[gameState.enemyIndex].enemy_abilityActive:
                 print('# %s rolled %s ' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll), end='')
-            time.sleep(1)
+            time.sleep(gameState.sleepTimer * 1)
             print('CRITICAL HIT!!!')
-            time.sleep(1)
+            time.sleep(gameState.sleepTimer * 1)
             critDmg = damageRoll() + damageRoll()
             damageHandling(gameState, critDmg, gameState.enemy[gameState.enemyIndex].isEnemy)
         else:
@@ -216,10 +216,10 @@ def counterattack(gameState, enemy):
     # a character in parry mode has x more armor value, and if the attacker does not hit, the defender gets a chance to counterattack.
     # the counterattack roll does not have hit modifier, so that parry isn't too overpowered.
     print('\n# Attack was parried, provoking a counterattack!')
-    time.sleep(1)
+    time.sleep(gameState.sleepTimer * 1)
     if enemy == False: 
         # Player attempt counterattck
-        hitRoll = combatRoll() 
+        hitRoll = combatRoll(gameState) 
         hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, gameState.player.isENEMY)
         # Own handling if critical hit or fumble is rolled. 
         if hitResult == 'CRITICAL':
@@ -234,7 +234,7 @@ def counterattack(gameState, enemy):
             
     elif enemy == True:
         # enemy attempt counterattck
-        hitRoll = combatRoll()
+        hitRoll = combatRoll(gameState)
         hitResult = hitDecider(gameState, hitRoll, gameState.player.attributes.pl_currentArmor, gameState.enemy[gameState.enemyIndex].isEnemy)
         
         # Own handling if critical hit, miss or fumble is rolled. 
@@ -272,7 +272,7 @@ def combatLoop(gameState):
     print('\n(Que funky cool combat music)', end='')
     time.sleep(0.3)
     gm_map.printThis(' * DU DU DU DU DU DU DU DU DUUUUUUUUUUU DU DU DUDUDU... *\n\n',speed=0.05)
-    time.sleep(1)
+    time.sleep(gameState.sleepTimer * 1)
     turn = initiativeRoll(gameState)
     print()
     
@@ -316,7 +316,7 @@ def combatLoop(gameState):
                         if enteredAction == 'power attack': # power attack
                             message = 'You take a deep breath and swing your blade like you mean it!\n'
                             gm_map.printThis(message)
-                            hitRoll = combatRoll()
+                            hitRoll = combatRoll(gameState)
                             hitResult = hitDecider(gameState, hitRoll, currentEnemy.enemy_currentArmor, player.isENEMY)
                             if hitResult == 'CRITICAL': # If power attack crits
                                 critHandling(gameState, player.isENEMY)
@@ -326,21 +326,21 @@ def combatLoop(gameState):
                         elif enteredAction == 'shield bash': # Shield bash
                             message = 'You lean back and swing your hip like you mean it(hips don\'t lie), and slam your shield towards the enemy!\n'
                             gm_map.printThis(message)
-                            hitRoll = combatRoll()
+                            hitRoll = combatRoll(gameState)
                             hitResult = hitDecider(gameState, hitRoll, currentEnemy.enemy_currentArmor, player.isENEMY)
                             if hitResult == 'CRITICAL':
                                 hitResult = 'Hit'
 
                         elif enteredAction == 'parry': # Parry functionality
                             print('You hunker down into a defensive pose.')
-                            time.sleep(1)
+                            time.sleep(gameState.sleepTimer * 1)
                             turn = 'enemy'
                             continue
                         
 
                     elif enteredAction == 'hit' or enteredAction == 'h':
                         # Roll for hit, and check the result of the hit roll.
-                        hitRoll = combatRoll() 
+                        hitRoll = combatRoll(gameState) 
                         hitResult = hitDecider(gameState, hitRoll, currentEnemy.enemy_currentArmor, player.isENEMY)
                         # Own handling if critical hit or fumble is rolled. 
                         if hitResult == 'CRITICAL':
@@ -413,7 +413,7 @@ def combatLoop(gameState):
                     continue
             
             # Roll for hit, and check the result of the hit roll.
-            hitRoll = combatRoll()
+            hitRoll = combatRoll(gameState)
             hitResult = hitDecider(gameState, hitRoll, player.attributes.pl_currentArmor, currentEnemy.isEnemy)
             # Own handling if critical hit, miss or fumble is rolled. 
             if hitResult == 'CRITICAL':
