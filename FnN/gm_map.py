@@ -129,7 +129,7 @@ class WorldMap():
             ctrl = input('. What do you do? ').lower().strip()
         
         if ctrl.lower() == 'rest' or ctrl.lower().startswith('r'): # Rest, player gets full hp and continues.
-            gm_charstats.Player.rest(gameState)
+            gameState.player.rest(gameState)
             print('\nYou get up and look around.')
             self.whatToDo(gameState)
         elif ctrl.lower() == 'map' or ctrl.lower().startswith('m'): # Movement, calls the map

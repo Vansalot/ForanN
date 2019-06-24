@@ -235,4 +235,5 @@ def gameOver():
         import os
         import gm_charstats
         os.system('cls')
-        gm_charstats.main()
+        import gm_gameloop
+        gm_gameloop.main()

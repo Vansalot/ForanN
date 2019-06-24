@@ -313,7 +313,8 @@ def combatLoop(gameState):
                     # first check for ability/feat/special actions
                     if enteredAction == 'power attack' or enteredAction == 'parry' or enteredAction == 'shield bash': # power attack, parry or shield bash. 
                         player.abilityActive.append(enteredAction)
-                        if enteredAction == 'power attack': # power attack
+                        # Power attack # 
+                        if enteredAction == 'power attack':
                             message = 'You take a deep breath and swing your blade like you mean it!\n'
                             gm_map.printThis(message)
                             hitRoll = combatRoll(gameState)
@@ -322,24 +323,23 @@ def combatLoop(gameState):
                                 critHandling(gameState, player.isENEMY)
                                 turn = 'enemy'
                                 continue
-                        
-                        elif enteredAction == 'shield bash': # Shield bash
+                        # Shield Bash # 
+                        elif enteredAction == 'shield bash':
                             message = 'You lean back and swing your hip like you mean it(hips don\'t lie), and slam your shield towards the enemy!\n'
                             gm_map.printThis(message)
                             hitRoll = combatRoll(gameState)
                             hitResult = hitDecider(gameState, hitRoll, currentEnemy.enemy_currentArmor, player.isENEMY)
                             if hitResult == 'CRITICAL':
                                 hitResult = 'Hit'
-
-                        elif enteredAction == 'parry': # Parry functionality
+                        # Parry # 
+                        elif enteredAction == 'parry':
                             print('You hunker down into a defensive pose.')
                             time.sleep(gameState.sleepTimer * 1)
                             turn = 'enemy'
                             continue
-                        
 
+                    # Roll for hit, and check the result of the hit roll.
                     elif enteredAction == 'hit' or enteredAction == 'h':
-                        # Roll for hit, and check the result of the hit roll.
                         hitRoll = combatRoll(gameState) 
                         hitResult = hitDecider(gameState, hitRoll, currentEnemy.enemy_currentArmor, player.isENEMY)
                         # Own handling if critical hit or fumble is rolled. 
@@ -351,8 +351,8 @@ def combatLoop(gameState):
                             print('fumble')
                             turn = 'enemy'
                             continue
+                    # Use healing potion
                     elif enteredAction == 'heal' or enteredAction == 'healing potion':
-                        # use healing potion
                         gm_items.drinkHealingPot(gameState)
                         turn = 'enemy'
                         continue
@@ -364,7 +364,7 @@ def combatLoop(gameState):
                         # If the player get a hit, it goes through normal hit handling.
                         if 'power attack' in player.abilityActive or 'shield bash' in player.abilityActive:
                             hitpen = 2
-                            print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, player.attributes.pl_hitmod - hitpen, hitRoll + player.attributes.pl_hitmod , hitResult))     
+                            print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, player.attributes.pl_hitmod - hitpen, hitRoll + player.attributes.pl_hitmod - hitpen, hitResult))     
                         else:    
                             print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, player.attributes.pl_hitmod, hitRoll + player.attributes.pl_hitmod, hitResult))
                         damageHandling(gameState, damageRoll(), player.isENEMY)
@@ -383,9 +383,8 @@ def combatLoop(gameState):
 
         elif turn == 'enemy':
             #
-            # Enemy's turn to act in combat
+            # Enemy's turn to act in combat #
             #
-
             try:
                 input('\n# %s\'s turn. Press enter to continue...\n' % (currentEnemy.enemy_name.title()))
             except EOFError:
