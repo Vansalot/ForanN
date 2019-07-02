@@ -155,7 +155,6 @@ def hpUpdater(gameState, modifiedDmg, enemy):
                 gameState.player.inCombat = False # set player out of combat so it can traverse the map
                 del gameState.enemy[gameState.enemyIndex] # remove enemy from enemy list
                 
-
         # enemy deals damage
         elif enemy == True:
             gameState.player.attributes.pl_current_hp -= modifiedDmg
@@ -221,7 +220,7 @@ def counterattack(gameState, enemy):
         # Player attempt counterattck
         hitRoll = combatRoll(gameState) 
         hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, gameState.player.isENEMY)
-        # Own handling if critical hit or fumble is rolled. 
+        # Own handling if critical hit is rolled. 
         if hitResult == 'CRITICAL':
             critHandling(gameState, gameState.player.isENEMY)
         # If the player get a hit, it goes through normal hit handling.
@@ -237,7 +236,7 @@ def counterattack(gameState, enemy):
         hitRoll = combatRoll(gameState)
         hitResult = hitDecider(gameState, hitRoll, gameState.player.attributes.pl_currentArmor, gameState.enemy[gameState.enemyIndex].isEnemy)
         
-        # Own handling if critical hit, miss or fumble is rolled. 
+        # Own handling if critical hit, miss is rolled. 
         if hitResult == 'CRITICAL':
             critHandling(gameState, gameState.enemy[gameState.enemyIndex].isEnemy)
         elif hitResult == 'Hit':
@@ -342,13 +341,9 @@ def combatLoop(gameState):
                     elif enteredAction == 'hit' or enteredAction == 'h':
                         hitRoll = combatRoll(gameState) 
                         hitResult = hitDecider(gameState, hitRoll, currentEnemy.enemy_currentArmor, player.isENEMY)
-                        # Own handling if critical hit or fumble is rolled. 
+                        # Own handling if critical hit is rolled. 
                         if hitResult == 'CRITICAL':
                             critHandling(gameState, player.isENEMY)
-                            turn = 'enemy'
-                            continue
-                        elif hitResult == 'fumble':
-                            print('fumble')
                             turn = 'enemy'
                             continue
                     # Use healing potion
@@ -414,15 +409,10 @@ def combatLoop(gameState):
             # Roll for hit, and check the result of the hit roll.
             hitRoll = combatRoll(gameState)
             hitResult = hitDecider(gameState, hitRoll, player.attributes.pl_currentArmor, currentEnemy.isEnemy)
-            # Own handling if critical hit, miss or fumble is rolled. 
+            # Own handling if critical hit or miss
             if hitResult == 'CRITICAL':
                 critHandling(gameState, currentEnemy.isEnemy)
                 turn = 'player'
-                continue
-            elif hitResult == 'fumble':
-                print('fumble')
-                turn = 'player'
-                continue
             elif hitResult == 'Hit':
                 print('# %s rolled %s + %s (hit modifier) = %s. * %s *' % (currentEnemy.enemy_name.title(), hitRoll, currentEnemy.enemy_hitmod, hitRoll + currentEnemy.enemy_hitmod, hitResult))
                 damageHandling(gameState, damageRoll(), currentEnemy.isEnemy)

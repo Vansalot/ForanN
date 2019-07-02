@@ -13,9 +13,17 @@ class Locationforest():
         self.visitedText = ''
         self.beenExamined = False # If the location has been examined before, it can not be examined again. 
         self.description = description
-        self.mapTile = '#'
+        self.mapTile = '#' # Set maptile function? For future use, if tiles are e.g impassable.
         self.startLocation = False
+        self.validDirections = []
+
+
 
 def setExamined(location):
     # Set self.examined to True when a player has examined location.
     location.beenExamined = True
+
+def setTileImpassable(location):
+    # RFU 
+    # Set tiles impassable marked as e.g X on the map. 
+    pass
