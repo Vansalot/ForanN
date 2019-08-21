@@ -4,6 +4,7 @@ import gm_combat, gm_map, gm_items, gm_scenarios, gm_locations, gm_charstats
 #
 # File that starts the game, sets up the game and contains the game loop.
 # Contains the gamestate class which contains the objects from the other classes.
+# Note that print() and time.sleep(x) statements have been added in most files to try and smooth the flow of information on the screen.
 #
 
 SLEEPTIMER = 1
@@ -130,7 +131,7 @@ def enterDifficulty(gameState):
 
 def setPayexMode(gameState):
     # Set payex mode, it's just for naming enemies differently. For funs.
-    mode = input('Do you want PayEx mode? (\'yes\' for yes, any other input for NO. PayEx mode is a internal thing): ').lower()
+    mode = input('Do you want fast/debug mode? (\'yes\' for yes, any imput for NO.): ').lower()
     if mode == 'yes':
         gameState.payexMode = True
         gameState.sleepTimer = 0.1

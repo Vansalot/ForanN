@@ -176,8 +176,6 @@ class WorldMap():
 
     def navigateTheMap(self, gameState, tryAgain=False):
         # Asks the player for a move action. should be implemented so that you got a list of possible actions e.g: rest, look for trouble o.l, and go in directions.
-        # If direction is entered, then there should be a function that calls this function for movement. Might be changed so ensure proper state transitioning
-        # e.g map -> show map actions -> direction selected -> call this function to initiate move.
         ctrl = ''
         if tryAgain == True:
             self.showmap(tryAgain=True)
@@ -215,10 +213,11 @@ class WorldMap():
             spacing = 50
             # Printed player information
             lvlIndex = gameState.player.attributes.pl_lvl - 1
-            plInfoDashedLine = '+------------- <<< Player information >>> ------------'
-            nameLvlXp = '  %s | Level: %s | %s / %s xp  ' % (gameState.player.name.title(), gameState.player.attributes.pl_lvl, gameState.player.attributes.pl_xp, gameState.player.attributes.levelup[lvlIndex])
+            plInfoDashedLine = '┌─────────────<<< Player information >>>──────────────'                     
+            nameLvlXp = '  %s │ Level: %s | %s / %s xp  ' % (gameState.player.name.title(), gameState.player.attributes.pl_lvl, gameState.player.attributes.pl_xp, gameState.player.attributes.levelup[lvlIndex])
             nameLvlXpPrint = nameLvlXp.center(spacing)
-            dashedLine = '+-----------------------------------------------------'
+            dashedLine = '├─────────────────────────────────────────────────────'
+            bottomLine = '└─────────────────────────────────────────────────────'
             plAttributes= ' Str: %s  Agi: %s  Fort: %s | AC: %s HP: %s / %s ' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
             plAttributesPrint = plAttributes.center(spacing)
             
@@ -240,7 +239,7 @@ class WorldMap():
             # Draw the game map data structure together with the player information data structure.
             if gameState.player.inCombat == False:
                 print()
-            print('' + plInfoDashedLine + ('+- < MAP > -+'))
+            print('' + plInfoDashedLine + ('┬──< MAP >──┐'))
             # Print each line of the rows.
             for column in range(len(self.theMap)):
                 extraSpace = ''
@@ -250,28 +249,28 @@ class WorldMap():
                     boardRow += self.theMap[column][row].mapTile
                     boardRow += ' '
                 if nameLvlXpPrintP1 == False:
-                    print('  ' + nameLvlXpPrint.center(spacing) + '  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    print('  ' + nameLvlXpPrint.center(spacing) + '  %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
                     nameLvlXpPrintP1 = True
                     continue
                 if plAttributesP2 == False:
-                    print('  ' + plAttributesPrint.center(spacing) + '  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    print('  ' + plAttributesPrint.center(spacing) + '  %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
                     plAttributesP2 = True
                     continue
                 if nlxpLine1P2 == False:
-                    print(dashedLine + '%s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    print(dashedLine + '%s%s %s%s' % (extraSpace, '┤',boardRow, '│'))
                     nlxpLine1P2 = True
                     continue
                 if filler1 == False:
-                    print(inventoryinfoPrint.center(spacing) + '    %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    print(inventoryinfoPrint.center(spacing) + '    %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
                     filler1 = True
                     continue
                 if filler2 == False:
-                    print(equippedPrint.center(spacing) + '    %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                    print(equippedPrint.center(spacing) + '    %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
                     filler2 = True
                     continue
-                print('  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
+                print('  %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
                 
-            print('' + dashedLine + ('+- You = @ -+'))
+            print('' + bottomLine + ('┴─ You = @ ─┘'))
 
     def showmap(self, tryAgain=False):
         # Draw the game map when it is called from command prompt
@@ -279,7 +278,7 @@ class WorldMap():
         print('+------------------------ <<< MAP >>> ------------------------+\n')
         print('''                  _____________
                 =(_ ___  __ __ )=
-                  |           |''')
+                  │           │''')
         # Print each line of the rows.
         for column in range(len(self.theMap)):
             extraSpace = ''
@@ -288,8 +287,8 @@ class WorldMap():
             for row in range(len(self.theMap)):
                 boardRow += self.theMap[column][row].mapTile
                 boardRow += ' '
-            print('\t\t  %s%s %s%s' % (extraSpace, '|',boardRow, '|'))
-        print('''                  |__  ___   _|
+            print('\t\t  %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
+        print('''                  │__  ___   _│
                 =(_____________)=''')
         print('\nYou are @, Unvisited location are #, visited location are ¤')
         

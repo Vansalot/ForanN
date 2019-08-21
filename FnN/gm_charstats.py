@@ -1,7 +1,5 @@
 import time, sys, random
 import gm_combat, gm_map, gm_items, gm_scenarios, gm_locations, gm_gameloop
-# Main file for the game, will also contain the game loop.
-# Note that print() and time.sleep(x) statements have been added in most files to try and smooth the flow of information on the screen.
 
 # *** Classes ***
 class Player():
@@ -108,6 +106,8 @@ class Player():
     def printMoveActions(self):
         # Prints directions that player can move. invoked when player enters "move" or "map".
         print('Please enter a direction to move: ', end='')
+        # getMoveActions():
+        # function to get viable move directions. that will be printed on the screen. 
         print(*self.moveActions, sep=', ', end='')
 
     def examineLocation(self, gameState):
