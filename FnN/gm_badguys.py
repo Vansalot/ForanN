@@ -8,13 +8,11 @@ from random import choice
         
 class Enemy:
     # Initializes Enemy
-    def __init__(self, pl_lvl, gameState):
+    def __init__(self, pl_lvl, gameState, levelMod=0):
         # Enemy stats, level is based on the players level. 
         self.pl_lvl = pl_lvl
-        self.enemy_lvl = randint(self.pl_lvl, self.pl_lvl + 2)
-        self.nameList = ['Benny', 'bjarte', 'roger', 'bent', 'are', 'franz', 'preben', 'hans', 'patrick', 'Roy', 'egil', 'Kent', 'Robin', 'Ola', 'Jonny', 'Ronny', 'Raymond', 'Bendik', 'Henrik', 'Jens', 'Peder', 'Preben', 'William', 'Axel', 'Erlend', 'Fredrik', 'Hans', 'Jacob', 'Johan', 'Karl', 'Nicolai', 'Oscar', 'Sondre', 'Tobias']
-        self.payexNames = ['Jens Egil', 'Jørn Efteland', 'Jørn Tharaldsen', 'Hallstein Skjølsvik', 'Petter storaas', 'Jon Terje', 'Christian Slater', 'Andreas Jakobsen', 'Jan-Phillippe', 'Giresse Kadima', 'Nicolas Lopez', 'Dani Berentzen']
-        self.enemy_name = choice(self.nameList) + '-' + choice(self.nameList)
+        self.enemy_lvl = randint(self.pl_lvl, self.pl_lvl + 2) + levelMod
+        self.enemy_name = choice(gm_scenarios.ENEMYNAMES) + '-' + choice(gm_scenarios.ENEMYNAMES)
         self.enemy_str = 1 * self.enemy_lvl
         self.enemy_dmgFromStr = int(self.enemy_str / 4) # might be changed. Need to test how weak the enemy gets"
         self.enemy_hitmod = int(self.enemy_lvl / 4) + int(self.enemy_str / 4)
@@ -34,25 +32,29 @@ class Enemy:
     def setPayexName(self, gameState):
         # if payex mode is activated, use payexNames for enemy names
         if gameState.payexMode == True:
-            self.enemy_name = choice(self.payexNames)
+            self.enemy_name = choice(gm_scenarios.PAYEXNAMES)
         else:
             pass
 
     def printEnemyStats(self):
         # Print enemy stats when player is in combat. 
-        # First set up alignment of the text to be printed (49 is the lengt of the player information frame). 
-        spacing = 65
-        header = '+------------- <<< Enemy Information >>> -------------------------+'
-        eNameLvl = ' Enemy: %s Level: %s ' % (self.enemy_name.title(), self.enemy_lvl)
+        # First set up alignment of the text to be printed (49 is the lenght of the player information frame). 
+        spacing = 64
+        header = '┌─────────────<<< Enemy information >>>───────────────────────────┐'
+                    
+        eNameLvl = 'Enemy: %s Level: %s ' % (self.enemy_name.title(), self.enemy_lvl)
         eNameLvlPrint = eNameLvl.center(spacing)
-        eArmHp = '    Armor: %s HP: %s / %s      ' % (self.enemy_currentArmor, self.enemy_current_hp, self.enemy_maxhp)
+        eArmHp = '   Armor: %s HP: %s / %s      ' % (self.enemy_currentArmor, self.enemy_current_hp, self.enemy_maxhp)
         eArmHpPrint = eArmHp.center(spacing)
         filler = ''
         fillerP = filler.center(spacing)
         print(header)
-        print(eNameLvlPrint, '|')
-        print(eArmHpPrint, '|')
-        print(fillerP,'|')
+        print('│', end='')
+        print(eNameLvlPrint, '│')
+        print('│', end='')
+        print(eArmHpPrint, '│')
+        print('│', end='')
+        print(fillerP,'│')
 
     def calculateXpReward(self):
         # Scale xp reward down the higher level the enemy gets. Flat number gets too high at higher levels
@@ -72,7 +74,13 @@ class Enemy:
         enemy_xp_reward = xpMultiplier * self.enemy_lvl
         return enemy_xp_reward
 
-class Boss:
+class Boss(Enemy):
+    # Subclass of enemy, inherits enemy functions.
+    def __init__(self, pl_lvl, gameState, levelMod=3):
+        super().__init__(pl_lvl, gameState, levelMod=3)
+        self.enemy_name = choice(gm_scenarios.BOSSNAMES) # Get the boss object to use a bossname instead of a "regular" name.
+
+class BossOLD:
     # Initializes Boss
     def __init__(self, pl_lvl):
         from random import choice
@@ -97,25 +105,9 @@ class Boss:
         self.enemy_abilityActive = [] # For storing abilities used in combat. (taking over for self.statusEffects)
         self.isEnemy = True  
 
-    def printEnemyStats(self):
-        # Print enemy stats when player is in combat. 
-        # First set up alignment of the text to be printed (49 is the lenght of the player information frame). 
-        spacing = 65
-        header = '+------------- <<< Enemy Information >>> -------------------------+'
-        eNameLvl = ' Enemy: %s Level: %s ' % (self.enemy_name.title(), self.enemy_lvl)
-        eNameLvlPrint = eNameLvl.center(spacing)
-        eArmHp = '    Armor: %s HP: %s / %s      ' % (self.enemy_currentArmor, self.enemy_current_hp, self.enemy_maxhp)
-        eArmHpPrint = eArmHp.center(spacing)
-        filler = ''
-        fillerP = filler.center(spacing)
-        print(header)
-        print(eNameLvlPrint, '|')
-        print(eArmHpPrint, '|')
-        print(fillerP,'|')
-
 def createBoss(gameState):
     # Creates a boss that is more powerful than normal enemies.
-    boss = Boss(gameState.player.attributes.pl_lvl)
+    boss = Boss(gameState.player.attributes.pl_lvl, gameState)
     if boss.enemy_currentArmor > 18:
         boss.enemy_currentArmor = 18
     gameState.enemy.append(boss)
@@ -123,7 +115,6 @@ def createBoss(gameState):
     print()
     gm_map.printThis('A big ass mother dude lunges at you. He\'s yelling that he\'s going to turn you into an ear ornament! DEFEND YOURSELF!')
     time.sleep(gameState.sleepTimer * 1)
-    
 
 def createEnemy(gameState):
     # creates a new enemy, Appends the enemy in gamestate list, so that the information is available.

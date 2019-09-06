@@ -213,12 +213,13 @@ class WorldMap():
             spacing = 50
             # Printed player information
             lvlIndex = gameState.player.attributes.pl_lvl - 1
-            plInfoDashedLine = '┌─────────────<<< Player information >>>──────────────'                     
-            nameLvlXp = '  %s │ Level: %s | %s / %s xp  ' % (gameState.player.name.title(), gameState.player.attributes.pl_lvl, gameState.player.attributes.pl_xp, gameState.player.attributes.levelup[lvlIndex])
+            plInfoDashedLine = '┌─────────────<<< Player information >>>──────────────' # Line to be printed when not in combat
+            plInfoDashedLineCombat = '├─────────────<<< Player information >>>──────────────' # Line to be printed when in combat
+            nameLvlXp = '      %s │ Level: %s │ %s / %s xp  ' % (gameState.player.name.title(), gameState.player.attributes.pl_lvl, gameState.player.attributes.pl_xp, gameState.player.attributes.levelup[lvlIndex])
             nameLvlXpPrint = nameLvlXp.center(spacing)
             dashedLine = '├─────────────────────────────────────────────────────'
             bottomLine = '└─────────────────────────────────────────────────────'
-            plAttributes= ' Str: %s  Agi: %s  Fort: %s | AC: %s HP: %s / %s ' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
+            plAttributes= ' Str: %s  Agi: %s  Fort: %s │ AC: %s HP: %s / %s ' % (gameState.player.attributes.pl_str, gameState.player.attributes.pl_agi, gameState.player.attributes.pl_fort, gameState.player.attributes.pl_currentArmor, gameState.player.attributes.pl_current_hp, gameState.player.attributes.pl_maxhp)
             plAttributesPrint = plAttributes.center(spacing)
             
             # Set up boolean checks so that the right lines are printed at the right place. 
@@ -232,14 +233,16 @@ class WorldMap():
             inventoryinfoPrint = gameState.player.getInventoryForPrint()
             equippedPrint = gameState.player.getequippedForPrint()
             if inventoryinfoPrint == None:
-                inventoryinfoPrint = ' Inventory: '
+                inventoryinfoPrint = ' Inventory: Lint'
             if equippedPrint == None: 
-                equippedPrint = ' Equipped: '
+                equippedPrint = ' Equipped: Good looks'
 
             # Draw the game map data structure together with the player information data structure.
             if gameState.player.inCombat == False:
                 print()
-            print('' + plInfoDashedLine + ('┬──< MAP >──┐'))
+                print('' + plInfoDashedLine + ('┬──< MAP >──┐'))
+            if gameState.player.inCombat == True:
+                print('' + plInfoDashedLineCombat + ('┬──< MAP >──┤'))
             # Print each line of the rows.
             for column in range(len(self.theMap)):
                 extraSpace = ''
@@ -249,11 +252,13 @@ class WorldMap():
                     boardRow += self.theMap[column][row].mapTile
                     boardRow += ' '
                 if nameLvlXpPrintP1 == False:
-                    print('  ' + nameLvlXpPrint.center(spacing) + '  %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
+                    print('│', end='')
+                    print('  ' + nameLvlXpPrint.center(spacing) + ' %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
                     nameLvlXpPrintP1 = True
                     continue
                 if plAttributesP2 == False:
-                    print('  ' + plAttributesPrint.center(spacing) + '  %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
+                    print('│', end='')
+                    print('  ' + plAttributesPrint.center(spacing) + ' %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
                     plAttributesP2 = True
                     continue
                 if nlxpLine1P2 == False:
@@ -261,11 +266,11 @@ class WorldMap():
                     nlxpLine1P2 = True
                     continue
                 if filler1 == False:
-                    print(inventoryinfoPrint.center(spacing) + '    %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
+                    print('│', inventoryinfoPrint.center(spacing) + '  %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
                     filler1 = True
                     continue
                 if filler2 == False:
-                    print(equippedPrint.center(spacing) + '    %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
+                    print('│', equippedPrint.center(spacing) + '  %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
                     filler2 = True
                     continue
                 print('  %s%s %s%s' % (extraSpace, '│',boardRow, '│'))
@@ -275,7 +280,7 @@ class WorldMap():
     def showmap(self, tryAgain=False):
         # Draw the game map when it is called from command prompt
         os.system('cls')
-        print('+------------------------ <<< MAP >>> ------------------------+\n')
+        print('+------------ <<< MAP >>> ------------+\n')
         print('''                  _____________
                 =(_ ___  __ __ )=
                   │           │''')
@@ -325,12 +330,15 @@ def printThis(message, speed=0.02, maxLength=100):
             newLine = True # Set new line to True
         if character in '.,' and index > 85:
             # If . or , has been printed and you are almost at the limit of the line, set flag that states that you should print new line.
-            sentenceEnd = True
+            sentenceEnd = True 
         if newLine == True and character == ' ':
             # If new line has been printed, if the next character is a blank space, strip it, so that the margin is not indented.
             character =''
             newLine = False # Set new line flag to False after you start on a new line or print.
         sys.stdout.write(character)
+        if character == '.' and index < 85 and speed == 0.02: 
+            # attemt to wait a bit when "." has been printed. Hope to make the text flow nicer.
+            time.sleep(speed * 15)
         sys.stdout.flush()
         time.sleep(speed)
         index += 1

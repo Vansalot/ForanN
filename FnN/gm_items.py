@@ -1,5 +1,5 @@
 # items that are possible to get in the game.
-import random
+import random, time
 import gm_scenarios, gm_map, gm_gameloop
 
 POSSIBLE_ITEMS = ['healing potion']
@@ -29,6 +29,7 @@ def itemFound(gameState):
     playerLocation = gameState.map.theMap[gameState.map.currentPosition[0]][gameState.map.currentPosition[0]]
     itemFound = random.choice(POSSIBLE_ITEMS)
     gm_map.printThis(playerLocation.examineText)
+    time.sleep(gameState.sleepTimer)
     print('You have found a %s' % (itemFound.title()))
     # Set up stuff to add the item to the inventory
     if itemFound == 'healing potion' and itemFound not in gameState.player.inventory:

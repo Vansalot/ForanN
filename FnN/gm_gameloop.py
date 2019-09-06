@@ -1,5 +1,6 @@
 import time, sys, random
 import gm_combat, gm_map, gm_items, gm_scenarios, gm_locations, gm_charstats
+import gm_badguys
 
 #
 # File that starts the game, sets up the game and contains the game loop.

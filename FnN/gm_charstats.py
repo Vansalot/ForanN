@@ -295,7 +295,7 @@ class PlayerAttributes():
         self.pl_agi = 0 # player agility
         self.pl_dmgReduction = 0 # dmg reduction, based on agi
         self.pl_base_armor = 10 # player base armor
-        self.pl_currentArmor = self.pl_base_armor + self.pl_agi # player armor modified by agility and items.
+        self.pl_currentArmor = self.pl_base_armor + (int(self.pl_agi / 2)) # player armor modified by agility and items.
         
         self.pl_fort = 0 # player foritude
         self.pl_base_hp = 10 # player base hp

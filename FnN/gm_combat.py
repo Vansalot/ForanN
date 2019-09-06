@@ -38,9 +38,9 @@ def combatRoll(gameState):
     # prints a more lively roll "animation", might be separated into an own function. 
     while len(rollist) < 10:
         rollist.append(randint(1, 20)) 
-    rollPrint = ''.join(str(number) for numberj in rollist)
+    rollPrint = ''.join(str(number) for number in rollist)
     print('# Rolling for hit',end='')
-    gm_map.printThis('.....')
+    gm_map.printThis('.....', speed=0.04)
     gm_map.printThis(rollPrint, speed=0.04)
     gm_map.printThis('....'+str(hitRoll)+'!', speed=0.04)
     time.sleep(gameState.sleepTimer * 1)
