@@ -1,8 +1,18 @@
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # Scenario, texts, dictionaries and other things  #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
 # Scenario file. Contains map data. Thought is that you can generate a new map/scenario after completing first scenario based on data in this file. 
+# Also contains information about items, strings for combat situations, enemy names, and such.
+
 
 #
 # Scenario 1. Forest data
 #
+
+
 forest = {
     "intro": '\nYou wake up lying on the ground, you are confused and wondering where you are, around you are a lush forest. Birds are chirping, and the noonday sun shines above you.\n',
 
@@ -23,7 +33,7 @@ forest = {
     ],
     [
     'Tired, you wander along the path in front of you, if you only had some juløl.\n',
-    'Humming to the song "knuckle pokel man" you gaze further into the deep forest. You can only hear some rustling in the bushes nearby\n',
+    'Humming to the song "knuckle pokel man" you gaze further into the deep forest. You can only hear some rustling in the bushes nearby.\n',
     'There\'s many problems in this world, and to you it seems that trees ain\'t one of them, or is it?\n', 
     'You wander further into the forest, thinking about what good old gammel nok told you in your younger days. For example he said if you sleep in telt, make sure that it is raintett.\n',
     'The forest clears up in sort of a circle, looks like someone have cleared this area and put up a sick rock in the middle.\n',
@@ -143,6 +153,7 @@ town = {
     "storylocations": [[1, 1],[3, 1],[2, 4], [4, 1]],
 }
 
+# Hills not implemented yet
 hills = {
 
 }
@@ -150,6 +161,7 @@ hills = {
 #
 # Helptext for items and abilities
 #
+
 
 itemsAndAbilities = {
     "rest": '* Rest * Player rests and restores his hp. Can only be used while traveling.\n',
@@ -165,6 +177,7 @@ itemsAndAbilities = {
     "shield bash": '* Shield bash * Attempt to hit the enemy with your shield, hit and dmg are reduced by 2.\n  If Shield bash hits, there\'s a chance that the enemy will loose his round.\n',
 }
 
+
 # List of scenarios
 SCENARIOS = [forest, town] # List of scenario dictionaries. used for initializing scenarios. New scenarios should be added to this list. 
 
@@ -172,6 +185,8 @@ SCENARIOS = [forest, town] # List of scenario dictionaries. used for initializin
 #
 # Combat flavor text strings
 #
+
+
 COMBAT_FLAVOR = {
     "combatintrostart": [
     'A raving madman who calls himself ',
@@ -201,9 +216,11 @@ COMBAT_FLAVOR = {
     "combatwonending": ['ass, real goood.'],
 }   
 
+
 BOSSNAMES = ['Da Governator','El prehidente', 'TrumPetten', 'Mr. Smith', 'Boba Futt', 'Shredder', 'Joffrey', 'lex luthor', 'bubba ho-tep', 'B.J. Blazkowicz', 'The Sherminator']
 ENEMYNAMES = ['Benny', 'bjarte', 'roger', 'bent', 'are', 'franz', 'preben', 'hans', 'patrick', 'Roy', 'egil', 'Kent', 'Robin', 'Ola', 'Jonny', 'Ronny', 'Raymond', 'Bendik', 'Henrik', 'Jens', 'Peder', 'Preben', 'William', 'Axel', 'Erlend', 'Fredrik', 'Hans', 'Jacob', 'Johan', 'Karl', 'Nicolai', 'Oscar', 'Sondre', 'Tobias']
 PAYEXNAMES = ['Jens Egil', 'Jørn Efteland', 'Jørn Tharaldsen', 'Hallstein Skjølsvik', 'Petter storaas', 'Jon Terje', 'Christian Slater', 'Andreas Jakobsen', 'Jan-Phillippe', 'Giresse Kadima', 'Nicolas Lopez', 'Dani Berentzen', 'Jon Erlend']
+
 
 VICTORY = '''\n
    :::     ::: ::::::::::: :::::::: ::::::::::: ::::::::  :::::::::  :::   :::  ::: 
@@ -213,6 +230,7 @@ VICTORY = '''\n
 +#+   +#+      +#+    +#+           +#+    +#+    +#+ +#+    +#+    +#+     +#+     
 #+#+#+#       #+#    #+#    #+#    #+#    #+#    #+# #+#    #+#    #+#             
  ###     ########### ########     ###     ########  ###    ###    ###     ###       \n'''
+
 
 ENDING_MSG = 'You have completed the initial story, starting game from the beginning. Your stats carry over.\n'
 

@@ -1,7 +1,15 @@
-import time, sys, random
-import gm_combat, gm_map, gm_items, gm_scenarios, gm_locations, gm_gameloop
 
-# *** Classes ***
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    #       Player initialization and functions       #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+import gm_combat, gm_map, gm_items, gm_scenarios, gm_locations, gm_gameloop
+import time, sys, random, os
+
+
 class Player():
     # Player, which holds the player name, attributes are created from PlayerAttributes class.
     # Player is stored in the gamestate object.
@@ -22,17 +30,21 @@ class Player():
         self.inventory = [] # inventory, will for now only contain healing pots
         self.equipped = [] # items that the player find will be here, in a list of dicts.
 
+#   ### Player functions ###
+
     def printHelpText(self):
-        # Prints a screen with information based on what actions/items are available to the player. WIP
-        import os
-        os.system('cls')
+        # Prints a screen with information based on what actions/items are available to the player.
+        # Meant for help / debug purposes. 
+        os.system('cls') # Clear the screen before printing the rest
         print('          +------------------------------ <<< Help >>> -----------------------------------+')
         print('Map actions:')
+        # Print information based on what actions are available to player.
         for action in self.possibleMapActions:
 	        if action.lower() in gm_scenarios.itemsAndAbilities:
 		        print(gm_scenarios.itemsAndAbilities[action.lower()])
 
         print('\nCombat actions: ')
+        # Print information based on what combat actions are available to player.
         for action in self.possibleCombatActions:
             if action.lower() not in gm_scenarios.itemsAndAbilities:
                 print('# Log:', action,' Item not in gm_scenarios.itemsAndAbilities. From printHelpText()')
@@ -41,6 +53,7 @@ class Player():
 
         if len(self.equipped) > 0:
             print('\nEquipped items: ')
+            # Print information based on what items are available to player.
             for itemDict in range(len(self.equipped)):
                 if self.equipped[itemDict]["type"] not in gm_scenarios.itemsAndAbilities:
                     print('# Log:', self.equipped[itemDict]["type"], 'Item not in gm_scenarios.itemsAndAbilities. From printHelpText()')
@@ -48,9 +61,10 @@ class Player():
                 else:
                     print(gm_scenarios.itemsAndAbilities[self.equipped[itemDict]["type"].lower()])
         input("Hit 'Enter' to continue... ")
-        os.system('cls')
+        os.system('cls')    
         strEquippedItems = str(self.equipped).replace("[{","").replace("}]","").replace("{","").replace("}","") # Make print of equipped list look nicer.
         
+        # Print player attributes. 
         print('          +------------------------ <<< Player Attributes >>> ----------------------------+\n')
         print('\t\tDamage bonus from strength:      ' ,self.attributes.pl_dmgFromStr)
         print('\t\tDamage bonus from equipped items:', self.attributes.pl_dmgBonusFromEquipped)
@@ -68,6 +82,7 @@ class Player():
         input("\n\t\tHit 'Enter' to continue... ")
         os.system('cls')
 
+
     def printPlayerPossibleactions(self):
         # Prints the possible actions the player can perform, depending on if the player is in combat or not.
         if self.inCombat == True:
@@ -78,8 +93,9 @@ class Player():
             print('Your possible actions are: ', end='')
             print(*self.possibleMapActions, sep=', ', end='')
 
+
     def getInventoryForPrint(self):
-        # Print the inventory
+        # Return a string of the inventory that is available to the player.
         spacing = 45 # set centerspace for the printed text
         if len(self.inventory) > 0:
             itemCount = len(self.inventory)
@@ -89,7 +105,9 @@ class Player():
         else:
             return None
 
+
     def getequippedForPrint(self):
+        # Return a string of the equipped items that is available to the player.
         if len(self.equipped) > 0:
             # if player has something equipped
             spacing = 45 # set centerspace for the printed text
@@ -103,12 +121,14 @@ class Player():
         else:
             return None
 
+
     def printMoveActions(self):
         # Prints directions that player can move. invoked when player enters "move" or "map".
         print('Please enter a direction to move: ', end='')
         # getMoveActions():
         # function to get viable move directions. that will be printed on the screen. 
         print(*self.moveActions, sep=', ', end='')
+
 
     def examineLocation(self, gameState):
         # function for examining an area.
@@ -139,6 +159,7 @@ class Player():
         else:
             print('something strange is happening in examineLocation function')
 
+
     def rest(self, gameState):
         # Rest function, player can rest if it is not in combat, restores HP to full.
         time.sleep(gameState.sleepTimer * 1)
@@ -147,21 +168,27 @@ class Player():
         self.attributes.pl_current_hp = self.attributes.pl_maxhp
 
 
-    '''  vvv Xp gain, check if player has leveled up, and levelup mechanics vvv '''
+#   ### # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # ###
+#   ### Xp gain, check if player has leveled up, and levelup functions  ###
+#   ### # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # ###
     
     def plXpGain(self, enemy_xp_reward):
         # Updates experience gain of the player, and calls plCheckLvlup to check if the character has leveled up.
         self.attributes.pl_xp += enemy_xp_reward
         self.plCheckLvlup()
     
+
     def plCheckLvlup(self):
         # Checks if the player has leveled up, if so, calls the plLevelUp procedure, otherwise moves on. (added log line for now).
         # Levelup happpens at the xp limits set up in playerAttributes.
         index = self.attributes.pl_lvl -1
-        if self.attributes.pl_xp >= self.attributes.levelup[index]:
-            self.plLevelUp()
-        else:
+        try: 
+            if self.attributes.pl_xp >= self.attributes.levelup[index]:
+                self.plLevelUp()
+        except IndexError:
+            print("# LOG: You have reached max level.")
             pass
+
 
     def plLevelUp(self):
         # Asks which stat you want to increase when you level up and calls pl_stat_change to update the stat.
@@ -188,11 +215,13 @@ class Player():
                 print()
         self.updatePlayerCombatAttributes()
 
+
     def playerStatChange(self, strength, agility, fortitude):
         # Procedure to change character stats. 
         self.attributes.pl_str += strength 
         self.attributes.pl_agi += agility
         self.attributes.pl_fort += fortitude
+
 
     def updatePlayerCombatAttributes(self):
         self.playerHpChange() # update hp
@@ -200,6 +229,7 @@ class Player():
         self.setupModifiers() # update hit, dmg and dmg reduction modifiers
         self.checkSkilLearn() # check if there's any skills to learn
         
+
     def checkSkilLearn(self):
         # During levelup, if player has an item, 
         if len(self.equipped) > 0:
@@ -215,10 +245,12 @@ class Player():
             pass
             #print('# Log: No new abilities learned, no items in equipped')
 
+
     def playerHpChange(self):
         # Part of the level up routine, updates hp and armor.
         self.attributes.pl_maxhp += self.attributes.pl_fort
         self.attributes.pl_current_hp = self.attributes.pl_maxhp
+
 
     def playerArmChange(self):
         # Update player current armor
@@ -226,6 +258,7 @@ class Player():
         newArmModifier += int(self.attributes.pl_agi / 2) # modified from lvl
         newArmModifier += self.attributes.pl_armorBonusFromEquipped # modified from equipped
         self.attributes.pl_currentArmor = newArmModifier
+
 
     def setupModifiers(self):
         # Sets up modifiers for dmg bonus modifier, dmg reduction modifier, and hit modifier
@@ -254,8 +287,6 @@ class Player():
             newHitModifier += 4        
         self.attributes.pl_hitmod = newHitModifier # set the new hit modifier to the players attribute
 
-        ''' ^^^ Levelup functions ^^^ '''
-
 
     def ItemBonusUpdate(self):
         # update bonuses from items in player attributes.
@@ -278,6 +309,9 @@ class Player():
                 self.setupModifiers() # update player hit modifier
             if totarmB > 0:
                 self.playerArmChange() # update player armor
+
+# ###   End of Levelup functions ###
+
 
 class PlayerAttributes():
     # Initializes the player attributes, they are part of the Player class.

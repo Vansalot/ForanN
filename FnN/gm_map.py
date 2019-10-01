@@ -1,12 +1,21 @@
-#     Game map and movement functions
+
+
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    #        Game map and movement functions          #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 
 import random, math, sys, time, os
 import gm_charstats, gm_badguys, gm_scenarios, gm_locations, gm_items, gm_gameloop
+
 
 class Board(list):
     def __str__(self):
         # Setting up the map so that it looks like it should
         return "\n".join(" ".join(row) for row in self)
+
 
 class WorldMap():
     from random import randint
@@ -31,6 +40,7 @@ class WorldMap():
         self.setStoryLoc(scenario, scenarioIndex) # Set the story locations
         self.movesSinceCombat = 0
 
+
     def createLocations(self, scenario, scenarioIndex):
             # Set up objects for every location/tile on the map           
             locations = [] # The complete list of 5 lists with 5 locations. [[5][5][5][5][5]]
@@ -41,6 +51,7 @@ class WorldMap():
                     templist.append(gm_locations.Locationforest(string, examineText))
                 locations.append(templist)
             WorldMap.STARTINGBOARD = locations
+
 
     def setStoryLoc(self, scenario, scenarioIndex):
         # Set the story locations on the map, they will be hidden from the player, setting up 3 to start with, so increase the players chances of ladning on a storyloc.
@@ -55,6 +66,7 @@ class WorldMap():
                 self.storyLocations.append(storyLoc)
         else:
             self.storyLocations = scenario["storylocations"]
+
 
     def checkIfOnStoryLoc(self, gameState):
         # change the board data structure with a sonar device character
@@ -82,6 +94,7 @@ class WorldMap():
             else:
                 return False
 
+
     def printStoryLoc(self, gameState):
         # Prints flavortext for the story locations
         if self.storylocIndex == self.maxStorylocIndex:
@@ -99,6 +112,7 @@ class WorldMap():
             if gameState.scenarioIndex == 0:
                 self.setStoryLoc(gameState.scenario, gameState.scenarioIndex)
             time.sleep(3)
+
 
     def setStartLoc(self, scenario, scenarioIndex):
         # Set player position on the map according to the scenariotext
@@ -119,6 +133,7 @@ class WorldMap():
             self.theMap[currentY][currentX].mapTile = WorldMap.heroCurrentPos
             self.theMap[currentY][currentX].visitedText = scenario["startlocationagain"] # Set flavor text on the starting location of the game.
             self.theMap[currentY][currentX].startLocation = True # Set startlocation to True so that we know where it is.
+
 
     def whatToDo(self, gameState):
         # Ask the player what to do when on the map, choices move, examine, rest. "move" takes you to the "submenu" where player is promted for a direction.
@@ -150,6 +165,7 @@ class WorldMap():
             gameState.player.examineLocation(gameState)
             self.whatToDo(gameState)
         
+
     def move_player(self, gameState):
         # Validates if the move entered is on the board and executes it.
         previousX, previousY = self.previousPosition
@@ -174,6 +190,7 @@ class WorldMap():
             self.currentPosition = self.previousPosition[:]
             self.navigateTheMap(gameState, tryAgain=True)
 
+
     def navigateTheMap(self, gameState, tryAgain=False):
         # Asks the player for a move action. should be implemented so that you got a list of possible actions e.g: rest, look for trouble o.l, and go in directions.
         ctrl = ''
@@ -194,6 +211,7 @@ class WorldMap():
         else:
             print('You entered an invalid direction')
 
+
     def checkCombat(self, encounterChance):
         # Randomly encounter checker
         checkCombatRoll = random.randint(1, 10) ### !!! 1, 10
@@ -207,6 +225,7 @@ class WorldMap():
                     return True
             return False
     
+
     def drawMap(self, gameState):
             # Merged printing of map together with printing of the player information.
             # setting up the player info prints:
@@ -277,6 +296,7 @@ class WorldMap():
                 
             print('' + bottomLine + ('┴─ You = @ ─┘'))
 
+
     def showmap(self, tryAgain=False):
         # Draw the game map when it is called from command prompt
         os.system('cls')
@@ -300,13 +320,16 @@ class WorldMap():
         if tryAgain == True:
             print(" * Can't go further in that direction, please select another direction. *")
 
+
 def printThisOLD(message, speed=0.02):
+    # Not in use at the moment, will lie here since it is how the printThis function originally works, the new function has been blinged up alot.
     # Function that prints text in a cascading way. Gives the game a more story like feel than text instantly popping onto the screen.
 
     for character in message:
                     sys.stdout.write(character)
                     sys.stdout.flush()
                     time.sleep(speed)
+
 
 def printThis(message, speed=0.02, maxLength=100):
     # Function that prints text in a cascading way. Gives the game a more story like feel than text instantly popping onto the screen.
@@ -345,6 +368,7 @@ def printThis(message, speed=0.02, maxLength=100):
 
 
 
+# Game title, could be moved into scenarios module.
 TITLE1 = '''
    	            ###########################################################
 

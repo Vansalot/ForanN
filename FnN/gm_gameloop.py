@@ -1,18 +1,29 @@
+
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    #               Forest's and Nåså's               #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    #        Gameloop and setting up the game.        #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #      
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# File that starts the game, sets up the game and contains the game loop.
+# Contains the gamestate class which contains the objects from the other classes.
+#
+
 import time, sys, random
 import gm_combat, gm_map, gm_items, gm_scenarios, gm_locations, gm_charstats
 import gm_badguys
 
-#
-# File that starts the game, sets up the game and contains the game loop.
-# Contains the gamestate class which contains the objects from the other classes.
-# Note that print() and time.sleep(x) statements have been added in most files to try and smooth the flow of information on the screen.
-#
+SLEEPTIMER = 1 # Global variable used for changing the speed of the cascading print function,
+# and time.sleep(sleeptimer)
 
-SLEEPTIMER = 1
 
 class Gamestate():
     def __init__(self):
-        # Groups up all game information(hopefully) in one class, so that it can be passed around in the functions.
+        # Groups up all game information in one class, so that it can be passed around in the functions.
         self.scenarioIndex = 0 # Index to iterate over scenarios
         self.scenario = gm_scenarios.SCENARIOS[self.scenarioIndex] # Inserts the dictionary of the scenario
         self.player = gm_charstats.Player()
@@ -22,6 +33,7 @@ class Gamestate():
         self.enemy = []
         self.enemyIndex = len(self.enemy) - 1
         self.sleepTimer = 1
+
 
     def iterateScenario(self):
         # updates gamestate when you change to the next scenario. 
@@ -39,6 +51,12 @@ class Gamestate():
             self.map = gm_map.WorldMap(self.scenario, self.scenarioIndex) # set up the next map based on the dictionary in self.scenario
             self.map.victory = False # reset victory flag
 
+
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    #              Setting up player                  #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
 def enterPlayerName(gameState):
     #starts the game, prompts for user to enter player name and calls playerStartingStats()
     playerName = ""
@@ -52,6 +70,7 @@ def enterPlayerName(gameState):
                 print("Name must be written with letters, avoid numbers and special characters")
                 playerName = ""
     
+
 def setPlayerAttributes(gameState):
     # Set the starting attributes of the newPlayer
     getStartingStats(gameState.player)
@@ -61,6 +80,7 @@ def setPlayerAttributes(gameState):
     gameState.player.setupModifiers()
     # gameState is returned to the main() function.
     return gameState
+
 
 def getStartingStats(gameState):
     # Setting the starting stats of the player. Default max attribute points(variable: totalPointsAllocated) are changed by difficulty settings.
@@ -98,6 +118,7 @@ def getStartingStats(gameState):
     time.sleep(SLEEPTIMER * 1)
     print()
 
+
 def getStartingAttribute(prompt, min_value, max_value):
     # When starting the game, player are prompted to enter value for the different stats.
     # this checks if the value is valid according to input from getStartingStats()
@@ -111,6 +132,7 @@ def getStartingAttribute(prompt, min_value, max_value):
                 print("You entered a value that is too high, or too low.")
         else:
             print("You did not enter a number, please enter a number.")
+
 
 def enterDifficulty(gameState):
     # Set game difficulty, with input validation.
@@ -129,13 +151,21 @@ def enterDifficulty(gameState):
         elif difficulty == 'god': # god mode, for show and tell
             gameState.player.totalPointsAllocated = 30
             break
+        elif difficulty == 'debug': # Debug-ish mode, with more stats, and timers are reduced. To speed through states.
+            gameState.sleepTimer = 0.1
+            gameState.player.totalPointsAllocated = 30
+            break
+
 
 def setPayexMode(gameState):
     # Set payex mode, it's just for naming enemies differently. For funs.
-    mode = input('Do you want fast/debug mode? (\'yes\' for yes, any imput for NO.): ').lower()
-    if mode == 'yes':
+    mode = input('Do you want Payex names?: ').lower()
+    if mode == 'yes' or mode == 'y':
         gameState.payexMode = True
-        gameState.sleepTimer = 0.1
+
+
+#   ### End of player setup ###
+
 
 def nextScenario(gameState):
     # When a scenario is finished, ititiate the next scenario.
@@ -146,6 +176,7 @@ def nextScenario(gameState):
     input("\nHit 'Enter' to continue...")
     gameLoop(gameState) # go back to the game loop after the setup is complete.
 
+
 def titleScreen():
     # prints the title of the game.
     print(gm_map.TITLE1) 
@@ -153,25 +184,37 @@ def titleScreen():
     print(gm_map.TITLE2)
     time.sleep(SLEEPTIMER * 2)
 
+
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    #              Main function                      #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
 def main():
     # Starts the game, calls the game loop
     titleScreen() # print the title of the game.    
     
     # Setting the game up
-    gameState = Gamestate()
+    gameState = Gamestate() # Set up gamestate object
     setPayexMode(gameState) # Can be commented out to remove payex functionality.
     enterDifficulty(gameState) # Set up difficulty
     enterPlayerName(gameState) # Set up new player, This will also print prompts and player information to the player.
-    setPlayerAttributes(gameState)
+    setPlayerAttributes(gameState) # Set player attributes based on the stats set in the previous function.
     
-    # Game is starting Print map info and introduction text.    
+    # Game is set up, print map info and introduction text.    
     gameState.map.drawMap(gameState) # Draw the map on the screen.
     gm_map.printThis(gameState.scenario["intro"])
     time.sleep(SLEEPTIMER * 1)
-    gameState.map.whatToDo(gameState) # Start the first "what would you like to do dialogue" before entering the game loop.
+    gameState.map.whatToDo(gameState) # Start the first "what would you like to do" dialogue before entering the game loop.
     
     # Move on to the game loop
     gameLoop(gameState)
+
+
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    #              Game loop                          #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 
 def gameLoop(gameState):
     # Main game loop

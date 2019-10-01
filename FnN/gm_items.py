@@ -1,8 +1,19 @@
-# items that are possible to get in the game.
+
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    #                      Items                      #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# Module for handing items.
+# Might be subjec to change, the healing potion class is not in use at the moment. To be decided.
+
 import random, time
 import gm_scenarios, gm_map, gm_gameloop
 
+
 POSSIBLE_ITEMS = ['healing potion']
+
 
 class Healingpotion():
     # NOT IN USE ATM
@@ -12,6 +23,7 @@ class Healingpotion():
         self.potionLvl = gameState.player.attributes.pl_lvl
         self.hpgained = 3 * potionLvl
         
+
 def drinkHealingPot(gameState):
     # Using healing pot heals the player
     hpgained = 3 + gameState.player.attributes.pl_lvl # provisorisk kode
@@ -23,6 +35,7 @@ def drinkHealingPot(gameState):
             gameState.player.possibleCombatActions.remove('healing potion')
     else:
         pass
+
 
 def itemFound(gameState):
     # If the search roll passes, this function designates what item is found
@@ -37,6 +50,7 @@ def itemFound(gameState):
     gameState.player.inventory.append(itemFound)
     #print()
     
+
 def specialItemFound(gameState):
     from random import choice
     playerLocation = gameState.map.theMap[gameState.map.currentPosition[0]][gameState.map.currentPosition[0]] # set up variable for playerlocation.
@@ -57,7 +71,7 @@ def specialItemFound(gameState):
 
 
 ''' 
-    ** Itemlist, for now, items can be represented in the following way: **
+    ** items are represented in the following way: **
     'type' : sword / shield / breastplate / etc (string)
     'armorbonus' : int
     'hitbonus' : int

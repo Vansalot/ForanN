@@ -1,6 +1,15 @@
+
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    #     Combat functions/loop, damage resolving     #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
 import gm_badguys, gm_charstats, gm_map, gm_items, gm_gameloop
 from random import randint
 import time
+
 
 def initiativeRoll(gameState):
     # When combat starts player and enemy rolls initiative, it is modified by agi. Returns who starts combat (str).
@@ -29,7 +38,8 @@ def initiativeRoll(gameState):
         print(' * %s begins combat *\n' % (gameState.enemy[gameState.enemyIndex].enemy_name.title()),end='') 
         time.sleep(2)
         return 'enemy'
-            
+
+
 def combatRoll(gameState):
     # Returns a random number in the range of 1-20.
     hitRoll = randint(8, 20) # changed for debug purposes default value (1,20)
@@ -46,7 +56,8 @@ def combatRoll(gameState):
     time.sleep(gameState.sleepTimer * 1)
     print()
     return hitRoll
-    
+
+
 def hitDecider(gameState, hit_roll, currentArmor, enemy):
     # If hit roll >= the opponents CurrentArmor(armorclass) it will result in a normal hit, then hitDecider returns 'Hit'.
     # If parry is in the picture call the parry function
@@ -84,6 +95,7 @@ def hitDecider(gameState, hit_roll, currentArmor, enemy):
     else:
         return 'Miss'
 
+
 def damageRoll():
     # Returns a random number between 1 and 6. Can also be called "Base damage".
     damageRoll = randint(1, 6)
@@ -97,6 +109,7 @@ def damageHandling(gameState, baseDamage, enemy):
     elif enemy == True: # For enemy
         modifiedDmg = modifiedDamage(gameState, baseDamage, gameState.enemy[gameState.enemyIndex].isEnemy)
         hpUpdater(gameState, modifiedDmg, gameState.enemy[gameState.enemyIndex].isEnemy)
+
 
 def modifiedDamage(gameState, baseDamage, enemy):
     # Returns damage modified by player/enemy stats
@@ -137,6 +150,7 @@ def modifiedDamage(gameState, baseDamage, enemy):
         print('# %s (base) + %s (mod from enemy str) - %s (mod from player agi) = %s damage dealt.' % (baseDamage, gameState.enemy[gameState.enemyIndex].enemy_dmgFromStr, gameState.player.attributes.pl_dmgReduction, modDmg))
         return modDmg
 
+
 def hpUpdater(gameState, modifiedDmg, enemy):
     # Updates player and enemy hp, also checks if the enemy is dead.
         if enemy != True:
@@ -164,6 +178,7 @@ def hpUpdater(gameState, modifiedDmg, enemy):
                 gameState.player.inCombat = False
             else:
                 pass
+
 
 def critHandling(gameState, enemy):
     # Handling of critical hits.
@@ -210,6 +225,12 @@ def critHandling(gameState, enemy):
             print('Miss, crit becomes normal attack')
             damageHandling(gameState, damageRoll(), gameState.enemy[gameState.enemyIndex].isEnemy)
 
+
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    #              Special abilities                  #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
 def counterattack(gameState, enemy):
     # Takes over for the hit decider if the defender is in "parry" mode.
     # a character in parry mode has x more armor value, and if the attacker does not hit, the defender gets a chance to counterattack.
@@ -247,12 +268,14 @@ def counterattack(gameState, enemy):
         else: # Also known as 'miss'
             print('# Counterattack: %s rolled %s * %s *' % (gameState.enemy[gameState.enemyIndex].enemy_name.title(), hitRoll, hitResult))
 
+
 def powerAttack(gameState):
     message = 'You take a deep breath and swing your blade like you mean it!\n'
     gm_map.printThis(message)
     hitRoll = combatRoll(gameState)
     hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, gameState.player.isENEMY)
     return hitResult
+
 
 def shieldBash(gameState):
     message = 'You lean back and swing your hip like you mean it(hips don\'t lie), and slam your shield towards the enemy!\n'
@@ -262,6 +285,10 @@ def shieldBash(gameState):
     if hitResult == 'CRITICAL':
         hitResult = 'Hit'
     return hitResult
+
+
+#   ### End of special abilities ###
+
 
 def checkValidAction(gameState):
     # Validating input during combat. Checks if the input is in the valid combat actions list. if not you are asked to enter the correct action.
@@ -278,6 +305,12 @@ def checkValidAction(gameState):
             enteredAction = ''
 
     return enteredAction
+
+
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+#    #                 Combat loop                     #
+#    # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 
 def combatLoop(gameState):
     # General combat loop for the game.
