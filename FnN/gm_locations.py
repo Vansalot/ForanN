@@ -23,7 +23,8 @@ class Locationforest():
         self.visitedText = ''
         self.beenExamined = False # If the location has been examined before, it can not be examined again. 
         self.description = description
-        self.mapTile = '#' # Set maptile function? For future use, if tiles are e.g impassable.
+        self.mapTile = '▒' # Set maptile function? For future use, if tiles are e.g impassable.
+        #self.mapTile = '#' # Set maptile function? For future use, if tiles are e.g impassable.
         self.startLocation = False
         self.validDirections = []
 
