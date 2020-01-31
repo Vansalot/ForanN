@@ -272,15 +272,15 @@ def counterattack(gameState, enemy):
 def powerAttack(gameState):
     message = 'You take a deep breath and swing your blade like you mean it!\n'
     gm_map.printThis(message)
-    hitRoll = combatRoll(gameState)
-    hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, gameState.player.isENEMY)
-    return hitResult
+    # hitRoll = combatRoll(gameState)
+    # hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, gameState.player.isENEMY)
+    # return hitResult
 
 
-def shieldBash(gameState):
+def shieldBash(gameState, hitRoll):
     message = 'You lean back and swing your hip like you mean it(hips don\'t lie), and slam your shield towards the enemy!\n'
     gm_map.printThis(message)
-    hitRoll = combatRoll(gameState)
+    #hitRoll = combatRoll(gameState)
     hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, gameState.player.isENEMY)
     if hitResult == 'CRITICAL':
         hitResult = 'Hit'
@@ -300,6 +300,7 @@ def checkValidAction(gameState):
         if enteredAction == 'medic': 
             # in combat cheat, meant for debug purposes
             gameState.player.attributes.pl_current_hp = gameState.player.attributes.pl_maxhp
+            print('# Cheat, you got full hp.\n')
         if enteredAction not in gameState.player.possibleCombatActions:
             print('Entered action is not valid, try again.\n')
             enteredAction = ''
@@ -353,13 +354,15 @@ def combatLoop(gameState):
             # Get action from player and check if it is valid.
             enteredAction = checkValidAction(gameState)
             print()
-
             
             if enteredAction != 'hit': # power attack, parry or shield bash. 
                 player.abilityActive.append(enteredAction)
                 # Power attack # 
                 if enteredAction == 'power attack':
-                    hitResult = powerAttack(gameState)
+                    hitRoll = combatRoll(gameState)
+                    #hitResult = powerAttack(gameState, hitRoll)
+                    powerAttack()
+                    hitResult = hitDecider(gameState, hitRoll, gameState.enemy[gameState.enemyIndex].enemy_currentArmor, gameState.player.isENEMY)
                     if hitResult == 'CRITICAL': # If power attack crits
                         critHandling(gameState, player.isENEMY)
                         turn = 'enemy'
@@ -396,7 +399,7 @@ def combatLoop(gameState):
                 # If the player get a hit, it goes through normal hit handling.
                 if 'power attack' in player.abilityActive or 'shield bash' in player.abilityActive:
                     hitpen = 2
-                    print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, player.attributes.pl_hitmod - hitpen, hitRoll + player.attributes.pl_hitmod - hitpen, hitResult))     
+                    print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, player.attributes.pl_hitmod - hitpen, hitRoll + (player.attributes.pl_hitmod - hitpen), hitResult))     
                 else:    
                     print('# You rolled %s + %s (hit modifier) = %s. * %s *' % (hitRoll, player.attributes.pl_hitmod, hitRoll + player.attributes.pl_hitmod, hitResult))
                 damageHandling(gameState, damageRoll(), player.isENEMY)

@@ -101,7 +101,7 @@ def createBoss(gameState):
     gameState.enemy.append(boss)
     time.sleep(gameState.sleepTimer * 2)
     print()
-    gm_map.printThis('\nA big ass mother dude lunges at you. He\'s yelling that he\'s going to turn you into an ear ornament! DEFEND YOURSELF!')
+    gm_map.printThis('A big ass mother dude lunges at you. He\'s yelling that he\'s going to turn you into an ear ornament! DEFEND YOURSELF!')
     time.sleep(gameState.sleepTimer * 1)
 
 
