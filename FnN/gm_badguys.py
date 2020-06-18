@@ -14,7 +14,7 @@ from random import randint, choice
 class Enemy:
     # Initializes Enemy
     def __init__(self, pl_lvl, gameState, levelMod=0):
-        # Enemy stats, level is based on the players level. 
+        # Enemy stats, level is based on the players level
         self.pl_lvl = pl_lvl
         self.enemy_lvl = randint(self.pl_lvl, self.pl_lvl + 2) + levelMod
         self.enemy_name = choice(gm_scenarios.ENEMYNAMES) + '-' + choice(gm_scenarios.ENEMYNAMES)
