@@ -444,7 +444,7 @@ def combatLoop(gameState):
                         continue
                 # Shield Bash # 
                 elif enteredAction == 'shield bash':                                     
-                    hitResult = shieldBash(gameState)
+                    hitResult = shieldBash(gameState, combatRoll(gameState))
                 # Parry # 
                 elif enteredAction == 'parry':
                     print('You hunker down into a defensive pose.')
